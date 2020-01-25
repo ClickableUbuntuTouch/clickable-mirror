@@ -54,13 +54,6 @@ class CordovaBuilder(CMakeBuilder):
             else:
                 shutil.copy(full_source_path, full_dest_path)
 
-        # Modify default files with updated settings
-        # taken straing from cordova build.js
-        manifest = self.config.install_files.get_manifest()
-        manifest['architecture'] = self.config.build_arch
-        manifest['framework'] = self.sdk
-        self.config.install_files.write_manifest(manifest)
-
         apparmor_file = os.path.join(self.config.install_dir, 'apparmor.json')
         with open(apparmor_file, 'r') as apparmor_reader:
             apparmor = json.load(apparmor_reader)

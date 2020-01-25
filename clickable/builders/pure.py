@@ -12,20 +12,11 @@ from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 
 
-class PureQMLMakeBuilder(MakeBuilder):
-    def post_make_install(self):
-        super().post_make_install()
-
-        manifest = self.config.install_files.get_manifest()
-        manifest['architecture'] = 'all'
-        self.config.install_files.write_manifest(manifest)
-
-
-class PureQMLQMakeBuilder(PureQMLMakeBuilder, QMakeBuilder):
+class PureQMLQMakeBuilder(QMakeBuilder):
     name = Constants.PURE_QML_QMAKE
 
 
-class PureQMLCMakeBuilder(PureQMLMakeBuilder, CMakeBuilder):
+class PureQMLCMakeBuilder(CMakeBuilder):
     name = Constants.PURE_QML_CMAKE
 
 
