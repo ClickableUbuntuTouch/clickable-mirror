@@ -85,12 +85,12 @@ class LibBuildCommand(Command):
                     logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
 
                 if lib.prebuild:
-                    run_subprocess_check_call(lib.prebuild, cwd=self.config.cwd, shell=True)
+                    lib.container.run_command(lib.prebuild, cwd=self.config.cwd)
 
                 self.build(lib)
 
                 if lib.postbuild:
-                    run_subprocess_check_call(lib.postbuild, cwd=lib.build_dir, shell=True)
+                    lib.container.run_command(lib.postbuild, cwd=self.config.cwd)
 
     def build(self, lib):
         builder_classes = get_builders()

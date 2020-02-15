@@ -94,14 +94,14 @@ class BuildCommand(Command):
         self.container.setup()
 
         if self.config.prebuild:
-            run_subprocess_check_call(self.config.prebuild, cwd=self.config.cwd, shell=True)
+            self.container.run_command(self.config.prebuild, cwd=self.config.cwd)
 
         self.build()
 
         self.install_additional_files()
 
         if self.config.postbuild:
-            run_subprocess_check_call(self.config.postbuild, cwd=self.config.build_dir, shell=True)
+            self.container.run_command(self.config.postbuild, cwd=self.config.cwd)
 
         self.click_build()
 

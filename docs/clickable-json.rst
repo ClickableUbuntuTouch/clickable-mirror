@@ -129,7 +129,7 @@ Optional, a custom command to execute from the build directory, after make (duri
 postbuild
 ---------
 
-Optional, a custom command to execute from the build dir, after build and before click packaging.
+Optional, a custom command to execute from the root dir, after build, but before click packaging.
 
 .. _clickable-json-env_vars:
 
