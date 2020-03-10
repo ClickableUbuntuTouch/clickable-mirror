@@ -28,15 +28,16 @@ class RustBuilder(Builder):
 
     def build(self):
         # Build using cargo
-        cargo_command = 'cargo build {} --target {}' \
+        cargo_command = 'cargo build {} --target {} --target-dir {}' \
             .format('--release' if not self.debug_build else '',
-                    self._cargo_target)
+                    self._cargo_target, self.config.build_dir)
         self.container.run_command(cargo_command)
 
         # There could be more than one executable
-        executables = glob.glob('{}/target/{}/{}/*'
-                                .format(self.config.cwd,
-                                        self._cargo_target,
-                                        'debug' if self.debug_build else 'release'))
+        executables = glob.glob(os.path.join(
+            self.config.build_dir,
+            self._cargo_target,
+            'debug' if self.debug_build else 'release',
+            "*"))
         for filename in filter(lambda f: os.path.isfile(f), executables):
             self.config.install_bin.append(filename)
