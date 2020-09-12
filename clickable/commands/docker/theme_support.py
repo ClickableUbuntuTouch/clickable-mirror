@@ -7,11 +7,9 @@ from .docker_support import DockerSupport
 
 
 class ThemeSupport(DockerSupport):
-    config = None
-    package_name = ''
-
-    def __init__(self, config):
+    def __init__(self, config, dark_mode):
         self.config = config
+        self.dark_mode = dark_mode
 
     def update(self, docker_config: DockerConfig):
         package_name = self.config.install_files.find_package_name()
@@ -19,7 +17,7 @@ class ThemeSupport(DockerSupport):
         config_path = makedirs(os.path.join(Constants.desktop_device_home, '.config/ubuntu-ui-toolkit'))
 
         theme = 'Ubuntu.Components.Themes.Ambiance'
-        if self.config.dark_mode:
+        if self.dark_mode:
             theme = 'Ubuntu.Components.Themes.SuruDark'
 
         with open(os.path.join(config_path, 'theme.ini'), 'w') as f:

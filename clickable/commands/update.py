@@ -16,13 +16,15 @@ def update_image(image):
 
 
 class UpdateCommand(Command):
-    aliases = ['update_docker', 'update-docker']
-    name = 'update'
-    help = 'Update the docker container for use with clickable'
+    def __init__(self):
+        Command.__init__(self)
+        self.cli_conf.aliases = ['update-images']
+        self.cli_conf.name = 'update'
+        self.cli_conf.help_msg = 'Update all Clickable docker images that have already been used'
 
-    def run(self, path_arg=None):
-        self.config.container.check_docker()
+    def run(self):
+        self.container.check_docker()
 
-        container_mapping = Constants.container_mapping[self.config.host_arch]
+        container_mapping = Constants.container_mapping[Constants.host_arch]
         for image in container_mapping.values():
             update_image(image)

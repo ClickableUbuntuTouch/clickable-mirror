@@ -20,7 +20,6 @@ class QtCreatorDelegate(IdeCommandDelegate):
         'CMAKE_INSTALL_BINDIR': 'bin',
     }
 
-
     def override_command(self, path):
         #point qtcreator settingspath to a custom location to make sure instance share the same configuration
         #also add current project's dir to make qtcreator open directly the project
@@ -105,9 +104,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
         if not executable:
             return
 
-        choice = input(Colors.INFO + 'Do you want Clickable to setup a QtCreator project for you? [Y/n]: ' + Colors.CLEAR
-                       ).strip().lower()
-        if choice != 'y' and choice != 'yes' and choice != '':
+        if not self.confirm('Do you want Clickable to setup a QtCreator project for you?'):
             return
 
         #CLICK_EXE can be a variable

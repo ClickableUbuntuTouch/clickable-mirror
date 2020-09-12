@@ -4,22 +4,83 @@ import shutil
 
 from .base import Command
 from .review import ReviewCommand
+from .clean import CleanCommand
 from clickable.utils import (
     get_builders,
     run_subprocess_check_call,
     makedirs,
     is_sub_dir,
+    env,
 )
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 
 
 class BuildCommand(Command):
-    aliases = []
-    name = 'build'
-    help = 'Compile the app'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'build'
+        self.cli_conf.help_msg = 'Compile the app'
 
-    def run(self, path_arg=None):
+        self.clean = False
+        self.output_path = None
+        self.skip_review = False
+        self.debug_build = False
+
+    def setup_parser(self, parser):
+        parser.add_argument(
+            '--clean',
+            action='store_true',
+            help='Clean build directory before building',
+            default=False,
+        )
+        parser.add_argument(
+            '--output',
+            help='Where to output the compiled click package',
+        )
+        parser.add_argument(
+            '--debug',
+            action='store_true',
+            help='Perform a debug build',
+            default=False,
+        )
+        parser.add_argument(
+            '--skip-review',
+            action='store_true',
+            help='Do not review click package after build (useful for unconfined apps)',
+            default=False,
+        )
+
+    def configure(self, args):
+        self.clean = args.clean or self.config.always_clean
+        self.skip_review = args.skip_review
+        self.output_path = args.output
+        self.debug_build = args.debug
+
+        self.parse_env()
+
+    def configure_nested(self):
+        self.clean = self.config.always_clean
+
+        self.parse_env()
+
+    def parse_env(self):
+        if env('CLICKABLE_DEBUG_BUILD'):
+            self.debug_build = True
+            self.config.debug_build = True
+            self.config.env_vars['DEBUG_BUILD'] = '1'
+
+        if not self.output_path:
+            output_env = env('CLICKABLE_OUTPUT')
+            if output_env:
+                self.output_path = output_env
+
+    def run(self):
+        if self.clean:
+            clean_cmd = CleanCommand()
+            clean_cmd.init_from_command(self)
+            clean_cmd.run()
+
         try:
             os.makedirs(self.config.build_dir, exist_ok=True)
         except Exception:
@@ -30,7 +91,7 @@ class BuildCommand(Command):
         except Exception:
             logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
 
-        self.config.container.setup()
+        self.container.setup()
 
         if self.config.prebuild:
             run_subprocess_check_call(self.config.prebuild, cwd=self.config.cwd, shell=True)
@@ -44,13 +105,17 @@ class BuildCommand(Command):
 
         self.click_build()
 
-        if not self.config.skip_review:
-            review = ReviewCommand(self.config)
+        if not self.skip_review:
+            review = ReviewCommand()
+            review.init_from_command(self)
             review.check(self.click_path, raise_on_error=False)
 
     def build(self):
+        if os.path.isdir(self.config.install_dir):
+            shutil.rmtree(self.config.install_dir)
+
         builder_classes = get_builders()
-        builder = builder_classes[self.config.builder](self.config, self.device)
+        builder = builder_classes[self.config.builder](self.config, self.container, self.debug_build)
         builder.build()
 
     def install_files(self, pattern, dest_dir):
@@ -63,17 +128,17 @@ class BuildCommand(Command):
             raise ClickableException("install_* patterns must not contain any '\"' quotation character.")
 
         command = 'ls -d "{}"'.format(pattern)
-        files = self.config.container.run_command(command, get_output=True).split()
+        files = self.container.run_command(command, get_output=True).split()
 
         logger.info("Installing {}".format(", ".join(files)))
-        self.config.container.pull_files(files, dest_dir)
+        self.container.pull_files(files, dest_dir)
 
     def install_qml_files(self, pattern, dest_dir):
         if '*' in pattern:
             self.install_files(pattern, dest_dir)
         else:
             command = 'cat {}'.format(os.path.join(pattern, 'qmldir'))
-            qmldir = self.config.container.run_command(command, get_output=True)
+            qmldir = self.container.run_command(command, get_output=True)
             module = None
             for line in qmldir.split('\n'):
                 if line.startswith('module'):
@@ -142,16 +207,16 @@ class BuildCommand(Command):
         self.manipulate_manifest()
 
         command = 'click build {} --no-validate'.format(self.config.install_dir)
-        self.config.container.run_command(command)
+        self.container.run_command(command)
 
         click = self.config.install_files.get_click_filename()
         self.click_path = os.path.join(self.config.build_dir, click)
 
-        if self.config.click_output:
-            output_file = os.path.join(self.config.click_output, click)
+        if self.output_path:
+            output_file = os.path.join(self.output_path, click)
 
-            if not os.path.exists(self.config.click_output):
-                os.makedirs(self.config.click_output)
+            if not os.path.exists(self.output_path):
+                os.makedirs(self.output_path)
 
             shutil.copyfile(self.click_path, output_file)
             self.click_path = output_file

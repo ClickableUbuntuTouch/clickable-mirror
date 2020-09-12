@@ -48,8 +48,6 @@ class PureBuilder(Builder):
         return ignored
 
     def build(self):
-        if os.path.isdir(self.config.install_dir):
-            raise ClickableException('Build directory already exists. Please run "clickable clean" before building again!')
         shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
         logger.info('Copied files to install directory for click building')
 

@@ -29,8 +29,6 @@ class ColorFormatter(logging.Formatter):
         return super().format(record)
 
 
-# TODO log to a file
-
 logger = logging.getLogger('clickable')
 logger.setLevel(logging.DEBUG)
 

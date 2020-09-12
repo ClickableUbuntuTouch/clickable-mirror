@@ -35,4 +35,4 @@ class GoBuilder(Builder):
             install_dir=self.config.install_dir,
             app_name=self.config.install_files.find_app_name(),
         )
-        self.config.container.run_command(gocommand)
+        self.container.run_command(gocommand)

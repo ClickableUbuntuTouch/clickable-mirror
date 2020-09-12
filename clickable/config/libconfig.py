@@ -2,14 +2,15 @@ import os
 
 from clickable.utils import (
     merge_make_jobs_into_args,
+    get_make_jobs_from_args,
     flexible_string_to_list,
     make_absolute,
 )
+import multiprocessing
 from clickable.exceptions import ClickableException
 from clickable.logger import logger
 from .constants import Constants
 from collections import OrderedDict
-import multiprocessing
 import platform
 
 
@@ -18,6 +19,7 @@ class LibConfig(object):
     config = {}
 
     placeholders = OrderedDict({
+        "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
         "NAME": "name",
         "ROOT": "root_dir",
@@ -35,8 +37,7 @@ class LibConfig(object):
                  'build_home']
     required = ['builder']
     flexible_lists = ['dependencies_host', 'dependencies_target',
-                      'dependencies_ppa', 'dependencies_build',
-                      'build_args', 'make_args']
+                      'dependencies_ppa', 'build_args', 'make_args']
     builders = [Constants.QMAKE, Constants.CMAKE, Constants.CUSTOM]
 
     first_docker_info = True
@@ -45,12 +46,8 @@ class LibConfig(object):
     gopath = None
     verbose = False
 
-    def __init__(self, name, json_config, arch, root_dir, qt_version, debug_build, verbose):
-        # Must come after ARCH_TRIPLET to avoid breaking it
-        self.placeholders.update({"ARCH": "arch"})
-
+    def __init__(self, name, json_config, arch, root_dir, qt_version, verbose):
         self.qt_version = qt_version
-        self.debug_build = debug_build
         self.verbose = verbose
 
         self.set_host_arch()
@@ -60,7 +57,6 @@ class LibConfig(object):
             'name': name,
             'arch': arch,
             'arch_triplet': None,
-            'template': None,
             'builder': None,
             'postmake': None,
             'prebuild': None,
@@ -70,7 +66,6 @@ class LibConfig(object):
             'build_home': '${BUILD_DIR}/.clickable/home',
             'src_dir': '${ROOT}/libs/${NAME}',
             'root_dir': root_dir,
-            'dependencies_build': [],
             'dependencies_host': [],
             'dependencies_target': [],
             'dependencies_ppa': [],
@@ -83,12 +78,6 @@ class LibConfig(object):
             'image_setup': {},
             'test': 'ctest',
         }
-
-        # TODO remove support for deprecated "template" in clickable.json
-        if "template" in json_config:
-            logger.warning('Parameter "template" is deprecated in clickable.json. Use "builder" as drop-in replacement instead.')
-            json_config["builder"] = json_config["template"]
-            json_config["template"] = None
 
         self.config.update(json_config)
         if self.config["docker_image"]:
@@ -138,9 +127,6 @@ class LibConfig(object):
     def get_env_vars(self):
         env_vars = {}
 
-        if self.debug_build:
-            env_vars['DEBUG_BUILD'] = '1'
-
         for key, conf in self.placeholders.items():
             env_vars[key] = self.config[conf]
 
@@ -162,8 +148,6 @@ class LibConfig(object):
             for sub in self.placeholders:
                 rep = self.config[self.placeholders[sub]]
                 self.substitute("${"+sub+"}", rep, key)
-                # TODO remove deprecated syntax $VAR
-                self.substitute("$"+sub, rep, key)
             if key in self.path_keys and self.config[key]:
                 self.config[key] = make_absolute(self.config[key])
 
@@ -172,11 +156,6 @@ class LibConfig(object):
             self.config['make_jobs'] = multiprocessing.cpu_count()
         self.make_args = merge_make_jobs_into_args(
             make_args=self.make_args, make_jobs=self.make_jobs)
-
-        if self.config['dependencies_build']:
-            self.config['dependencies_host'] += self.config['dependencies_build']
-            self.config['dependencies_build'] = []
-            logger.warning('"dependencies_build" is deprecated. Use "dependencies_host" instead!')
 
         for key in self.flexible_lists:
             self.config[key] = flexible_string_to_list(self.config[key])

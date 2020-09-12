@@ -150,6 +150,9 @@ class Container(object):
 
             raise ClickableException('Log out or restart to apply changes')
 
+    def is_docker_ready(self):
+        return self.docker_group_exists() and self.user_part_of_docker_group()
+
     def pull_files(self, files, dst_parent):
         os.makedirs(dst_parent, exist_ok=True)
 

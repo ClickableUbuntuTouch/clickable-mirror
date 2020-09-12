@@ -11,9 +11,22 @@ from clickable.logger import logger
 from clickable.exceptions import ClickableException
 
 class GdbserverCommand(Command):
-    aliases = []
-    name = 'gdbserver'
-    help = 'Opens a gdbserver session on the device accessible at localhost:3333'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'gdbserver'
+        self.cli_conf.help_msg = 'Opens a gdbserver session on the device accessible at localhost:3333'
+
+        self.port = 3333
+
+    def setup_parser(self, parser):
+        parser.add_argument(
+            '--port',
+            default=self.port,
+            help='Open local GDB Server specified port'
+        )
+
+    def configure(self, args):
+        self.port = args.port
 
     def set_signal_handler(self):
         def signal_handler(sig, frame):
@@ -127,7 +140,7 @@ class GdbserverCommand(Command):
             raise ClickableException('Failed to check installed version on device. The device is either not accessible or the app version you are trying to debug is not installed. Make sure the device is accessible or run "clickable install" and try again.')
 
     def push_gdbserver(self):
-        self.config.container.pull_files(["/usr/bin/gdbserver"], "/tmp/clickable")
+        self.container.pull_files(["/usr/bin/gdbserver"], "/tmp/clickable")
         self.device.push_file('/tmp/clickable/gdbserver', '/home/phablet/bin/gdbserver')
 
     def start_gdbserver(self):
@@ -149,10 +162,8 @@ class GdbserverCommand(Command):
         self.set_signal_handler()
         self.device.run_command(commands, forward_port=self.port)
 
-    def run(self, path_arg=None):
-        self.port = 3333
-
-        self.config.container.setup()
+    def run(self):
+        self.container.setup()
         self.check_cached_desktop_file()
 
         self.push_gdbserver()

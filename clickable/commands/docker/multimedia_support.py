@@ -1,4 +1,4 @@
-from clickable import ProjectConfig
+from clickable.config.project import ProjectConfig
 from clickable.commands.docker.docker_config import DockerConfig
 from .docker_support import DockerSupport
 import os

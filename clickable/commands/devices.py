@@ -3,11 +3,12 @@ from clickable.logger import logger
 
 
 class DevicesCommand(Command):
-    aliases = []
-    name = 'devices'
-    help = 'Lists all connected devices'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'devices'
+        self.cli_conf.help_msg = 'Lists all connected devices'
 
-    def run(self, path_arg=None):
+    def run(self):
         devices = self.device.detect_attached()
 
         if len(devices) == 0:

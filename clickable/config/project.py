@@ -10,6 +10,7 @@ from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
 from .libconfig import LibConfig
 from .file_helpers import InstallFiles, ProjectFiles
 from .constants import Constants
+from clickable.version import __version__
 
 from ..utils import (
     merge_make_jobs_into_args,
@@ -20,6 +21,7 @@ from ..utils import (
     validate_clickable_json,
     make_absolute,
     make_env_var_conform,
+    let_user_confirm,
 )
 from ..logger import logger, Colors
 from clickable.exceptions import ClickableException
@@ -40,13 +42,14 @@ class ProjectConfig(object):
         'CLICKABLE_DOCKER_IMAGE': 'docker_image',
         'CLICKABLE_BUILD_ARGS': 'build_args',
         'CLICKABLE_MAKE_ARGS': 'make_args',
-        'CLICKABLE_DIRTY': 'dirty',
+        'CLICKABLE_ALWAYS_CLEAN': 'always_clean',
         'CLICKABLE_TEST': 'test',
     }
 
     static_placeholders = OrderedDict({
         "SDK_FRAMEWORK": "framework",
         "QT_VERSION": "qt_version",
+        "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
         "NUM_PROCS": "make_jobs",
         "ROOT": "root_dir",
@@ -70,45 +73,33 @@ class ProjectConfig(object):
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
                  'app_qml_dir', 'build_home']
     flexible_lists = ['dependencies_host', 'dependencies_target',
-                      'dependencies_ppa', 'dependencies_build',
+                      'dependencies_ppa',
                       'install_lib', 'install_bin', 'install_qml',
                       'build_args', 'make_args', 'default', 'ignore']
     removed_keywords = ['chroot', 'sdk', 'package', 'app', 'premake', 'ssh',
-                        'dependencies', 'specificDependencies', 'dir', 'lxd']
+                        'dependencies', 'specificDependencies', 'dir', 'lxd',
+                        'arch', 'template', 'dependencies_build', 'dirty']
 
     first_docker_info = True
     device_serial_number = None
     ssh = None
-    click_output = None
     container_mode = False
     use_nvidia = False
     avoid_nvidia = False
-    apikey = None
     verbose = False
-    debug_build = False
-    debug_valgrind = False
-    debug_gdb = False
-    debug_gdb_port = None
-    dark_mode = False
     interactive = True
-    skip_review = False
-    desktop_locale = os.getenv('LANG', 'C')
-    desktop_skip_build = False
 
-    def __init__(self, args=None, clickable_version=None, commands=[],
-            cwd=None):
+    def __init__(self, args=None, cwd=None, commands=[], always_clean=False):
         self.placeholders = {}
         self.placeholders.update(ProjectConfig.static_placeholders)
-        # TODO move to static_placeholders after removing deprecated $VAR syntax
-        self.placeholders.update({"ARCH": "arch"})
 
-        self.clickable_version = clickable_version
-        self.set_host_arch()
+        if not Constants.host_arch:
+            raise ClickableException("No support for host architecture {}".format(platform.machine()))
         self.cwd = cwd if cwd else os.getcwd()
         self.project_files = ProjectFiles(self.cwd)
 
         self.set_default_config()
-        self.parse_configs(args, commands)
+        self.parse_configs(args, commands, always_clean)
         self.check_paths()
         self.set_builder_interactive()
         self.set_conditional_defaults()
@@ -122,7 +113,6 @@ class ProjectConfig(object):
             'restrict_arch_env': None,
             'restrict_arch': None,
             'arch_triplet': None,
-            'template': None,
             'builder': None,
             'postmake': None,
             'prebuild': None,
@@ -135,9 +125,8 @@ class ProjectConfig(object):
             'root_dir': self.cwd,
             'kill': None,
             'scripts': {},
-            'default': 'clean build install launch',
+            'default': 'build install launch',
             'log': None,
-            'dependencies_build': [],
             'dependencies_host': [],
             'dependencies_target': [],
             'dependencies_ppa': [],
@@ -157,30 +146,18 @@ class ProjectConfig(object):
             'env_vars': {},
             'env_env_vars': {},
             'make_args': [],
-            'dirty': False,
             'libraries': {},
             'test': 'qmltestrunner',
             'install_dir': '${BUILD_DIR}/install',
             'image_setup': {},
             'qt_version': Constants.default_qt,
             'framework': None,
+            'always_clean': False,
         }
 
-    def parse_configs(self, args, commands):
+    def parse_configs(self, args, commands, always_clean):
         config_path = args.config if args else None
         json_config = self.load_json_config(config_path)
-
-        # TODO remove support for deprecated "arch" in clickable.json
-        if "arch" in json_config:
-            logger.warning('Parameter "arch" is deprecated in clickable.json. Use "restricted_arch" instead.')
-            json_config["restrict_arch"] = json_config["arch"]
-            json_config["arch"] = None
-
-        # TODO remove support for deprecated "template" in clickable.json
-        if "template" in json_config:
-            logger.warning('Parameter "template" is deprecated in clickable.json. Use "builder" as drop-in replacement instead.')
-            json_config["builder"] = json_config["template"]
-            json_config["template"] = None
 
         self.config.update(json_config)
         env_config = self.load_env_config()
@@ -192,10 +169,18 @@ class ProjectConfig(object):
             self.config.update(arg_config)
 
         self.config['default'] = flexible_string_to_list(self.config['default'])
-        if self.config['dirty'] and 'clean' in self.config['default']:
-            self.config['default'].remove('clean')
 
-        self.commands = commands if commands else self.config['default']
+        self.commands = commands
+        if always_clean:
+            self.config['always_clean'] = True
+
+        if not self.commands:
+            self.commands = self.config['default']
+
+        if (self.config['always_clean'] 
+                    and self.is_app_build_cmd() 
+                    and self.commands[0] != 'clean'):
+                self.commands = ['clean'] + self.commands
 
     def setup(self):
         self.cleanup_config()
@@ -221,7 +206,7 @@ class ProjectConfig(object):
                 self.config["arch"] = "all"
                 logger.debug('Architecture set to "all" because builder "{}" is architecture agnostic'.format(self.config['builder']))
             elif self.is_desktop_mode():
-                self.config["arch"] = self.host_arch
+                self.config["arch"] = Constants.host_arch
                 logger.debug('Architecture set to "{}" because of desktop mode.'.format(self.config["arch"]))
             elif self.config["restrict_arch"]:
                 self.config["arch"] = self.config["restrict_arch"]
@@ -229,7 +214,7 @@ class ProjectConfig(object):
                 self.config["arch"] = self.config["restrict_arch_env"]
                 logger.debug('Architecture set to "{}" due to environment restriction'.format(self.config["arch"]))
             elif self.container_mode:
-                self.config['arch'] = self.host_arch
+                self.config['arch'] = Constants.host_arch
                 logger.debug('Architecture set to "{}" due to container mode'.format(self.config['arch']))
             else:
                 self.config['arch'] = 'armhf'
@@ -244,8 +229,8 @@ class ProjectConfig(object):
             raise ClickableException('There is currently no support for architecture  "{}"'.format(self.config['arch']))
         self.config['arch_triplet'] = Constants.arch_triplet_mapping[self.config['arch']]
 
-        if self.host_arch not in Constants.container_mapping:
-            raise ClickableException('Clickable currently does not have docker images for your host architecture "{}"'.format(self.host_arch))
+        if Constants.host_arch not in Constants.container_mapping:
+            raise ClickableException('Clickable currently does not have docker images for your host architecture "{}"'.format(Constants.host_arch))
 
         if not self.config['kill']:
             if self.config['builder'] == Constants.CORDOVA:
@@ -307,7 +292,7 @@ class ProjectConfig(object):
             image_framework = Constants.framework_image_mapping.get(
                     self.config['framework'], Constants.framework_fallback)
 
-            container_mapping_host = Constants.container_mapping[self.host_arch]
+            container_mapping_host = Constants.container_mapping[Constants.host_arch]
             if (image_framework, self.build_arch) not in container_mapping_host:
                 raise ClickableException('There is currently no docker image for {}/{}'.format(image_framework, self.build_arch))
             self.config['docker_image'] = container_mapping_host[(image_framework, self.build_arch)]
@@ -334,7 +319,6 @@ class ProjectConfig(object):
     def load_json_schema(self):
         schema_path = os.path.join(os.path.dirname(__file__), 'clickable.schema')
         with open(schema_path, 'r') as f:
-            schema = {}
             try:
                 return json.load(f)
             except ClickableException:
@@ -357,7 +341,7 @@ class ProjectConfig(object):
 
                 for key in self.removed_keywords:
                     if key in config_json:
-                        raise ClickableException('"{}" is a no longer a valid configuration option'.format(key))
+                        raise ClickableException('"{}" is no longer a valid configuration option'.format(key))
 
                 schema = self.load_json_schema()
                 validate_clickable_json(config=config_json, schema=schema)
@@ -373,9 +357,6 @@ class ProjectConfig(object):
         return config
 
     def load_env_config(self):
-        if self.get_env_var('OPENSTORE_API_KEY'):
-            self.apikey = self.get_env_var('OPENSTORE_API_KEY')
-
         if self.get_env_var('CLICKABLE_CONTAINER_MODE'):
             self.container_mode = True
 
@@ -385,20 +366,11 @@ class ProjectConfig(object):
         if self.get_env_var('CLICKABLE_SSH'):
             self.ssh = self.get_env_var('CLICKABLE_SSH')
 
-        if self.get_env_var('CLICKABLE_OUTPUT'):
-            self.click_output = self.get_env_var('CLICKABLE_OUTPUT')
-
         if self.get_env_var('CLICKABLE_NVIDIA'):
             self.use_nvidia = True
 
         if self.get_env_var('CLICKABLE_NO_NVIDIA'):
             self.avoid_nvidia = True
-
-        if self.get_env_var('CLICKABLE_DEBUG_BUILD'):
-            self.debug_build = True
-
-        if self.get_env_var('CLICKABLE_DARK_MODE'):
-            self.dark_mode = True
 
         if self.get_env_var('CLICKABLE_NON_INTERACTIVE'):
             self.interactive = False
@@ -426,9 +398,6 @@ class ProjectConfig(object):
         if args.ssh:
             self.ssh = args.ssh
 
-        if args.output:
-            self.click_output = args.output
-
         if args.container_mode:
             self.container_mode = args.container_mode
 
@@ -438,43 +407,11 @@ class ProjectConfig(object):
         if args.no_nvidia:
             self.avoid_nvidia = True
 
-        if args.apikey:
-            self.apikey = args.apikey
-
         if args.verbose:
             self.verbose = True
 
-        if args.debug:
-            self.debug_build = True
-
-        if args.debug_build:
-            self.debug_build = True
-            logger.warning('"--debug-build" is deprecated, use "--debug" instead!')
-
-        if args.valgrind:
-            self.debug_build = True
-            self.debug_valgrind = True
-
-        if args.gdb:
-            self.debug_build = True
-            self.debug_gdb = True
-
-        if args.gdbserver:
-            self.debug_build = True
-            self.debug_gdb = True
-            self.debug_gdb_port = args.gdbserver
-
-        if args.dark_mode:
-            self.dark_mode = True
-
         if args.non_interactive:
             self.interactive = False
-
-        if args.skip_review:
-            self.skip_review = True
-
-        if args.lang:
-            self.desktop_locale = args.lang
 
         config = {}
         if args.arch:
@@ -482,12 +419,6 @@ class ProjectConfig(object):
 
         if args.docker_image:
             config['docker_image'] = args.docker_image
-
-        if args.dirty:
-            config['dirty'] = True
-
-        if args.skip_build:
-            self.desktop_skip_build = True
 
         return config
 
@@ -510,9 +441,6 @@ class ProjectConfig(object):
 
         if self.config['gopath']:
             env_vars['GOPATH'] = self.config['gopath']
-
-        if self.debug_build:
-            env_vars['DEBUG_BUILD'] = '1'
 
         if self.lib_configs:
             install_dirs = [lib.install_dir for lib in self.lib_configs]
@@ -543,21 +471,12 @@ class ProjectConfig(object):
             for sub in self.placeholders:
                 rep = self.config[self.placeholders[sub]]
                 self.substitute("${"+sub+"}", rep, key)
-                # TODO remove deprecated syntax $VAR
-                self.substitute("$"+sub, rep, key)
             if key in self.path_keys and self.config[key]:
                 self.config[key] = make_absolute(self.config[key])
 
-    def set_host_arch(self):
-        host = platform.machine()
-        self.host_arch = Constants.host_arch_mapping.get(host, None)
-
-        if not self.host_arch:
-            raise ClickableException("No support for host architecture {}".format(host))
-
     def set_build_arch(self):
-        if self.is_desktop_mode() or self.config['arch'] == 'all':
-            self.build_arch = self.host_arch
+        if self.config['arch'] == 'all':
+            self.build_arch = Constants.host_arch
         else:
             self.build_arch = self.config['arch']
 
@@ -582,8 +501,7 @@ class ProjectConfig(object):
                 self.config['arch'],
                 self.config['root_dir'],
                 self.config['qt_version'],
-                self.debug_build,
-                self.verbose,
+                self.verbose, # TODO check whether verbosity is handled by this config
             ) for name, lib in self.config['libraries'].items()
         ]
 
@@ -600,28 +518,13 @@ class ProjectConfig(object):
                 self.placeholders[placeholder] = key
                 self.config[key] = lib.config[lp]
 
-                # TODO remove deprecated env var name
-                placeholder_old = '{}_LIB_{}'.format(lib.name, make_env_var_conform(lp))
-                self.placeholders[placeholder_old] = key
-
     def cleanup_config(self):
         for key in self.flexible_lists:
             self.config[key] = flexible_string_to_list(self.config[key])
 
         self.ignore.extend(['.git', '.bzr', '.clickable'])
 
-        if self.desktop_locale != "C" and "." not in self.desktop_locale:
-            self.desktop_locale = "{}.UTF-8".format(self.desktop_locale)
-
-        if self.config['dirty'] and 'clean' in self.config['default']:
-            self.config['default'].remove('clean')
         self.config['default'] = ' '.join(self.config['default'])
-
-        # TODO remove deprecated "dependencies_build"
-        if self.config['dependencies_build']:
-            self.config['dependencies_host'] += self.config['dependencies_build']
-            self.config['dependencies_build'] = []
-            logger.warning('"dependencies_build" is deprecated. Use "dependencies_host" instead!')
 
     def is_arch_agnostic(self):
         return self.config["builder"] in Constants.arch_agnostic_builders
@@ -632,9 +535,11 @@ class ProjectConfig(object):
     def is_ide_command(self):
         return "ide" in self.commands
 
+    def is_app_build_cmd(self):
+        return self.is_desktop_mode() or 'build' in self.commands
+
     def is_build_cmd(self):
-        return (self.is_desktop_mode() or
-                bool(set(['build', 'build-libs', 'clean-build']).intersection(self.commands)))
+        return self.is_app_build_cmd() or 'build-libs' in self.commands
 
     def needs_builder(self):
         return self.is_build_cmd()
@@ -656,7 +561,7 @@ class ProjectConfig(object):
                 raise ClickableException('"{}" specified as "clickable_minimum_required" is not a valid version number'.format(self.config['clickable_minimum_required']))
 
             # Convert version strings to integer lists
-            clickable_version_numbers = [int(n) for n in re.split('\.', self.clickable_version)]
+            clickable_version_numbers = [int(n) for n in re.split('\.', __version__)]
             clickable_required_numbers = [int(n) for n in re.split('\.', self.config['clickable_minimum_required'])]
             if len(clickable_required_numbers) > len(clickable_version_numbers):
                 logger.warning('Clickable version number only consists of {} numbers, but {} numbers specified in "clickable_minimum_required". Superfluous numbers will be ignored.'.format(len(clickable_version_numbers), len(clickable_required_numbers)))
@@ -666,7 +571,7 @@ class ProjectConfig(object):
                 if req < ver:
                     break
                 if req > ver:
-                    raise ClickableException('This project requires Clickable version {} ({} is used). Please update Clickable!'.format(self.config['clickable_minimum_required'], self.clickable_version))
+                    raise ClickableException('This project requires Clickable version {} ({} is used). Please update Clickable!'.format(self.config['clickable_minimum_required'], __version__))
 
     def check_arch_restrictions(self):
         if self.is_arch_agnostic():
@@ -683,8 +588,8 @@ class ProjectConfig(object):
                 ))
         else:
             if self.is_desktop_mode():
-                if self.config["arch"] != self.host_arch:
-                    raise ClickableException('Desktop mode needs host architecture "{}", but "{}" was specified'.format(self.host_arch, self.config["arch"]))
+                if self.config["arch"] != Constants.host_arch:
+                    raise ClickableException('Desktop mode needs host architecture "{}", but "{}" was specified'.format(Constants.host_arch, self.config["arch"]))
 
         if (self.config['restrict_arch'] and
                 self.config['restrict_arch'] != self.config['arch']):
@@ -737,15 +642,6 @@ class ProjectConfig(object):
                 logger.warning("Docker image setup is ignored when using a custom docker image!")
 
     def check_desktop_configs(self):
-        if self.debug_valgrind and self.debug_gdb:
-            raise ClickableException("Valgrind (--valgrind) and GDB (--gdb or --gdbserver) can not be combined.")
-
-        if self.debug_valgrind and not self.is_desktop_mode():
-            raise ClickableException("Valgrind debugging is only supported in desktop mode! Consider running 'clickable desktop --valgrind'")
-
-        if self.debug_gdb and not self.is_desktop_mode():
-            raise ClickableException('"--gdb" and "--gdbserver" are flags for desktop mode. Use `clickable gdb` and `clickable gdbserver` for on-device debugging.')
-
         if self.is_desktop_mode():
             if self.use_nvidia and self.avoid_nvidia:
                 raise ClickableException('Configuration conflict: enforcing and avoiding nvidia mode must not be specified together.')
@@ -767,11 +663,10 @@ class ProjectConfig(object):
         if not self.interactive:
             raise ClickableException('No builder specified. Add a builder to your clickable.json.')
 
-        choice = input(
-            Colors.INFO + 'No builder was specified, would you like to auto detect the builder [y/N]: ' + Colors.CLEAR
-        ).strip().lower()
-        if choice != 'y' and choice != 'yes':
-            raise ClickableException('Not auto detecting builder')
+        if not let_user_confirm(
+                'No builder was specified, would you like to auto detect the builder?',
+                default=False):
+            raise ClickableException('Not builder configured. Is this a Clickable project?')
 
         builder = None
         directory = os.listdir(os.getcwd())

@@ -2,11 +2,12 @@ from .base import Command
 from clickable.utils import run_subprocess_check_call
 
 
-class WritableImageCommand(Command):
-    aliases = []
-    name = 'screenshots'
-    help = 'Download all the screenshots from the device'
+class ScreenshotsCommand(Command):
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'screenshots'
+        self.cli_conf.help_msg = 'Download all the screenshots from the device'
 
-    def run(self, path_arg=None):
+    def run(self):
         command = 'adb pull /home/phablet/Pictures/Screenshots'
         run_subprocess_check_call(command, cwd=self.config.cwd)

@@ -10,22 +10,50 @@ except ImportError:
 from .base import Command
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
-
+from clickable.utils import env
 
 OPENSTORE_API = 'https://open-store.io'
 OPENSTORE_API_PATH = '/api/v3/manage/{}/revision'
 
 
 class PublishCommand(Command):
-    aliases = []
-    name = 'publish'
-    help = 'Publish your click app to the OpenStore'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'publish'
+        self.cli_conf.help_msg = 'Publish your click app to the OpenStore'
 
-    def run(self, path_arg=''):
+        self.api_key = None
+        self.changelog = ''
+
+    def setup_parser(self, parser):
+        parser.add_argument(
+            '--apikey',
+            help='Api key for the OpenStore',
+        )
+        parser.add_argument(
+            'changelog',
+            nargs='*',
+            help='Change log message to be appended in OpenStore app changelog',
+        )
+
+    def configure(self, args):
+        self.api_key = args.apikey
+        self.changelog = ' '.join(args.changelog)
+
+        self.parse_env()
+
+    def configure_nested(self):
+        self.parse_env()
+
+    def parse_env(self):
+        if not self.api_key:
+            self.api_key = env('OPENSTORE_API_KEY')
+
+    def run(self):
         if not requests_available:
             raise ClickableException('Unable to publish app, python requests module is not installed')
 
-        if not self.config.apikey:
+        if not self.api_key:
             raise ClickableException('No api key specified, use OPENSTORE_API_KEY or --apikey')
 
         click = self.config.install_files.get_click_filename()
@@ -41,9 +69,9 @@ class PublishCommand(Command):
         files = {'file': open(click_path, 'rb')}
         data = {
             'channel': channel,
-            'changelog': path_arg.encode('utf8', 'surrogateescape'),
+            'changelog': self.changelog.encode('utf8', 'surrogateescape'),
         }
-        params = {'apikey': self.config.apikey}
+        params = {'apikey': self.api_key}
 
         logger.info('Uploading version {} of {} for {}/{} to the OpenStore'.format(
             self.config.install_files.find_version(),

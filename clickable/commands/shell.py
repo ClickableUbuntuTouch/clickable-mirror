@@ -12,9 +12,11 @@ from clickable.exceptions import ClickableException
 
 
 class ShellCommand(Command):
-    aliases = ['ssh']
-    name = 'shell'
-    help = 'Opens a shell on the device via ssh'
+    def __init__(self):
+        Command.__init__(self)
+        self.cli_conf.name = 'shell'
+        self.cli_conf.help_msg = 'Opens a shell on the device via ssh'
+        self.aliases = ['ssh']
 
     def toggle_ssh(self, on=False):
         command = 'sudo -u phablet bash -c \'/usr/bin/gdbus call -y -d com.canonical.PropertyService -o /com/canonical/PropertyService -m com.canonical.PropertyService.SetProperty ssh {}\''.format(
@@ -27,7 +29,7 @@ class ShellCommand(Command):
 
         run_subprocess_call(shlex.split('adb {} shell "{}"'.format(adb_args, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    def run(self, path_arg=None):
+    def run(self):
         '''
         Inspired by http://bazaar.launchpad.net/~phablet-team/phablet-tools/trunk/view/head:/phablet-shell
         '''
@@ -71,15 +73,15 @@ class ShellCommand(Command):
             with open(id_pub, 'r') as f:
                 public_key = f.read().strip()
 
-            self.device.run_command('[ -d ~/.ssh ] || mkdir ~/.ssh', cwd=self.config.cwd)
-            self.device.run_command('touch  ~/.ssh/authorized_keys', cwd=self.config.cwd)
+            self.device.run_command('[ -d ~/.ssh ] || mkdir ~/.ssh')
+            self.device.run_command('touch  ~/.ssh/authorized_keys')
 
             output = run_subprocess_check_output('adb {} shell "grep \\"{}\\" ~/.ssh/authorized_keys"'.format(adb_args, public_key), shell=True).strip()
             if not output or 'No such file or directory' in output:
                 logger.info('Inserting ssh public key on the connected device')
-                self.device.run_command('echo \"{}\" >>~/.ssh/authorized_keys'.format(public_key), cwd=self.config.cwd)
-                self.device.run_command('chmod 700 ~/.ssh', cwd=self.config.cwd)
-                self.device.run_command('chmod 600 ~/.ssh/authorized_keys', cwd=self.config.cwd)
+                self.device.run_command('echo \"{}\" >>~/.ssh/authorized_keys'.format(public_key))
+                self.device.run_command('chmod 700 ~/.ssh')
+                self.device.run_command('chmod 600 ~/.ssh/authorized_keys')
 
             subprocess.check_call(shlex.split('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p {} phablet@localhost'.format(port)))
             self.toggle_ssh(on=False)

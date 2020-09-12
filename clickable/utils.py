@@ -12,6 +12,8 @@ from os.path import dirname, basename, isfile, join
 from clickable.builders.base import Builder
 from clickable.logger import logger
 from clickable.exceptions import FileNotFoundException, ClickableException
+from clickable.config.constants import Constants
+from clickable.logger import Colors
 
 # TODO use these subprocess functions everywhere
 
@@ -30,6 +32,16 @@ def prepare_command(cmd, shell=False):
 
     return cmd
 
+
+def get_container_mapping():
+    if Constants.host_arch in Constants.container_mapping:
+        return Constants.container_mapping[Constants.host_arch]
+    else:
+        return {}
+
+
+def get_container_list():
+    return list(get_container_mapping().values())
 
 def run_subprocess_call(cmd, shell=False, **args):
     return subprocess.call(prepare_command(cmd, shell), shell=shell, **args)
@@ -213,3 +225,15 @@ def is_sub_dir(path, parent):
     p1 = os.path.abspath(path)
     p2 = os.path.abspath(parent)
     return os.path.commonpath([p1, p2]).startswith(p2)
+
+
+def let_user_confirm(message, default=True):
+    options = 'Y/n' if default else 'y/N'
+    question = '{} [{}]: '.format(message, options)
+
+    choice = input(Colors.INFO + question + Colors.CLEAR).strip().lower()
+
+    if choice == '':
+        return default
+
+    return choice == 'y' or choice == 'yes'

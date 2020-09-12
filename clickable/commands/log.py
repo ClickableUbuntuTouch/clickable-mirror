@@ -3,11 +3,12 @@ from clickable.logger import logger
 
 
 class LogCommand(Command):
-    aliases = []
-    name = 'log'
-    help = 'Outputs the app\'s log from the device'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'log'
+        self.cli_conf.help_msg = 'Outputs the app\'s log from the device'
 
-    def run(self, path_arg=None):
+    def run(self):
         if self.config.is_desktop_mode():
             logger.debug('Skipping log, running in desktop mode')
             return

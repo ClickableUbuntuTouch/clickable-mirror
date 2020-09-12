@@ -7,16 +7,18 @@ from clickable.logger import logger
 
 
 class CleanCommand(Command):
-    aliases = []
-    name = 'clean'
-    help = 'Clean the build directory'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'clean'
+        self.cli_conf.help_msg = 'Clean the build directory'
 
-    def run(self, path_arg=None):
+    def run(self):
         if os.path.exists(self.config.build_dir):
             try:
+                logger.info("Cleaning build dir {}.".format(self.config.build_dir))
                 shutil.rmtree(self.config.build_dir)
             except Exception:
-                cls, value, traceback = sys.exc_info()
+                cls, value, _ = sys.exc_info()
                 if cls == OSError and 'No such file or directory' in str(value):  # TODO see if there is a proper way to do this
                     pass  # Nothing to do here, the directory didn't exist
                 else:
@@ -24,9 +26,10 @@ class CleanCommand(Command):
 
         if os.path.exists(self.config.install_dir):
             try:
+                logger.info("Cleaning install dir {}.".format(self.config.build_dir))
                 shutil.rmtree(self.config.install_dir)
             except Exception:
-                cls, value, traceback = sys.exc_info()
+                cls, value, _ = sys.exc_info()
                 if cls == OSError and 'No such file or directory' in str(value):  # TODO see if there is a proper way to do this
                     pass  # Nothing to do here, the directory didn't exist
                 else:

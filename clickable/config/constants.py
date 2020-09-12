@@ -1,4 +1,5 @@
 import os
+import platform
 
 class Constants(object):
     PURE_QML_QMAKE = 'pure-qml-qmake'
@@ -71,6 +72,7 @@ class Constants(object):
         'aarch64': 'arm64',
         'armv7l': 'armhf',
     }
+    host_arch = host_arch_mapping.get(platform.machine(), None)
 
     desktop_device_home = os.path.expanduser('~/.clickable/home')
     device_home = '/home/phablet'

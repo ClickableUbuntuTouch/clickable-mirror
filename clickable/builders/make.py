@@ -24,12 +24,9 @@ class MakeBuilder(Builder):
         if self.config.verbose:
             command = '{} {}'.format(command, 'VERBOSE=1')
 
-        self.config.container.run_command(command)
+        self.container.run_command(command)
 
     def make_install(self):
-        if os.path.exists(self.config.install_dir) and os.path.isdir(self.config.install_dir):
-            shutil.rmtree(self.config.install_dir)
-
         try:
             os.makedirs(self.config.install_dir)
         except FileExistsError:

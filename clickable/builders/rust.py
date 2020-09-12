@@ -70,10 +70,6 @@ class RustBuilder(Builder):
         return ignored
 
     def build(self):
-        # Remove old artifacts unless the dirty option is active
-        if not self.config.dirty and os.path.isdir(self.config.install_dir):
-            shutil.rmtree(self.config.install_dir)
-
         # Copy project assets
         shutil.copytree(self.config.cwd,
                         self.config.install_dir, ignore=self._ignore)
@@ -89,15 +85,15 @@ class RustBuilder(Builder):
 
         # Build using cargo
         cargo_command = 'cargo build {} --target {}' \
-            .format('--release' if not self.config.debug_build else '',
+            .format('--release' if not self.debug_build else '',
                     self._cargo_target)
-        self.config.container.run_command(cargo_command)
+        self.container.run_command(cargo_command)
 
         # There could be more than one executable
         executables = glob.glob('{}/target/{}/{}/*'
                                 .format(self.config.cwd,
                                         self._cargo_target,
-                                        'debug' if self.config.debug_build else 'release'))
+                                        'debug' if self.debug_build else 'release'))
         for filename in filter(lambda f: os.path.isfile(f), executables):
             shutil.copy2(filename, '{}/{}'.format(
                 target_dir,
