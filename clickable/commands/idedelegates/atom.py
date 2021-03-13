@@ -23,8 +23,8 @@ class AtomDelegate(IdeCommandDelegate):
 
     def override_command(self, path):
         #atom does not launch within the bash process, but starts a decoupled process, making the bash command directly return causing clickable to close the docker container
-        #dirty hack: after starting atom, start a process that waits for atom to finish before it returns. This way the container keeps running as long as atom runs.
-        return path.replace('atom', "atom .&& tail --pid=`pgrep atom` -f /dev/null >/dev/null 2>&1")
+        #to fix this it needs to be started with --wait parameter to wait for the process to finish before it returns. This way the container keeps running as long as atom runs.
+        return path.replace('atom', "atom --wait .")
 
     def before_run(self, config, docker_config):
 
