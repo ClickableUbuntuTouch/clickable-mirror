@@ -28,9 +28,6 @@ class AtomDelegate(IdeCommandDelegate):
 
     def before_run(self, config, docker_config):
 
-        # if self.is_cmake_project() and not os.path.isfile(os.path.join(self.project_path, 'CMakeLists.txt.user')):
-        #     self.init_cmake_project(config, docker_config)
-
         #delete conflicting env vars in some cases
         docker_config.environment.pop("INSTALL_DIR", None)
         docker_config.environment.pop("APP_DIR", None)
@@ -83,71 +80,3 @@ class AtomDelegate(IdeCommandDelegate):
                     cmd = cmd.replace('${'+ var +'}', replacement)
                     cmd = self.recurse_replace(cmd, cmake_vars)
         return cmd
-
-    # #templates run/build generation for cmake project
-    # def init_cmake_project(self, config, docker_config):
-    #
-    #     executable = config.project_files.find_any_executable()
-    #     exec_args = " ".join(config.project_files.find_any_exec_args())
-    #
-    #     #don't do all that if exec line not found
-    #     if not executable:
-    #         return
-    #
-    #     choice = input(Colors.INFO + 'Do you want Clickable to setup a Atom project for you? [Y/n]: ' + Colors.CLEAR
-    #                    ).strip().lower()
-    #     if choice != 'y' and choice != 'yes' and choice != '':
-    #         return
-    #
-    #     #CLICK_EXE can be a variable
-    #     match_exe_var = re.match("@([-\w]+)@", executable)
-    #     if match_exe_var:
-    #         #catch the variable name and try to get it from CMakeLists.txt
-    #         cmd_var = match_exe_var.group(1)
-    #         final_cmd = self.cmake_guess_exec_command(cmd_var)
-    #         if final_cmd is not None:
-    #             try:
-    #                 exe, exe_arg = final_cmd.split(' ', maxsplit=1)
-    #             except:
-    #                 exe, exe_arg = final_cmd, ''
-    #
-    #             executable = exe
-    #             exec_args = exe_arg
-    #             logger.debug('found that executable is {} with args: {}'.format(exe, exe_arg))
-    #         else:
-    #             #was not able to guess executable
-    #             logger.warning("Could not determine executable command '{}', please adjust your project's run settings".format(executable))
-    #
-    #
-    #     # work around for qtcreator bug when first run of a project to avoid qtcreator hang
-    #     # we need to create the build directory first
-    #     if not os.path.isdir(config.build_dir):
-    #         os.makedirs(config.build_dir)
-    #
-    #     env_vars = docker_config.environment
-    #     clickable_env_path = '{}:{}'.format(env_vars["PATH"], env_vars["CLICK_PATH"])
-    #     clickable_ld_library_path='{}:{}'.format(env_vars["LD_LIBRARY_PATH"], env_vars["CLICK_LD_LIBRARY_PATH"])
-    #     clickable_qml2_import_path='{}:{}:{}'.format(env_vars["QML2_IMPORT_PATH"], env_vars["CLICK_QML2_IMPORT_PATH"], os.path.join(config.install_dir, 'lib') )
-    #
-    #     template_replacement = {
-    #         "CLICKABLE_LD_LIBRARY_PATH": clickable_ld_library_path,
-    #         "CLICKABLE_QML2_IMPORT_PATH": clickable_qml2_import_path,
-    #         "CLICKABLE_BUILD_DIR": config.build_dir,
-    #         "CLICKABLE_INSTALL_DIR": config.install_dir,
-    #         "CLICKABLE_EXEC_CMD": executable,
-    #         "CLICKABLE_EXEC_ARGS": exec_args,
-    #         "CLICKABLE_SRC_DIR": config.src_dir,
-    #         "CLICKABLE_BUILD_ARGS": " ".join(config.build_args),
-    #         "CLICKABLE_PATH":clickable_env_path
-    #     }
-    #
-    #     output_path = os.path.join(self.project_path,'CMakeLists.txt.user.shared')
-    #     #now read template and generate the .shared file to the root project dir
-    #     with open(self.template_path, "r") as infile2, open(output_path, "w") as outfile:
-    #         for line in infile2:
-    #             for f_key, f_value in template_replacement.items():
-    #                 if f_key in line:
-    #                     line = line.replace(f_key, f_value)
-    #             outfile.write(line)
-    #
-    #     logger.info('generated default build/run template to {}'.format(output_path))
