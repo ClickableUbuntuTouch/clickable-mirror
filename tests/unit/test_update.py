@@ -13,8 +13,8 @@ def zero_fn(*args, **kwargs):
 
 class TestUpdateCommand(UnitTest):
     def setUp(self):
+        self.command = UpdateCommand()
         self.setUpConfig()
-        self.command = UpdateCommand(self.config)
 
     @mock.patch('clickable.container.Container.check_docker', side_effect=empty_fn)
     @mock.patch('clickable.utils.run_subprocess_call', side_effect=zero_fn)

@@ -8,6 +8,8 @@ from ..mocks import empty_fn, false_fn
 
 class TestLibBuildCommand(UnitTest):
     def setUp(self):
+        self.command = LibBuildCommand()
+
         self.custom_cmd = 'echo "Building lib"'
 
         config_json = {}
@@ -18,7 +20,6 @@ class TestLibBuildCommand(UnitTest):
             }
         }
         self.setUpConfig(mock_config_json = config_json)
-        self.command = LibBuildCommand(self.config)
 
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
     @mock.patch('os.makedirs', side_effect=empty_fn)

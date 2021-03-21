@@ -8,8 +8,8 @@ from .base_test import UnitTest
 
 class TestInstallCommand(UnitTest):
     def setUp(self):
+        self.command = InstallCommand()
         self.setUpWithTmpBuildDir()
-        self.command = InstallCommand(self.config)
 
     @mock.patch('clickable.device.Device.check_any_attached', side_effect=empty_fn)
     @mock.patch('clickable.device.Device.check_multiple_attached', side_effect=empty_fn)
@@ -48,7 +48,8 @@ class TestInstallCommand(UnitTest):
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     @mock.patch('clickable.commands.install.run_subprocess_check_call', side_effect=empty_fn)
     def test_install_adb_with_path(self, mock_run_subprocess_check_call, mock_run_command, mock_check_multiple_attached, mock_check_any_attached):
-        self.command.run('/foo/bar.click')
+        self.command.click_path = '/foo/bar.click'
+        self.command.run()
 
         mock_check_any_attached.assert_called_once_with()
         mock_check_multiple_attached.assert_called_once_with()

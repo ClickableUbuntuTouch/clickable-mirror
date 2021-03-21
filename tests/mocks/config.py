@@ -4,6 +4,7 @@ from clickable.config.file_helpers import InstallFiles
 from clickable import __version__
 from unittest.mock import Mock
 
+import os
 
 class InstallFilesMock(InstallFiles):
     def write_manifest(self, *args):
@@ -27,11 +28,20 @@ class ConfigMock(ProjectConfig):
                  mock_config_json=None,
                  mock_config_env=None,
                  mock_install_files=False,
+                 respect_container_mode=False,
                  *args, **kwargs):
+        container_mode_key = "CLICKABLE_CONTAINER_MODE"
+
+        if respect_container_mode:
+            if (mock_config_env is not None and
+                    not container_mode_key in mock_config_env and
+                    container_mode_key in os.environ):
+                mock_config_env[container_mode_key] = os.environ[container_mode_key]
         self.mock_config_json = mock_config_json
         self.mock_config_env = mock_config_env
         self.mock_install_files = mock_install_files
-        super().__init__(clickable_version=__version__, *args, **kwargs)
+
+        super().__init__(*args, **kwargs)
 
     def load_json_config(self, config_path):
         if self.mock_config_json is None:

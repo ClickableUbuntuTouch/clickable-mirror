@@ -1,6 +1,4 @@
 from .config import ConfigMock
-from .clickable import ClickableMock
-
 
 def empty_fn(*args, **kwargs):
     pass

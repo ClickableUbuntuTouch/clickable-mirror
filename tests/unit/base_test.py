@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from clickable.device import Device
 from clickable.container import Container
 from clickable.exceptions import ClickableException
 from ..mocks import ConfigMock
@@ -25,8 +26,12 @@ class UnitTest(TestCase):
                 mock_install_files=True,
                 *args, **kwargs
             )
-            self.config.container = Container(self.config)
             self.config.interactive = False
+            if self.command:
+                self.command.config = self.config
+                self.command.device = Device(self.config)
+                self.command.container = Container(self.config)
+
             if expect_exception:
                 raise ClickableException("A ClickableException was expected, but was not raised")
         except ClickableException as e:
@@ -35,6 +40,7 @@ class UnitTest(TestCase):
 
     def setUp(self):
         self.config = None
+        self.command = None
 
     def tearDown(self):
         self.config = None

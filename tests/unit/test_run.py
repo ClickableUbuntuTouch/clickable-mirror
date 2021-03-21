@@ -9,13 +9,14 @@ from .base_test import UnitTest
 
 class TestRunCommand(UnitTest):
     def setUp(self):
+        self.command = RunCommand()
         self.setUpConfig()
-        self.command = RunCommand(self.config)
 
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
     @mock.patch('clickable.container.Container.setup', side_effect=empty_fn)
     def test_run(self, mock_setup, mock_run_command):
-        self.command.run('echo foo')
+        self.command.command = 'echo foo'
+        self.command.run()
 
         mock_setup.assert_called_once_with()
         mock_run_command.assert_called_once_with('echo foo',

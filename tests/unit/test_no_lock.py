@@ -8,8 +8,8 @@ from .base_test import UnitTest
 
 class TestNoLockCommand(UnitTest):
     def setUp(self):
+        self.command = NoLockCommand()
         self.setUpConfig()
-        self.command = NoLockCommand(self.config)
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_no_lock(self, mock_run_command):

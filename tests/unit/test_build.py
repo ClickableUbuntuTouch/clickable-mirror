@@ -9,8 +9,8 @@ from .base_test import UnitTest
 class TestBuildCommand(UnitTest):
     def setUp(self):
         super().setUp()
+        self.command = BuildCommand()
         self.setUpConfig()
-        self.command = BuildCommand(self.config)
         self.click_cmd = 'click build {} --no-validate'.format(self.config.install_dir)
 
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
@@ -24,7 +24,7 @@ class TestBuildCommand(UnitTest):
     @mock.patch('os.makedirs', side_effect=empty_fn)
     @mock.patch('shutil.copyfile', side_effect=empty_fn)
     def test_click_build_click_output(self, mock_copyfile, mock_makedirs, mock_exists, mock_run_command):
-        self.config.click_output = '/foo/bar'
+        self.command.output_path = '/foo/bar'
         self.command.click_build()
 
         mock_run_command.assert_called_once_with(self.click_cmd)

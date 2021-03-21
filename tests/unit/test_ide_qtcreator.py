@@ -9,6 +9,7 @@ from unittest import mock
 class TestIdeQtCreatorCommand(UnitTest):
 
     def setUp(self):
+        super().setUp()
         self.setUpConfig()
         self.docker_config = DockerConfig()
         self.docker_config.add_environment_variables(
@@ -22,7 +23,7 @@ class TestIdeQtCreatorCommand(UnitTest):
             }
         )
 
-        self.idedelegate = QtCreatorDelegate()
+        self.idedelegate = QtCreatorDelegate(self.config)
         self.idedelegate.clickable_dir = '/tmp/tests/.clickable'
         self.idedelegate.project_path = '/tmp/tests/qmlproject'
         self.output_file = os.path.join(self.idedelegate.project_path, 'CMakeLists.txt.user.shared')
@@ -84,6 +85,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         #mock prompt
         original_input = mock.builtins.input
         mock.builtins.input = lambda _: "no"
+        self.idedelegate.config.interactive = True
 
         #user choose not to let clickable generate config
         self.idedelegate.init_cmake_project(self.config, self.docker_config)
@@ -98,6 +100,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         #mock prompt
         original_input = mock.builtins.input
         mock.builtins.input = lambda _: "yes"
+        self.idedelegate.config.interactive = True
 
         #now he is ok to let clickable build the configuration template
         self.idedelegate.init_cmake_project(self.config, self.docker_config)
@@ -111,10 +114,6 @@ class TestIdeQtCreatorCommand(UnitTest):
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_executable', return_value='@FAKE_EXE@')
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_exec_args', return_value=[])
     def test_init_cmake_project_exe_as_var(self, find_any_executable_mock, find_any_exec_args_mock):
-        #mock prompt
-        original_input = mock.builtins.input
-        mock.builtins.input = lambda _: "yes"
-
         #Exec command as variable
         cmake_file = open(os.path.join(self.idedelegate.project_path,'CMakeLists.txt'), 'w')
         cmake_file.write("set(FAKE_EXE \"qmlscene --ok=\"args\"\")")
@@ -125,8 +124,6 @@ class TestIdeQtCreatorCommand(UnitTest):
         generated_shared_file = open(self.output_file, 'r').read()
         self.assertTrue(generated_shared_file.find('CustomExecutableRunConfiguration.Arguments">qmlscene</value>'))
         self.assertTrue(generated_shared_file.find('CustomExecutableRunConfiguration.Arguments">--ok="args"</value>'))
-
-        mock.builtins.input = original_input
 
     def tearDown(self):
         shutil.rmtree(self.idedelegate.project_path, ignore_errors=True)

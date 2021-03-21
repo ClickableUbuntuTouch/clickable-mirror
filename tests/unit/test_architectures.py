@@ -1,5 +1,7 @@
-from clickable import Clickable
+from clickable.cli import Cli
 from .base_test import UnitTest
+from clickable.commands.build import BuildCommand
+from clickable.commands.create import CreateCommand
 
 class TestArchitectures(UnitTest):
     def run_arch_test(self,
@@ -21,16 +23,21 @@ class TestArchitectures(UnitTest):
         if restrict_arch:
             config_json["restrict_arch"] = restrict_arch
 
-        cli_args = []
+        commands = []
+
+        if build_cmd:
+            commands.append('build')
+        else:
+            commands.append('create')
+
+        cli_args = commands
         if arch:
             cli_args += ["--arch", arch]
 
-        parser = Clickable.create_parser("Unit Test Call")
-        run_args = parser.parse_args(cli_args)
-
-        commands = ['no_command']
-        if build_cmd:
-            commands.append('build')
+        cli = Cli()
+        cli.add_cmd_parser(BuildCommand())
+        cli.add_cmd_parser(CreateCommand())
+        run_args = cli.parse_args(cli_args)
 
         self.setUpConfig(
             expect_exception = expect_exception,
