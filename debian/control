@@ -10,6 +10,7 @@ Build-Depends: debhelper (>= 9),
                python3-requests,
                python3-cookiecutter,
                python3-jsonschema,
+               python3-argcomplete,
                python3-setuptools
 Standards-Version: 4.1.4
 Homepage: https://gitlab.com/clickable/clickable
@@ -21,6 +22,7 @@ Depends: adb | android-tools-adb,
          docker.io | docker-ce,
          python3-requests,
          python3-jsonschema,
+         python3-argcomplete,
          ${misc:Depends},
          ${python3:Depends}
 Recommends: python3-distutils
