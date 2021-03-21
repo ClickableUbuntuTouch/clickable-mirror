@@ -1,0 +1,117 @@
+.. _migration:
+
+Clickable 7 Migration
+=====================
+
+This guide describes the changes that come with Clickable 7 and how to migrate a
+project from Clickable 6. The suggestions described here can be applied
+automatically using the
+`clickable-migration <https://crates.io/crates/clickable-migration>`__ tool.
+
+Clean Building
+--------------
+
+Clickable 6 was cleaning the build directory before each build by default.
+If you want to keep that behaviour for your project, add to your
+``clickable.json``:
+
+.. code-block:: javascript
+
+    "always_clean": true
+
+This behaviour can also be enabled temporarily by setting the environment variable
+``CLICKABLE_ALWAYS_CLEAN=ON`` or passing ``--clean`` to a build command. Example:
+``clickable build --clean``
+
+This means the ``clean-build`` command has been removed, as it is not needed
+anymore. This also means that the keyword ``dirty`` and the environment variable
+``CLICKABLE_DIRTY`` are no longer needed nor supported.
+
+Command Line Interface
+----------------------
+
+The command line interface has seen a complete overhaul, eliminating the
+glitches we saw with the old one and enabling a lot of improvements. To get
+an overview run ``clickable --help``.
+
+Bash Completion
+^^^^^^^^^^^^^^^
+
+Clickable 7 supports bash completion through ``argcomplete``. Run the setup and
+confirm to enable bash completion ``clickable setup completion``.
+
+If you use another shell, check `argcomplete docs <https://kislyuk.github.io/argcomplete/>`__
+on whether it is supported and how to enable it.
+
+Sub-Commands
+^^^^^^^^^^^^
+
+Clickable 7 introduces proper sub-commands providing specific parameters and help
+messages. Example: ``clickable create --help``.
+
+Chaining Commands
+^^^^^^^^^^^^^^^^^
+
+In Clickable 6 you could chain commands like ``clickable build install launch logs``.
+On one hand this was practical, on the other it caused a lot of issues with
+different commands. This is not possible anymore with Clickable 7. But don't be afraid!
+The ``chain`` command got your back.
+Example: ``clickable chain build install launch logs``
+
+If no command is provided to ``chain`` it will run the default chain
+``build install launch``, which can even be configured through the ``default`` field.
+And finally a pure ``clickable`` is equivalent to ``clickable chain``. So not much
+changed after all.
+
+Removal of Deprecated Things
+----------------------------
+
+Clickable 6 still accepted some deprecated keywords, which are rejected by
+Clickable 7.
+
+Architecture
+^^^^^^^^^^^^
+
+Instead of setting ``arch`` in your ``clickable.json`` you should specify the
+architecture you want to build for via command line.
+Example: ``clickable build --arch arm64``
+
+In case your app is restricted to one specific architecture for some reason, you
+can still set ``restrict_arch``. Example:
+
+.. code-block:: javascript
+
+    "restrict_arch": "arm64"
+
+If the environment used with container mode only supports compiling for one
+specific architecture, you should set the environment variable ``CLICKABLE_ARCH``.
+
+Build Templates
+^^^^^^^^^^^^^^^
+
+Clickable 6.12.2 changed the naming of build templates to builders in order to
+avoid confusion with app templates. A builder is rather a recipe for building than
+a template anyways. Clickable 7 now rejects the keyword ``template``. You can use
+``builder`` as a drop-in replacement.
+
+Dependencies
+^^^^^^^^^^^^
+
+Clickable can install build dependencies via ``apt``. Some of them are build tools
+you need on your host during the build, such as ``ninja`` or ``libtool``. We call
+these host dependencies. Others are libraries used by your app and need to be
+installed for the target architecture. We call these target dependencies. Clickable
+needs to distinguish them as they need to be installed for different architectures.
+
+Clickable 6 still accepted host dependencies through the deprecated keyword
+``dependencies_build``. Clickable 7 only accepts host dependencies through
+``dependencies_host``. The keyword for target dependencies remains
+``dependencies_target``.
+
+Click Build Command
+^^^^^^^^^^^^^^^^^^^
+
+The click packaging is done by the ``build`` command. Clickable 6 still accepted the
+deprecated ``click-build`` command, which would only print a deprecation message.
+This ancient command has been removed completely in Clickable 7.
+

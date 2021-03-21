@@ -3,15 +3,19 @@
 Commands
 ========
 
-From the root directory of your project you have the following sub-commands available:
+From the root directory of your project you have multiple sub-commands available. Run
+``clickable --help`` to list them all. Some of the most common ones are explained below.
 
+A pure ``clickable`` call is equivalent to ``clickable chain``.
 
-``clickable``
--------------
+``clickable chain``
+-------------------
 
-Runs the default sub-commands specified in the "default" config. A dirty build
-without cleaning the build dir can be achieved by running
-``clickable --dirty``.
+Chains multiple commands that can be specified. The default chain can be configured via the
+:ref:`default <clickable-json-default>` field. The default chain itself defaults to
+``build install launch``.
+
+A clean build can be enforced by running ``clickable chain --clean``.
 
 ``clickable desktop``
 ---------------------
@@ -74,7 +78,6 @@ As root:
 Run clickable with the ``--verbose`` flag to see the executed command for your system.
 
 .. _commands-ide:
-
 
 ``clickable ide <custom_command>``
 ----------------------------------

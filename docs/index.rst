@@ -28,6 +28,7 @@ Using Clickable
     builders
     continuous-integration
     changelog
+    migration
 
 Install Via Pip (Recommended)
 -----------------------------

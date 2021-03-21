@@ -23,7 +23,7 @@ Placeholders & Environment Variables
 ------------------------------------
 
 Placeholders are values provided by Clickable that can be used in some
-configuration fields as ``${PLACEHOLDER}`` (``$PLACEHOLDER`` is deprecated syntax).
+configuration fields as ``${PLACEHOLDER}``.
 All placeholders are provided as environment variables during build, additionally.
 For custom environment variables see :ref:`env_vars <clickable-json-env_vars>`.
 
@@ -103,22 +103,12 @@ This prevents the app from being build for other architectures and may also prev
 
 To specify the architecture for building use the cli argument instead (ex: ``--arch arm64``).
 
-arch
-----
-
-Deprecated, use ``restricted_arch`` instead.
-
 .. _clickable-json-builder:
 
 builder
 -------
 
 Optional, see :ref:`builders <builders>` for the full list of options.
-
-template
---------
-
-Deprecated, use :ref:`builder <clickable-json-builder>` instead.
 
 prebuild
 --------
@@ -294,26 +284,26 @@ Optional, an object detailing custom commands to run. For example:
         "echo": "echo ${ARCH_TRIPLET}"
     }
 
-That enables the use of ``clickable fetch`` and ``clickable echo``.
+That enables the use of ``clickable script fetch`` and ``clickable script echo``.
 
 .. _clickable-json-default:
 
 default
 -------
 
-Optional, sub-commands to run when no sub-commands are
-specified (running simply ``clickable``). Defaults to ``clean build install launch``.
-The ``--dirty`` cli argument removes ``clean`` from that list.
+Optional, sub-commands to run when with the ``chain`` command when no
+sub-commands are specified. Defaults to ``build install launch``.
+The ``--clean`` cli argument prepends ``clean`` to that list.
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-dirty:
+.. _clickable-json-always-clean:
 
-dirty
------
+always_clean
+------------
 
-Optional, whether or not do a dirty build, avoiding to clean the build directory
-before building. You may also specify this as a cli arg (``--dirty``).
+Optional, whether or not to always clean before building, disabling the build
+cache. Affects the ``chain``, ``build`` and ``desktop`` command.
 The default is ``false``.
 
 .. _clickable-json-dependencies_host:
@@ -326,11 +316,6 @@ Optional, a list of dependencies that will be installed in the build container.
 Add tools here that are part of your build tool chain.
 
 Can be specified as a string or a list of strings.
-
-dependencies_build
-------------------
-
-Deprecated, use :ref:`dependencies_host <clickable-json-dependencies_host>` instead.
 
 .. _clickable-json-dependencies_target:
 
@@ -524,3 +509,7 @@ The following keywords are no longer supported:
 - ``sdk``
 - ``package``
 - ``app``
+- ``dirty`` (use ``always_clean`` for the opposite case instead)
+- ``arch`` (use program option ``--arch`` instead)
+- ``template`` (use ``builder`` instead)
+- ``dependencies_build`` (use ``dependencies_host`` instead)
