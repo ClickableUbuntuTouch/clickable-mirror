@@ -92,7 +92,10 @@ class PublishCommand(Command):
                 )
             )
         else:
-            if response.text == 'Unauthorized':
-                raise ClickableException('Failed to upload click: Unauthorized')
-            else:
-                raise ClickableException('Failed to upload click: {}'.format(response.json()['message']))
+            try:
+                message = response.json()['message']
+            except:
+                message = 'Unspecified Error'
+                logger.debug("Publish failed with: {}".format(response.text))
+
+            raise ClickableException('Failed to upload click: {} ({})'.format(message, response.status_code))
