@@ -12,6 +12,7 @@ from clickable.utils import (
     is_sub_dir,
     env,
 )
+from clickable.container import Container
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 
@@ -20,18 +21,21 @@ class BuildCommand(Command):
     def __init__(self):
         super().__init__()
         self.cli_conf.name = 'build'
-        self.cli_conf.help_msg = 'Compile the app'
+        self.cli_conf.help_msg = 'Build the app and/or libraries'
 
-        self.clean = False
+        self.clean_app = False
+        self.clean_libs = False
         self.output_path = None
         self.skip_review = False
         self.debug_build = False
+        self.app = True
+        self.libs = None
 
     def setup_parser(self, parser):
         parser.add_argument(
             '--clean',
             action='store_true',
-            help='Clean build directory before building',
+            help='Clean build directory before building (only applies for app)',
             default=False,
         )
         parser.add_argument(
@@ -50,17 +54,38 @@ class BuildCommand(Command):
             help='Do not review click package after build (useful for unconfined apps)',
             default=False,
         )
+        parser.add_argument(
+            '--app',
+            action='store_true',
+            help='Build app after building libs (only needed when using --libs as well)',
+            default=False,
+        )
+        parser.add_argument(
+            '--libs',
+            nargs='*',
+            help='Build specified libs or all libs if none is specified',
+            default=None,
+        )
 
     def configure(self, args):
-        self.clean = args.clean or self.config.always_clean
+        self.clean_app = args.clean or self.config.always_clean
+        self.clean_libs = args.clean and args.libs is not None
         self.skip_review = args.skip_review
         self.output_path = args.output
         self.debug_build = args.debug
+        self.app = args.app or args.libs is None
+        self.libs = args.libs
+
+        if self.libs is not None:
+            existing_libs = [lib.name for lib in self.config.lib_configs]
+            for lib in self.libs:
+                if lib not in existing_libs:
+                    raise ClickableException('Cannot build unknown library "{}", which is not in your clickable.json'.format(lib))
 
         self.parse_env()
 
     def configure_nested(self):
-        self.clean = self.config.always_clean
+        self.clean_app = self.config.always_clean
 
         self.parse_env()
 
@@ -70,39 +95,55 @@ class BuildCommand(Command):
             self.config.debug_build = True
             self.config.env_vars['DEBUG_BUILD'] = '1'
 
+            for lib in self.config.lib_configs:
+                lib.env_vars['DEBUG_BUILD'] = '1'
+
         if not self.output_path:
             output_env = env('CLICKABLE_OUTPUT')
             if output_env:
                 self.output_path = output_env
 
     def run(self):
-        if self.clean:
+        if self.libs is not None:
+            self.build_libs()
+        if self.app:
+            self.build_app()
+
+    def build_libs(self):
+        if not self.config.lib_configs:
+            logger.warning('No libraries defined.')
+            return
+
+        if self.clean_libs:
+            clean_cmd = CleanCommand(libs=self.libs)
+            clean_cmd.init_from_command(self)
+            clean_cmd.run()
+
+        filter_libs = self.libs
+
+        for lib in self.config.lib_configs:
+            if lib.name in filter_libs or not filter_libs:
+                logger.info("Building {}".format(lib.name))
+
+                lib.container_mode = self.config.container_mode
+                lib.docker_image = self.config.docker_image
+                lib.build_arch = self.config.build_arch
+                container = Container(lib, lib.name)
+
+                # This is a workaround for lib env vars being overwritten by
+                # project env vars, especially affecting Container Mode.
+                lib.set_env_vars()
+
+                self.build(lib, container, is_app=False)
+
+    def build_app(self):
+        if self.clean_app:
             clean_cmd = CleanCommand()
             clean_cmd.init_from_command(self)
             clean_cmd.run()
 
-        try:
-            os.makedirs(self.config.build_dir, exist_ok=True)
-        except Exception:
-            logger.warning('Failed to create the build directory: {}'.format(str(sys.exc_info()[0])))
-
-        try:
-            os.makedirs(self.config.build_home, exist_ok=True)
-        except Exception:
-            logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
-
-        self.container.setup()
-
-        if self.config.prebuild:
-            self.run_custom_commands(self.config.prebuild)
-
-        self.build()
-
-        self.install_additional_files()
-
-        if self.config.postbuild:
-            self.run_custom_commands(self.config.postbuild)
-
+        logger.info("Building app")
+        self.build(self.config, self.container)
         self.click_build()
 
         if not self.skip_review:
@@ -110,13 +151,37 @@ class BuildCommand(Command):
             review.init_from_command(self)
             review.check(self.click_path, raise_on_error=False)
 
-    def build(self):
-        if os.path.isdir(self.config.install_dir):
-            shutil.rmtree(self.config.install_dir)
+    def build(self, config, container, is_app=True):
+        try:
+            makedirs(config.build_dir)
+        except Exception:
+            logger.warning('Failed to create the build directory: {}'.format(str(sys.exc_info()[0])))
 
-        builder_classes = get_builders()
-        builder = builder_classes[self.config.builder](self.config, self.container, self.debug_build)
-        builder.build()
+        try:
+            makedirs(config.build_home)
+        except Exception:
+            logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
+
+        if os.path.isdir(config.install_dir):
+            shutil.rmtree(config.install_dir)
+
+        try:
+            makedirs(config.install_dir)
+        except Exception:
+            logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
+
+        container.setup()
+
+        if self.config.prebuild:
+            self.run_custom_commands(self.config.prebuild)
+
+        run_builder(config, container, self.debug_build)
+
+        if is_app:
+            self.install_additional_files()
+
+        if self.config.postbuild:
+            self.run_custom_commands(self.config.postbuild)
 
     def install_files(self, pattern, dest_dir):
         if not is_sub_dir(dest_dir, self.config.install_dir):
@@ -216,7 +281,7 @@ class BuildCommand(Command):
             output_file = os.path.join(self.output_path, click)
 
             if not os.path.exists(self.output_path):
-                os.makedirs(self.output_path)
+                makedirs(self.output_path)
 
             shutil.copyfile(self.click_path, output_file)
             self.click_path = output_file
@@ -227,3 +292,9 @@ class BuildCommand(Command):
         if commands:
             for cmd in commands:
                 self.container.run_command(cmd, cwd=self.config.cwd)
+
+
+def run_builder(config, container, debug_build):
+    builder_classes = get_builders()
+    builder = builder_classes[config.builder](config, container, debug_build)
+    builder.build()
