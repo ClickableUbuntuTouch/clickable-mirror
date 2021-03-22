@@ -40,6 +40,9 @@ class Container(object):
             if self.needs_customized_container():
                 self.restore_cached_image()
 
+        if self.config.builder == Constants.RUST and self.config.cargo_home:
+            logger.info("Caching cargo related files in {}".format(self.config.cargo_home))
+
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):
             return
@@ -252,12 +255,6 @@ class Container(object):
                 ]
                 go_config = '-e GOPATH={}'.format(':'.join(docker_gopaths), )
 
-            rust_config = ''
-
-            if self.config.builder == Constants.RUST and self.config.cargo_home:
-                logger.info("Caching cargo related files in {}".format(
-                    self.config.cargo_home))
-
             env_vars = self.config.prepare_docker_env_vars()
 
             user = ""
@@ -267,11 +264,10 @@ class Container(object):
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[cwd]))
 
-            wrapped_command = 'docker run {mounts} {env} {go} {rust} {user} -w {cwd} --rm {tty} {network} -i {image} bash -c "{cmd}"'.format(
+            wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} {network} -i {image} bash -c "{cmd}"'.format(
                 mounts=mounts,
                 env=env_vars,
                 go=go_config,
-                rust=rust_config,
                 cwd=self.config.build_dir if use_build_dir else cwd,
                 user=user,
                 image=self.docker_image,
