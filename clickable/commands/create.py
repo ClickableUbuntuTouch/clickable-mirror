@@ -43,6 +43,7 @@ class CreateCommand(Command):
 
         self.extra_context = {}
         self.extra_context['Copyright Year'] = datetime.now().year
+        self.output_dir = '.'
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -105,8 +106,14 @@ class CreateCommand(Command):
             action='store_true',
             help='Confige CMake to dynamically set app versions based on git tags',
         )
+        parser.add_argument(
+            '--dir',
+            default=self.output_dir,
+            help='Output directory under which the project directory is created',
+        )
 
     def configure(self, args):
+        self.output_dir = args.dir
         self.extra_context['Copyright Year'] = args.copyright_year
 
         if args.name:
@@ -150,6 +157,7 @@ class CreateCommand(Command):
                 extra_context=self.extra_context,
                 no_input=not self.config.interactive,
                 config_file=config_file,
+                output_dir=self.output_dir,
             )
         except cookiecutter.exceptions.FailedHookException as err:
             raise ClickableException('Failed to create app, see logs above')
