@@ -17,16 +17,62 @@ class GdbserverCommand(Command):
         self.cli_conf.help_msg = 'Opens a gdbserver session on the device accessible at localhost:3333'
 
         self.port = 3333
+        self.app_dir = None
+        self.executable = None
+        self.add_env = True
+        self.desktop_file = None
+        self.add_desktop_file_hint = True
+        self.check_desktop_file = True
+        self.push_gdbserver = False
 
     def setup_parser(self, parser):
         parser.add_argument(
             '--port',
             default=self.port,
-            help='Open local GDB Server specified port'
+            help='Open local GDB Server specified port',
+        )
+        parser.add_argument(
+            '--app-dir',
+            help='Custom directory on the device where the gdbserver is started',
+        )
+        parser.add_argument(
+            '--exec',
+            help='Custom executable name',
+        )
+        parser.add_argument(
+            '--no-app-env',
+            action='store_true',
+            help='Skip setting app environment',
+        )
+        parser.add_argument(
+            '--desktop-file-hint',
+            help='Custom desktop file to set desktop file hint',
+        )
+        parser.add_argument(
+            '--no-desktop-file-hint',
+            action='store_true',
+            help='Custom desktop file to set desktop file hint',
+        )
+        parser.add_argument(
+            '--no-desktop-file-check',
+            action='store_true',
+            help='Skip check for cached desktop file',
+        )
+        parser.add_argument(
+            '--system-gdbserver',
+            action='store_true',
+            help='Use system gdbserver instead of pushing gdbserver to device home directory',
         )
 
     def configure(self, args):
         self.port = args.port
+        self.app_dir = args.app_dir
+        self.executable = args.exec
+        self.add_env = not args.no_app_env
+        self.desktop_file = args.desktop_file_hint
+        self.add_desktop_file_hint = not args.no_desktop_file_hint
+        self.check_desktop_file = not args.no_desktop_file_check
+        self.push_gdbserver = not args.system_gdbserver
 
     def set_signal_handler(self):
         def signal_handler(sig, frame):
@@ -139,7 +185,8 @@ class GdbserverCommand(Command):
         except:
             raise ClickableException('Failed to check installed version on device. The device is either not accessible or the app version you are trying to debug is not installed. Make sure the device is accessible or run "clickable install" and try again.')
 
-    def push_gdbserver(self):
+    def push_gdbserver_to_device(self):
+        self.container.setup()
         self.container.pull_files(["/usr/bin/gdbserver"], "/tmp/clickable")
         self.device.push_file('/tmp/clickable/gdbserver', '/home/phablet/bin/gdbserver')
 
@@ -147,24 +194,42 @@ class GdbserverCommand(Command):
         if not self.config.ssh:
             logger.warning('SSH is recommended for the "gdbserver" command. If you experience any issues, try again with "--ssh"')
 
-        app_exec = self.get_app_exec_full_path()
-        desktop_file = self.get_cached_desktop_path()
-        app_dir = self.get_app_dir()
-        environ = self.get_app_env()
+        app_exec = self.executable
+        desktop_file = self.desktop_file
+        desktop_file_hint = ''
+        app_dir = self.app_dir
+        environ = {}
+
+        if not self.executable:
+            app_exec = self.get_app_exec_full_path()
+
+        if not self.desktop_file:
+            desktop_file = self.get_cached_desktop_path()
+
+        if not app_dir:
+            app_dir = self.get_app_dir()
+
+        if self.add_env:
+            environ = self.get_app_env()
+
+        if self.add_desktop_file_hint:
+            desktop_file_hint = '--desktop_file_hint={}'.format(desktop_file)
 
         set_env = " ".join(["{}='{}'".format(key, value) for key, value in environ.items()])
         commands = [
-                'cd {}'.format(app_dir),
-                '{} gdbserver localhost:{} {} --desktop_file_hint={}'.format(
-                    set_env, self.port, app_exec, desktop_file)
+            'cd {}'.format(app_dir),
+            '{} gdbserver localhost:{} {} {}'.format(
+                set_env, self.port, app_exec, desktop_file_hint),
         ]
 
         self.set_signal_handler()
         self.device.run_command(commands, forward_port=self.port)
 
     def run(self):
-        self.container.setup()
-        self.check_cached_desktop_file()
+        if self.check_cached_desktop_file:
+            self.check_cached_desktop_file()
 
-        self.push_gdbserver()
+        if self.push_gdbserver:
+            self.push_gdbserver_to_device()
+
         self.start_gdbserver()
