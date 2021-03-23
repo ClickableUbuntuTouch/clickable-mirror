@@ -10,8 +10,30 @@ class TestBuildCommand(UnitTest):
     def setUp(self):
         super().setUp()
         self.command = BuildCommand()
-        self.setUpConfig()
+
+        self.lib_cmd = 'echo "Building lib"'
+
+        config_json = {
+            "libraries": {
+                "testlib": {
+                    'builder': 'custom',
+                    'build': self.lib_cmd,
+                }
+            }
+        }
+        self.setUpConfig(mock_config_json = config_json)
+
         self.click_cmd = 'click build {} --no-validate'.format(self.config.install_dir)
+
+    @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
+    @mock.patch('os.makedirs', side_effect=empty_fn)
+    def test_lib_build(self, mock_makedirs, mock_run_command):
+        self.command.app = False
+        self.command.libs = []
+        self.command.run()
+
+        mock_run_command.assert_called_once_with(self.lib_cmd)
+        mock_makedirs.assert_called_with(ANY, ANY, ANY)
 
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
     def test_click_build(self, mock_run_command):
@@ -29,7 +51,7 @@ class TestBuildCommand(UnitTest):
 
         mock_run_command.assert_called_once_with(self.click_cmd)
         mock_exists.assert_called_with(ANY)
-        mock_makedirs.assert_called_with(ANY)
+        mock_makedirs.assert_called_with(ANY, ANY, ANY)
         mock_copyfile.assert_called_with(ANY, ANY)
 
 
