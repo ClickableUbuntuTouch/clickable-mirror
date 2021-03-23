@@ -9,9 +9,6 @@ class AtomDelegate(IdeCommandDelegate):
     clickable_dir = os.path.expanduser('~/.clickable')
     project_path = os.getcwd()
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'atom')
-    # init_settings_path = os.path.join(template_path, 'QtProject.tar.xz')
-    # target_settings_path = os.path.join(clickable_dir,'QtProject')
-    # template_path = os.path.join(template_path,'CMakeLists.txt.user.shared.in')
     pattern_cmake_vars = re.compile("set\(([-\w]+)\s+(.*)\)", flags=re.IGNORECASE)
     pattern_cmake_subvars = re.compile("\${([-\w]+)}")
     default_cmake_paths = {
