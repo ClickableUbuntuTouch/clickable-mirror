@@ -313,8 +313,9 @@ Can be specified as a string or a list of strings.
 always_clean
 ------------
 
-Optional, whether or not to always clean before building, disabling the build
-cache. Affects the ``chain``, ``build`` and ``desktop`` command.
+Optional, whether or not to always clean app build directory before building,
+disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` command.
+Does not affect libraries.
 The default is ``false``.
 
 .. _clickable-json-dependencies_host:

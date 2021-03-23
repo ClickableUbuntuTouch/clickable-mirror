@@ -63,6 +63,12 @@ If no command is provided to ``chain`` it will run the default chain
 And finally a pure ``clickable`` is equivalent to ``clickable chain``. So not much
 changed after all.
 
+Libraries
+^^^^^^^^^
+
+Libraries are now cleaned and built by the same commands as the app itself. Run
+``clickable build --libs`` to build libraries and ``clickable clean --libs``.
+
 Builders
 --------
 
