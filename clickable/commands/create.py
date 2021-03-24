@@ -16,11 +16,10 @@ COOKIECUTTER_URL = 'https://gitlab.com/clickable/ut-app-meta-template.git'
 
 TEMPLATE_MAP = {
     'pure-qml-cmake': 'QML Only',
-    'cmake': 'C++ (Plugin)',
+    'cmake': 'C++',
     'python-cmake': 'Python',
     'html': 'HTML',
     'go': 'Go',
-    'main-cpp': 'C++ (Binary)',
     'rust': 'Rust',
 }
 
