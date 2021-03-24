@@ -88,7 +88,7 @@ class Device(object):
             return
 
         if not cwd:
-            cwd = self.config.build_dir
+            cwd = os.getcwd()
 
         wrapped_command = ''
         if self.config.ssh:
