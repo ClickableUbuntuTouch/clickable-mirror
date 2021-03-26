@@ -28,14 +28,7 @@ class MakeBuilder(Builder):
         self.container.run_command(command)
 
     def make_install(self):
-        try:
-            os.makedirs(self.config.install_dir)
-        except FileExistsError:
-            logger.warning('Failed to create temp dir, already exists')
-        except Exception:
-            logger.warning('Failed to create temp dir ({}): {}'.format(self.config.install_dir, str(sys.exc_info()[0])))
-
-        # The actual make command is implemented in the subclasses
+        raise NotImplementedError('make install is not yet implemented on this builder')
 
     def build(self):
         self.make()

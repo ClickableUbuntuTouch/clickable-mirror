@@ -27,6 +27,9 @@ class RustBuilder(Builder):
         return rust_arch_target_mapping[self.config.build_arch]
 
     def build(self):
+        if os.path.isdir(self.config.install_dir):
+            shutil.rmtree(self.config.install_dir)
+
         # Build using cargo
         cargo_command = 'cargo build {} --target {} --target-dir {}' \
             .format('--release' if not self.debug_build else '',

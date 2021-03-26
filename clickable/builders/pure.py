@@ -39,6 +39,8 @@ class PureBuilder(Builder):
         return ignored
 
     def build(self):
+        if os.path.isdir(self.config.install_dir):
+            shutil.rmtree(self.config.install_dir)
         shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
         logger.info('Copied files to install directory for click building')
 

@@ -7,8 +7,6 @@ class QMakeBuilder(MakeBuilder):
     name = Constants.QMAKE
 
     def make_install(self):
-        super().make_install()
-
         self.container.run_command('make INSTALL_ROOT={}/ install'.format(self.config.install_dir))
 
     def build(self):

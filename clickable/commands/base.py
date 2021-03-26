@@ -52,4 +52,4 @@ class Command(object):
 
     def run(self):
         """ Run command """
-        raise NotImplementedError('run is not yet implemeneted')
+        raise NotImplementedError('run is not yet implemented')

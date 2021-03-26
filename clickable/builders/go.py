@@ -28,6 +28,8 @@ class GoBuilder(Builder):
         return ignored
 
     def build(self):
+        if os.path.isdir(self.config.install_dir):
+            shutil.rmtree(self.config.install_dir)
         shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
 
         gocommand = '/usr/local/go/bin/go build -pkgdir {cwd}/.clickable/go -i -o {install_dir}/{app_name} ../../..'.format(

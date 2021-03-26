@@ -7,8 +7,6 @@ class CMakeBuilder(MakeBuilder):
     name = Constants.CMAKE
 
     def make_install(self):
-        super().make_install()
-
         self.container.run_command('make DESTDIR={}/ install'.format(self.config.install_dir))
 
     def build(self):
