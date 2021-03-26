@@ -149,7 +149,7 @@ def get_builders():
 
 
 def get_make_jobs_from_args(make_args):
-    for arg in flexible_string_to_list(make_args):
+    for arg in flexible_string_to_list(make_args, split=True):
         if arg.startswith('-j'):
             jobs_str = arg[2:]
             try:
@@ -169,9 +169,12 @@ def merge_make_jobs_into_args(make_args, make_jobs):
         return make_jobs_arg
 
 
-def flexible_string_to_list(variable):
+def flexible_string_to_list(variable, split=False):
     if isinstance(variable, (str, bytes)):
-        return variable.split(' ')
+        if split:
+            return variable.split(' ')
+        else:
+            return [variable]
     return variable
 
 

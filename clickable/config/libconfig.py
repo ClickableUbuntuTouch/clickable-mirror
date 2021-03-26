@@ -36,8 +36,11 @@ class LibConfig(object):
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'build_home']
     required = ['builder']
-    flexible_lists = ['dependencies_host', 'dependencies_target',
+    # If specified as a string split at spaces
+    flexible_split_list = ['dependencies_host', 'dependencies_target',
                       'dependencies_ppa', 'build_args', 'make_args']
+    # If specified as a string convert it to a list of size 1
+    flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
     builders = [Constants.QMAKE, Constants.CMAKE, Constants.CUSTOM]
 
     first_docker_info = True
@@ -157,8 +160,11 @@ class LibConfig(object):
         self.make_args = merge_make_jobs_into_args(
             make_args=self.make_args, make_jobs=self.make_jobs)
 
-        for key in self.flexible_lists:
-            self.config[key] = flexible_string_to_list(self.config[key])
+        for key in self.flexible_split_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=True)
+
+        for key in self.flexible_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=False)
 
     def check_config_errors(self):
         if not self.config['builder']:

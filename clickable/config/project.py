@@ -72,10 +72,13 @@ class ProjectConfig(object):
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
                  'app_qml_dir', 'build_home']
-    flexible_lists = ['dependencies_host', 'dependencies_target',
+    # If specified as a string split at spaces
+    flexible_split_list = ['dependencies_host', 'dependencies_target',
                       'dependencies_ppa',
                       'install_lib', 'install_bin', 'install_qml',
                       'build_args', 'make_args', 'default', 'ignore']
+    # If specified as a string convert it to a list of size 1
+    flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
     removed_keywords = ['chroot', 'sdk', 'package', 'app', 'premake', 'ssh',
                         'dependencies', 'specificDependencies', 'dir', 'lxd',
                         'arch', 'template', 'dependencies_build', 'dirty']
@@ -168,7 +171,7 @@ class ProjectConfig(object):
             arg_config = self.load_arg_config(args)
             self.config.update(arg_config)
 
-        self.config['default'] = flexible_string_to_list(self.config['default'])
+        self.config['default'] = flexible_string_to_list(self.config['default'], split=True)
 
         self.commands = commands
         if always_clean:
@@ -519,8 +522,11 @@ class ProjectConfig(object):
                 self.config[key] = lib.config[lp]
 
     def cleanup_config(self):
-        for key in self.flexible_lists:
-            self.config[key] = flexible_string_to_list(self.config[key])
+        for key in self.flexible_split_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=True)
+
+        for key in self.flexible_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=False)
 
         self.ignore.extend(['.git', '.bzr', '.clickable'])
 

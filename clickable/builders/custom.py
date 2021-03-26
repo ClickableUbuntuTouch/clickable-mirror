@@ -7,4 +7,5 @@ class CustomBuilder(Builder):
     name = Constants.CUSTOM
 
     def build(self):
-        self.container.run_command(self.config.build)
+        for cmd in self.config.build:
+            self.container.run_command(cmd)

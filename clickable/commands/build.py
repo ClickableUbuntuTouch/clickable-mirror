@@ -94,14 +94,14 @@ class BuildCommand(Command):
         self.container.setup()
 
         if self.config.prebuild:
-            self.container.run_command(self.config.prebuild, cwd=self.config.cwd)
+            self.run_custom_commands(self.config.prebuild)
 
         self.build()
 
         self.install_additional_files()
 
         if self.config.postbuild:
-            self.container.run_command(self.config.postbuild, cwd=self.config.cwd)
+            self.run_custom_commands(self.config.postbuild)
 
         self.click_build()
 
@@ -222,3 +222,8 @@ class BuildCommand(Command):
             self.click_path = output_file
 
         logger.debug('Click outputted to {}'.format(self.click_path))
+
+    def run_custom_commands(self, commands):
+        if commands:
+            for cmd in commands:
+                self.container.run_command(cmd, cwd=self.config.cwd)

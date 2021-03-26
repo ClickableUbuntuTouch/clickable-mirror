@@ -11,7 +11,8 @@ from clickable.config.project import ProjectConfig
 class MakeBuilder(Builder):
     def post_make(self):
         if self.config.postmake:
-            subprocess.check_call(self.config.postmake, cwd=self.config.build_dir, shell=True)
+            for cmd in self.config.postmake:
+                subprocess.check_call(cmd, cwd=self.config.build_dir, shell=True)
 
     def post_make_install(self):
         pass
