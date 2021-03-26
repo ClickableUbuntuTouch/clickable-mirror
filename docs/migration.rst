@@ -63,8 +63,22 @@ If no command is provided to ``chain`` it will run the default chain
 And finally a pure ``clickable`` is equivalent to ``clickable chain``. So not much
 changed after all.
 
-Pure and Cordova Builders
--------------------------
+Builders
+--------
+
+Rust
+^^^^
+
+In Clickable 6 the Rust builder would install files such as the manifest or assets.
+In order to be more flexible and better aligned with the other builds, this behaviour
+was removed from the builder and added as ``install_data`` field in the Rust app
+template. For existing Rust apps adding that field might be necessary as well.
+
+The Rust builder now configures the target directory to the build directory configured
+with Clickable in order to make the ``clean`` command work correctly for Rust apps.
+
+Pure and Cordova
+^^^^^^^^^^^^^^^^
 
 In Clickable 6 pure and cordova builders would silently override ``architecture`` and
 ``framework`` fields in the app manifest. This behaviour was removed. For existing apps
