@@ -29,7 +29,6 @@
         "custom",
         "cordova",
         "pure",
-        "python",
         "go",
         "rust",
         "precompiled"
