@@ -117,6 +117,12 @@ avoid confusion with app templates. A builder is rather a recipe for building th
 a template anyways. Clickable 7 now rejects the keyword ``template``. You can use
 ``builder`` as a drop-in replacement.
 
+Python Builder
+^^^^^^^^^^^^^^
+
+Use the ``precompiled`` builder if your Python-based app contains architecture
+specific files or the ``pure`` template otherwise.
+
 Dependencies
 ^^^^^^^^^^^^
 
