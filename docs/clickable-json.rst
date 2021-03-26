@@ -115,21 +115,30 @@ prebuild
 
 Optional, a custom command to run from the root dir, before a build.
 
+Can be specified as a string or a list of strings.
+
 build
 -----
 
 A custom command to run from the build dir. Required if using the ``custom``
 builder, ignored otherwise.
 
+Can be specified as a string or a list of strings.
+
 postmake
 ---------
 
-Optional, a custom command to execute from the build directory, after make (during build).
+Optional, a custom command to execute from the build directory, after make (during build). Only
+used for Make-based builders.
+
+Can be specified as a string or a list of strings.
 
 postbuild
 ---------
 
 Optional, a custom command to execute from the root dir, after build, but before click packaging.
+
+Can be specified as a string or a list of strings.
 
 .. _clickable-json-env_vars:
 
