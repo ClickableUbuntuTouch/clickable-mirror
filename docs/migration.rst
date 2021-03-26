@@ -63,6 +63,15 @@ If no command is provided to ``chain`` it will run the default chain
 And finally a pure ``clickable`` is equivalent to ``clickable chain``. So not much
 changed after all.
 
+Pure and Cordova Builders
+-------------------------
+
+In Clickable 6 pure and cordova builders would silently override ``architecture`` and
+``framework`` fields in the app manifest. This behaviour was removed. For existing apps
+relying on the removed behaviour one might need to set those fields correctly or let
+Clickable override it by setting the fields to ``@CLICK_ARCH@`` or ``@CLICK_FRAMEWORK@``
+accordingly.
+
 Removal of Deprecated Things
 ----------------------------
 
