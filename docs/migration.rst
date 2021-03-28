@@ -91,6 +91,16 @@ that would configure the manifest ``architecture`` field to ``amd`` when it actu
 should be ``all``. If that is the case for your app, just remove the command that
 sets the variable ``CLICK_ARCH``.
 
+Custom Build Commands
+---------------------
+
+In contrast to previous versions, Clickable 7 executes ``prebuild`` and ``postbuild``
+commands within the build container, making it independent of tools installed on host
+side.
+
+Clickable 7 lets you specify a list of commands for ``prebuild``, ``build``,
+``postmake`` and ``postbuild``.
+
 Removal of Deprecated Things
 ----------------------------
 
