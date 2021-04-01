@@ -86,6 +86,11 @@ relying on the removed behaviour one might need to set those fields correctly or
 Clickable override it by setting the fields to ``@CLICK_ARCH@`` or ``@CLICK_FRAMEWORK@``
 accordingly.
 
+Some time in the past, the pure builder app template contained a CMake configuration
+that would configure the manifest ``architecture`` field to ``amd`` when it actually
+should be ``all``. If that is the case for your app, just remove the command that
+sets the variable ``CLICK_ARCH``.
+
 Removal of Deprecated Things
 ----------------------------
 
