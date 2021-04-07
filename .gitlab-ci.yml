@@ -14,6 +14,13 @@ unit-test:
   script:
     - nosetests tests/unit
 
+check-template-names:
+  stage: test
+  image: clickable/testing
+  script:
+    - tests/check-template-names.py
+  allow_failure: true
+
 publish-pypi:
   stage: publish
   image: clickable/build-deb:focal
