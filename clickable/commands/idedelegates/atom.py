@@ -6,17 +6,6 @@ from clickable.logger import logger, Colors
 from .idedelegate import IdeCommandDelegate
 
 class AtomDelegate(IdeCommandDelegate):
-    clickable_dir = os.path.expanduser('~/.clickable')
-    project_path = os.getcwd()
-    template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'atom')
-    pattern_cmake_vars = re.compile("set\(([-\w]+)\s+(.*)\)", flags=re.IGNORECASE)
-    pattern_cmake_subvars = re.compile("\${([-\w]+)}")
-    default_cmake_paths = {
-        'CMAKE_INSTALL_DATADIR': 'share',
-        'CMAKE_INSTALL_LIBDIR': 'lib',
-        'CMAKE_INSTALL_BINDIR': 'bin',
-    }
-
 
     def override_command(self, path):
         #atom does not launch within the bash process, but starts a decoupled process, making the bash command directly return causing clickable to close the docker container
