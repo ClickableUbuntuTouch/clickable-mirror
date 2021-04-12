@@ -32,6 +32,8 @@ The following table lists all available placeholders.
 ======================= ======
 Placeholder             Output
 ======================= ======
+SDK_FRAMEWORK           Target framework (``ubuntu-sdk-16.04.5`` by default)
+QT_VERSION              Qt version within target framework (``5.12`` by default)
 ARCH                    Target architecture (``armhf``, ``arm64``, ``amd64`` or ``all``)
 ARCH_TRIPLET            Target architecture triplet (``arm-linux-gnueabihf``, ``aarch63-linux-gnu``, ``x86_64-linux-gnu`` or ``all``)
 NUM_PROCS               Number of build jobs recommended (``make_jobs``) and used by the CMake and QMake builders
