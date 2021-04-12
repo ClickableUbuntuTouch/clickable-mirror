@@ -6,13 +6,13 @@ integration-test:
   stage: test
   image: clickable/testing
   script:
-    - nosetests tests/integration
+    - nosetests integration
 
 unit-test:
   stage: test
   image: clickable/testing
   script:
-    - nosetests tests/unit
+    - nosetests unit
 
 check-template-names:
   stage: test
