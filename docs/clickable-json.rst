@@ -80,8 +80,8 @@ qt_version
 ----------
 
 Qt version consisting of major and minor version. This value is used to
-determine the framework automatically. Defaults to ``5.9``.
-Ex: ``5.12``
+determine the framework automatically. Defaults to ``5.12``.
+Ex: ``5.9``
 
 .. _clickable-json-framework:
 
@@ -400,7 +400,7 @@ docker_image
 
 Optional, the name of a docker image to use. When building a custom docker image
 it's recommended to use one of the Clickable images as a base. You can find them
-on `Docker Hub <https://hub.docker.com/r/clickable/ubuntu-sdk/tags/>`__.
+on `Docker Hub <https://hub.docker.com/u/clickable>`__.
 
 ignore
 ------
