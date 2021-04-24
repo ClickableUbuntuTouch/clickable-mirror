@@ -41,7 +41,8 @@ class Container(object):
                 self.restore_cached_image()
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
-            logger.info("Caching cargo related files in {}".format(self.config.cargo_home))
+            logger.info("Caching cargo related files in {} and {}".format(
+                self.config.cargo_home, self.config.rustup_home))
 
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):
@@ -200,9 +201,11 @@ class Container(object):
             cargo_git = os.path.join(self.config.cargo_home, 'git')
             cargo_package_cache_lock = os.path.join(self.config.cargo_home,
                                                     '.package-cache')
+            rustup_tmp = os.path.join(self.config.rustup_home, 'tmp')
 
             os.makedirs(cargo_registry, exist_ok=True)
             os.makedirs(cargo_git, exist_ok=True)
+            os.makedirs(rustup_tmp, exist_ok=True)
 
             # create .package-cache if it doesn't exist
             with open(cargo_package_cache_lock, "a"):
@@ -211,6 +214,7 @@ class Container(object):
             mounts['/opt/rust/cargo/registry'] = cargo_registry
             mounts['/opt/rust/cargo/git'] = cargo_git
             mounts['/opt/rust/cargo/.package-cache'] = cargo_package_cache_lock
+            mounts['/opt/rust/rustup/tmp'] = rustup_tmp
 
         for path in transparent:
             mounts[path] = path

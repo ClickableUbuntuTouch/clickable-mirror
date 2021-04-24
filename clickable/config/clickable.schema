@@ -106,6 +106,7 @@
     },
     "gopath": {"type": "string"},
     "cargo_home": {"type": "string"},
+    "rustup_home": {"type": "string"},
     "build_args": {
       "type": ["string","array"],
       "items": {"type": "string"}
