@@ -65,13 +65,13 @@ class ProjectConfig(object):
                             "app_lib_dir", "app_bin_dir", "app_qml_dir",
                             "gopath", "cargo_home", "scripts", "build",
                             "build_args", "make_args", "postmake", "postbuild",
-                            "prebuild",
+                            "prebuild", "rustup_home",
                             "install_lib", "install_qml", "install_bin",
                             "install_data", "env_vars", "build_home"]
 
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
-                 'app_qml_dir', 'build_home']
+                 'app_qml_dir', 'build_home', 'rustup_home']
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
                       'dependencies_ppa',
@@ -144,6 +144,7 @@ class ProjectConfig(object):
             'make_jobs': None,
             'gopath': None,
             'cargo_home': os.path.expanduser('~/.clickable/cargo'),
+            'rustup_home': os.path.expanduser('~/.clickable/rustup'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
