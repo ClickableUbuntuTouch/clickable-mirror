@@ -2,6 +2,7 @@ from .desktop import DesktopCommand
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 from .idedelegates.qtcreator import QtCreatorDelegate
+from .idedelegates.atom import AtomDelegate
 
 class IdeCommand(DesktopCommand):
     def __init__(self):
@@ -32,5 +33,10 @@ class IdeCommand(DesktopCommand):
             self.ide_delegate = QtCreatorDelegate(self.config)
             self.command = self.ide_delegate.override_command(self.command)
             logger.debug('QtCreator command detected. Changing command to: {}'.format(self.command))
+
+        if 'atom' in self.command.split():
+            self.ide_delegate = AtomDelegate()
+            self.command = self.ide_delegate.override_command(self.command)
+            logger.debug('Atom command detected. Changing command to: {}'.format(self.command))
 
         super().run()
