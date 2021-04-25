@@ -35,7 +35,7 @@ class IdeCommand(DesktopCommand):
             logger.debug('QtCreator command detected. Changing command to: {}'.format(self.command))
 
         if 'atom' in self.command.split():
-            self.ide_delegate = AtomDelegate()
+            self.ide_delegate = AtomDelegate(self.config)
             self.command = self.ide_delegate.override_command(self.command)
             logger.debug('Atom command detected. Changing command to: {}'.format(self.command))
 
