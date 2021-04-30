@@ -1,4 +1,5 @@
-from .config import ConfigMock
+from .config import ConfigMock  # noqa=F401
+
 
 def empty_fn(*args, **kwargs):
     pass

@@ -1,5 +1,6 @@
 from clickable.utils import let_user_confirm
 
+
 class IdeCommandDelegate:
     def __init__(self, config):
         self.config = config

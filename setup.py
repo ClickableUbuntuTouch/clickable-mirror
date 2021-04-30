@@ -4,6 +4,7 @@
 import ast
 import re
 
+
 try:
     from setuptools import setup
 except ImportError:
@@ -27,7 +28,8 @@ requirements = [
 setup(
     name='clickable-ut',
     version=version,
-    description='Compile, build, and deploy Ubuntu Touch click packages all from the command line.',
+    description='Compile, build, and deploy Ubuntu Touch click packages all '
+                'from the command line.',
     long_description=readme,
     long_description_content_type='text/markdown',
     author='Brian Douglass',

@@ -1,8 +1,7 @@
 from unittest import mock
-from unittest.mock import ANY
 
 from clickable.commands.launch import LaunchCommand
-from ..mocks import empty_fn, exception_fn, true_fn
+from ..mocks import empty_fn, exception_fn
 from .base_test import UnitTest
 
 
@@ -27,7 +26,10 @@ class TestLaunchCommand(UnitTest):
     def test_launch(self, mock_run_command):
         self.command.run()
 
-        mock_run_command.assert_called_once_with('sleep 1s && ubuntu-app-launch foo.bar_foo_1.2.3', cwd='/tmp/build')
+        mock_run_command.assert_called_once_with(
+            'sleep 1s && ubuntu-app-launch foo.bar_foo_1.2.3',
+            cwd='/tmp/build'
+        )
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_launch_custom(self, mock_run_command):

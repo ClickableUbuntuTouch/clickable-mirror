@@ -11,7 +11,7 @@ class UnitTest(TestCase):
         config_json = {}
         config_json["build_dir"] = "/tmp/build"
         config_json["install_dir"] = "/tmp/build/install"
-        self.setUpConfig(mock_config_json = config_json)
+        self.setUpConfig(mock_config_json=config_json)
 
     def setUpConfig(self,
                     expect_exception=False,

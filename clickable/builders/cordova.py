@@ -1,14 +1,11 @@
-import subprocess
-import shlex
 import json
 import shutil
-import sys
 import os
 from distutils.dir_util import copy_tree
 
-from .cmake import CMakeBuilder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
+
+from .cmake import CMakeBuilder
 
 
 class CordovaBuilder(CMakeBuilder):
@@ -25,7 +22,7 @@ class CordovaBuilder(CMakeBuilder):
         self.config.src_dir = os.path.join(self.platform_dir, 'build')
 
         if not os.path.isdir(self.platform_dir):
-            command = self.container.run_command("cordova platform add ubuntu")
+            self.container.run_command("cordova platform add ubuntu")
 
     def make_install(self):
         super().make_install()

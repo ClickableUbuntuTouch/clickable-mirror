@@ -2,9 +2,10 @@ import os
 import shutil
 import sys
 
-from .base import Command
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
+
+from .base import Command
 
 
 class CleanCommand(Command):
@@ -38,7 +39,10 @@ class CleanCommand(Command):
             existing_libs = [lib.name for lib in self.config.lib_configs]
             for lib in self.libs:
                 if lib not in existing_libs:
-                    raise ClickableException('Cannot clean unknown library "{}", which is not in your clickable.json'.format(lib))
+                    raise ClickableException(
+                        'Cannot clean unknown library "{}", which is not in your '
+                        'clickable.json'.format(lib)
+                    )
 
     def run(self):
         if self.libs is not None:
@@ -62,14 +66,16 @@ class CleanCommand(Command):
         logger.info("Cleaning app build directory")
         clean(self.config.build_dir)
 
+
 def clean(path):
     if os.path.exists(path):
         try:
             logger.info("Cleaning directory {}.".format(path))
             shutil.rmtree(path)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             cls, value, _ = sys.exc_info()
-            if cls == OSError and 'No such file or directory' in str(value):  # TODO see if there is a proper way to do this
+            # TODO see if there is a proper way to do this
+            if cls == OSError and 'No such file or directory' in str(value):
                 pass  # Nothing to do here, the directory didn't exist
             else:
                 logger.warning('Failed to clean the directory: {}: {}'.format(cls, value))

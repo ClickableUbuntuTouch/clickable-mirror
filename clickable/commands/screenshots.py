@@ -1,5 +1,6 @@
-from .base import Command
 from clickable.utils import run_subprocess_check_call
+
+from .base import Command
 
 
 class ScreenshotsCommand(Command):

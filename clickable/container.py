@@ -12,16 +12,14 @@ from clickable.utils import (
     run_subprocess_call,
     run_subprocess_check_call,
     run_subprocess_check_output,
-    check_command,
     image_exists,
 )
 from clickable.logger import logger
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 
 
-class Container(object):
+class Container():
     def __init__(self, config, name=None, minimum_version=None):
         self.config = config
         self.docker_mode = self.config.needs_docker()
@@ -86,7 +84,11 @@ class Container(object):
 
     def start_docker(self):
         started = False
-        error_code = run_subprocess_call(shlex.split('which systemctl'), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        error_code = run_subprocess_call(
+            shlex.split('which systemctl'),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
         if error_code == 0:
             logger.info('Asking for root to start docker')
@@ -98,17 +100,23 @@ class Container(object):
 
     def check_docker(self, retries=3):
         if not self.docker_mode:
-            raise ClickableException("Container was not initialized with Container Mode. This seems to be a bug in Clickable.")
+            raise ClickableException(
+                "Container was not initialized with Container Mode. "
+                "This seems to be a bug in Clickable."
+            )
 
         if self.needs_docker_setup():
             self.setup_docker()
 
         try:
             run_subprocess_check_output(shlex.split('docker ps'), stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as err:
             retries -= 1
             if retries <= 0:
-                raise ClickableException("Couldn't check docker. If you just installed Clickable you may need to reboot once.")
+                raise ClickableException(
+                    "Couldn't check docker. If you just installed Clickable you may "
+                    "need to reboot once."
+                ) from err
 
             self.start_docker()
 
@@ -126,10 +134,17 @@ class Container(object):
         return group_exists
 
     def user_part_of_docker_group(self):
-        output = run_subprocess_check_output(shlex.split('groups {}'.format(getpass.getuser()))).strip()
+        output = run_subprocess_check_output(
+            shlex.split('groups {}'.format(getpass.getuser()))
+        ).strip()
 
         # Test for exactly docker in the group list
-        return (' docker ' in output or output.endswith(' docker') or output.startswith('docker ') or output == 'docker')
+        return (
+            ' docker ' in output or
+            output.endswith(' docker') or
+            output.startswith('docker ') or
+            output == 'docker'
+        )
 
     def needs_docker_setup(self):
         return (
@@ -150,7 +165,9 @@ class Container(object):
             logger.info('Setup has already been completed')
         else:
             logger.info('Asking for root to add the current user to the docker group')
-            subprocess.check_call(shlex.split('sudo usermod -aG docker {}'.format(getpass.getuser())))
+            subprocess.check_call(
+                shlex.split('sudo usermod -aG docker {}'.format(getpass.getuser()))
+            )
 
             raise ClickableException('Log out or restart to apply changes')
 
@@ -187,7 +204,7 @@ class Container(object):
             run_subprocess_check_call(command_remove,
                                       stdout=subprocess.DEVNULL)
 
-    def get_docker_mounts(self, transparent=[]):
+    def get_docker_mounts(self, transparent=None):
         # container path is key, host path is value
         mounts = {}
 
@@ -216,8 +233,9 @@ class Container(object):
             mounts['/opt/rust/cargo/.package-cache'] = cargo_package_cache_lock
             mounts['/opt/rust/rustup/tmp'] = rustup_tmp
 
-        for path in transparent:
-            mounts[path] = path
+        if transparent:
+            for path in transparent:
+                mounts[path] = path
 
         return mounts
 
@@ -244,7 +262,10 @@ class Container(object):
             self.check_docker()
 
             if ' ' in cwd or ' ' in self.config.build_dir:
-                raise ClickableException('There are spaces in the current path, this will cause errors in the build process')
+                raise ClickableException(
+                    'There are spaces in the current path, this will cause errors in the '
+                    'build process'
+                )
 
             if self.config.first_docker_info:
                 logger.debug('Using docker container "{}"'.format(self.docker_image))
@@ -268,17 +289,18 @@ class Container(object):
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[cwd]))
 
-            wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} {network} -i {image} bash -c "{cmd}"'.format(
-                mounts=mounts,
-                env=env_vars,
-                go=go_config,
-                cwd=self.config.build_dir if use_build_dir else cwd,
-                user=user,
-                image=self.docker_image,
-                cmd=command,
-                tty="-t" if tty else "",
-                network='--network="host"' if localhost else "",
-            )
+            wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} ' \
+                              '{network} -i {image} bash -c "{cmd}"'.format(
+                                mounts=mounts,
+                                env=env_vars,
+                                go=go_config,
+                                cwd=self.config.build_dir if use_build_dir else cwd,
+                                user=user,
+                                image=self.docker_image,
+                                cmd=command,
+                                tty="-t" if tty else "",
+                                network='--network="host"' if localhost else "",
+                              )
 
         kwargs = {}
         if use_build_dir:
@@ -286,8 +308,9 @@ class Container(object):
 
         if get_output:
             return run_subprocess_check_output(shlex.split(wrapped_command), **kwargs)
-        else:
-            subprocess.check_call(shlex.split(wrapped_command), **kwargs)
+
+        subprocess.check_call(shlex.split(wrapped_command), **kwargs)
+        return None
 
     def get_dependency_packages(self):
         dependencies = self.config.dependencies_host
@@ -309,7 +332,7 @@ class Container(object):
 
     def construct_dockerfile_content(self, commands, env_vars):
         env_strings = [
-            'ENV {}="{}"'.format(key, var) for key,var in env_vars.items()
+            'ENV {}="{}"'.format(key, var) for key, var in env_vars.items()
         ]
 
         run_strings = [
@@ -338,11 +361,14 @@ FROM {}
             json.dump({
                 'name': self.docker_image,
                 'base_image': self.base_docker_image,
-            },f)
+            }, f)
 
         logger.debug('Generating new docker image')
         try:
-            subprocess.check_call(shlex.split('docker build -t {} .'.format(self.docker_image)), cwd=self.clickable_dir)
+            subprocess.check_call(
+                shlex.split('docker build -t {} .'.format(self.docker_image)),
+                cwd=self.clickable_dir
+            )
         except subprocess.CalledProcessError:
             self.clean_clickable()
             raise
@@ -362,8 +388,8 @@ FROM {}
                 return True
 
         command = 'docker images -q {}'.format(self.docker_image)
-        image_exists = run_subprocess_check_output(command).strip()
-        return not image_exists
+        exists = run_subprocess_check_output(command).strip()
+        return not exists
 
     def get_apt_install_cmd(self, dependencies):
         return 'apt-get install -y --force-yes --no-install-recommends {}'.format(
@@ -382,7 +408,9 @@ FROM {}
         dependencies = self.get_dependency_packages()
         if dependencies:
             commands.append(
-                'echo set debconf/frontend Noninteractive | debconf-communicate && echo set debconf/priority critical | debconf-communicate')
+                'echo set debconf/frontend Noninteractive | debconf-communicate && '
+                'echo set debconf/priority critical | debconf-communicate'
+            )
             commands.append(
                 'apt-get update && {} && apt-get clean'.format(
                     self.get_apt_install_cmd(dependencies)))
@@ -410,7 +438,11 @@ FROM {}
             for dep in dependencies:
                 exists = ''
                 try:
-                    exists = self.run_command('dpkg -s {} | grep Status'.format(dep), get_output=True, use_build_dir=False)
+                    exists = self.run_command(
+                        'dpkg -s {} | grep Status'.format(dep),
+                        get_output=True,
+                        use_build_dir=False
+                    )
                 except subprocess.CalledProcessError:
                     exists = ''
 
@@ -419,8 +451,10 @@ FROM {}
                     break
 
             if run:
-                self.run_command(self.get_apt_install_cmd(dependencies),
-                        use_build_dir=False)
+                self.run_command(
+                    self.get_apt_install_cmd(dependencies),
+                    use_build_dir=False
+                )
             else:
                 logger.debug('Dependencies already installed')
 
@@ -444,18 +478,23 @@ FROM {}
         version = 0
         try:
             format_string = '{{ index .Config.Labels "image_version"}}'
-            command = "docker inspect --format '{}' {}".format(format_string,
-                    self.docker_image)
+            command = "docker inspect --format '{}' {}".format(
+                format_string,
+                self.docker_image
+            )
             logger.debug('Checking docker image version via: {}'.format(command))
 
             version_string = run_subprocess_check_output(command)
             version = int(version_string)
         except (ValueError, subprocess.CalledProcessError):
-            logger.warn("Could not read the image version from the container")
+            logger.warning("Could not read the image version from the container")
 
         if version < self.minimum_version:
-            raise ClickableException('This version of Clickable requires Clickable docker image {} in version {} or higher (found version {}). Please run "clickable update" to update your local images.'.format(self.docker_image, self.minimum_version, version))
-
+            raise ClickableException(
+                'This version of Clickable requires Clickable docker image {} in version '
+                '{} or higher (found version {}). Please run "clickable update" to update '
+                'your local images.'.format(self.docker_image, self.minimum_version, version)
+            )
 
     def setup(self):
         if self.config.container_mode:
@@ -472,9 +511,10 @@ FROM {}
         if os.path.exists(path):
             try:
                 shutil.rmtree(path)
-            except Exception:
-                type, value, traceback = sys.exc_info()
-                if type == OSError and 'No such file or directory' in value:  # TODO see if there is a proper way to do this
+            except Exception:  # pylint: disable=broad-except
+                typ, value, _ = sys.exc_info()
+                # TODO see if there is a proper way to do this
+                if typ == OSError and 'No such file or directory' in value:
                     pass  # Nothing to do here, the directory didn't exist
                 else:
                     raise

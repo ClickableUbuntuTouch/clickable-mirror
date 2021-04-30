@@ -1,16 +1,17 @@
 import argparse
 import sys
 
-from clickable.config.project import ProjectConfig
-from clickable.version import __version__, show_version
+from clickable.version import show_version
 from clickable.exceptions import ClickableException
+
 
 class VersionAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         show_version()
         sys.exit(0)
 
-class Cli(object):
+
+class Cli():
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='clickable')
         self.subparsers = self.parser.add_subparsers(title='commands', dest='sub_command')
@@ -24,8 +25,11 @@ class Cli(object):
             raise ClickableException("Command class {} has no command name.".format(
                 type(command).__name__))
 
-        parser = self.subparsers.add_parser(config.name, help=config.help_msg,
-                aliases=config.aliases)
+        parser = self.subparsers.add_parser(
+            config.name,
+            help=config.help_msg,
+            aliases=config.aliases
+        )
 
         self.add_common_options(parser)
         command.setup_parser(parser)
@@ -36,13 +40,15 @@ class Cli(object):
         parser.add_argument(
             '--config',
             '-c',
-            help='Use specified config file instead of looking for the optional "clickable.json" in the current directory',
+            help='Use specified config file instead of looking for the optional "clickable.json" '
+                 'in the current directory',
             default=None
         )
         parser.add_argument(
             '--serial-number',
             '-s',
-            help='Directs command to the device or emulator with the given serial number or qualifier (using adb)',
+            help='Directs command to the device or emulator with the given serial number or '
+                 'qualifier (using adb)',
             default=None
         )
         parser.add_argument(
@@ -53,7 +59,7 @@ class Cli(object):
         parser.add_argument(
             '--arch',
             '-a',
-            choices=['armhf','arm64','amd64','all'],
+            choices=['armhf', 'arm64', 'amd64', 'all'],
             help='Use the specified arch when building'
         )
         parser.add_argument(
@@ -75,13 +81,15 @@ class Cli(object):
         parser.add_argument(
             '--no-nvidia',
             action='store_true',
-            help="Don't use docker with --runtime=nvidia and *-nvidia docker image (disables automatic nvidia detection)",
+            help="Don't use docker with --runtime=nvidia and *-nvidia docker image "
+                 "(disables automatic nvidia detection)",
             default=False,
         )
         parser.add_argument(
             '--non-interactive',
             action='store_true',
-            help='Do not show prompts for anything (meant for CIs and integration into other tools)',
+            help='Do not show prompts for anything (meant for CIs and integration '
+                 'into other tools)',
             default=False,
         )
 
@@ -97,4 +105,3 @@ class Cli(object):
 
     def parse_args(self, argv):
         return self.parser.parse_args(argv)
-

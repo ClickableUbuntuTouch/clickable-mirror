@@ -1,5 +1,6 @@
-from .base import Command
 from clickable.exceptions import ClickableException
+
+from .base import Command
 
 
 class RunCommand(Command):

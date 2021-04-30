@@ -1,5 +1,3 @@
-from unittest import mock
-
 from clickable.commands.shell import ShellCommand
 from .base_test import UnitTest
 

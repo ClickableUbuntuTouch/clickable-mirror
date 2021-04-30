@@ -1,6 +1,6 @@
-from .make import MakeBuilder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
+
+from .make import MakeBuilder
 
 
 class CMakeBuilder(MakeBuilder):
@@ -20,6 +20,9 @@ class CMakeBuilder(MakeBuilder):
         else:
             command = '{} {}'.format(command, '-DCMAKE_BUILD_TYPE=Release')
 
-        self.container.run_command('{} {} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(command, self.config.src_dir))
+        self.container.run_command('{} {} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(
+            command,
+            self.config.src_dir
+        ))
 
         super().build()

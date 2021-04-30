@@ -1,7 +1,9 @@
-from .base import Command
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 from clickable.utils import run_subprocess_check_call, is_command
+
+from .base import Command
+
 
 class SetupCommand(Command):
     def __init__(self):
@@ -51,14 +53,21 @@ class SetupCommand(Command):
             command = 'register-python-argcomplete3'
 
         if not is_command(command):
-            raise ClickableException('Cannot enable bash completion, because argcomplete is not installed.')
+            raise ClickableException(
+                'Cannot enable bash completion, because argcomplete is not installed.'
+            )
 
         return command
 
     def setup_bash_completion(self):
         if not self.confirm(
-                'Do you want Clickable to set up bash completion by appending a line to your ~/.bashrc?'):
-            logger.warning('Bash completion setup skipped. See https://kislyuk.github.io/argcomplete/ for how to enable completion manually, including other shells.')
+            'Do you want Clickable to set up bash completion by appending a '
+            'line to your ~/.bashrc?'
+        ):
+            logger.warning(
+                'Bash completion setup skipped. See https://kislyuk.github.io/argcomplete/ '
+                'for how to enable completion manually, including other shells.'
+            )
             return
 
         argcomplete_command = self.find_argcomplete_command()

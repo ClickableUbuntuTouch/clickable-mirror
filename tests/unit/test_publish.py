@@ -1,5 +1,3 @@
-from unittest import mock
-
 from clickable.commands.publish import PublishCommand
 from .base_test import UnitTest
 

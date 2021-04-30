@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 
-import argparse
 try:
     import argcomplete
-    has_argcomplete = True
-except:
-    has_argcomplete = False
+    HAS_ARGCOMPLETE = True
+except ImportError:
+    HAS_ARGCOMPLETE = False
 
 import sys
 import subprocess
 import logging
 
-from clickable.commands.base import Command
 from clickable.logger import logger, log_file, console_handler
 from clickable.exceptions import ClickableException
 from clickable.cli import Cli
 from clickable.version import __version__, check_version
 from clickable.command_utils import get_commands
 
-class Clickable(object):
+
+class Clickable():
     def __init__(self):
         self.cli = Cli()
         self.verbose = True
@@ -30,7 +29,7 @@ class Clickable(object):
             self.cli.add_cmd_parser(cmd)
 
     def run(self):
-        if has_argcomplete:
+        if HAS_ARGCOMPLETE:
             argcomplete.autocomplete(self.cli.parser)
         args = self.cli.parse_args(sys.argv[1:])
 
@@ -39,7 +38,7 @@ class Clickable(object):
             console_handler.setLevel(logging.DEBUG)
         logger.debug('Clickable v' + __version__)
 
-        if not "func" in args:
+        if "func" not in args:
             default = ['default']
             if self.verbose:
                 default += ['--verbose']
@@ -47,6 +46,7 @@ class Clickable(object):
             args = self.cli.parse_args(default)
 
         args.func(args)
+
 
 def main():
     clickable = Clickable()
@@ -61,15 +61,18 @@ def main():
         sys.exit(1)
     except subprocess.CalledProcessError as e:
         logger.debug('Command exited with an error:' + str(e.cmd), exc_info=e)
-        logger.critical('Command exited with non-zero exit status {}, see above for details. This is most likely not a problem with Clickable.'.format(
-            e.returncode,
-        ))
+        logger.critical(
+            'Command exited with non-zero exit status {}, see above for details. '
+            'This is most likely not a problem with Clickable.'.format(
+                e.returncode,
+            )
+        )
 
         sys.exit(2)
-    except KeyboardInterrupt as e:
-        logger.info('') # Print an empty space at then end so the cli prompt is nicer
+    except KeyboardInterrupt:
+        logger.info('')  # Print an empty space at then end so the cli prompt is nicer
         sys.exit(0)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         if isinstance(e, OSError) and '28' in str(e):
             logger.critical('No space left on device')
             sys.exit(2)
@@ -79,7 +82,11 @@ def main():
         if not clickable.verbose:
             logger.critical('Encountered an unknown error: ' + str(e))
 
-        logger.critical('If you believe this is a bug, please file a report at https://gitlab.com/clickable/clickable/issues with the log file located at ' + log_file)
+        logger.critical(
+            'If you believe this is a bug, please file a report at '
+            'https://gitlab.com/clickable/clickable/issues with the log file located at ' +
+            log_file
+        )
         sys.exit(3)
 
 

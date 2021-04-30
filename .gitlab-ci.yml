@@ -21,9 +21,16 @@ check-template-names:
     - tests/check-template-names.py
   allow_failure: true
 
+lint:
+  stage: test
+  image: clickable/clickable-ci
+  script:
+    - flake8
+    - pylint clickable
+
 publish-pypi:
   stage: publish
-  image: clickable/build-deb:focal
+  image: clickable/clickable-ci
   only:
     - tags
   script:

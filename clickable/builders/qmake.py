@@ -1,7 +1,7 @@
-from .make import MakeBuilder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
-from clickable.exceptions import ClickableException
+
+from .make import MakeBuilder
+
 
 class QMakeBuilder(MakeBuilder):
     name = Constants.QMAKE
@@ -10,7 +10,11 @@ class QMakeBuilder(MakeBuilder):
         self.container.run_command('make INSTALL_ROOT={}/ install'.format(self.config.install_dir))
 
     def build(self):
-        if self.config.arch == Constants.host_arch or self.config.qt_version == "5.9" or self.config.arch == "all":
+        if (
+            self.config.arch == Constants.host_arch or
+            self.config.qt_version == "5.9" or
+            self.config.arch == "all"
+        ):
             command = 'qmake'
         else:
             command = '/usr/lib/{}/qt5/bin/qmake'.format(self.config.arch_triplet)

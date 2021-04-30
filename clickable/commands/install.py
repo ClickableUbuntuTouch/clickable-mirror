@@ -1,9 +1,9 @@
 import os
-import subprocess
 
-from .base import Command
 from clickable.utils import run_subprocess_check_call
 from clickable.logger import logger
+
+from .base import Command
 
 
 class InstallCommand(Command):
@@ -24,7 +24,8 @@ class InstallCommand(Command):
         parser.add_argument(
             '--skip-uninstall',
             action='store_true',
-            help='Skip uninstall pre-step which ensures that new AppArmor permissions are applied even without a version number change'
+            help='Skip uninstall pre-step which ensures that new AppArmor permissions '
+                 'are applied even without a version number change'
         )
 
     def configure(self, args):
@@ -33,9 +34,12 @@ class InstallCommand(Command):
 
     def try_find_installed_version(self, package_name):
         try:
-            response = self.device.run_command('readlink /opt/click.ubuntu.com/{}/current'.format(package_name), get_output=True)
+            response = self.device.run_command(
+                'readlink /opt/click.ubuntu.com/{}/current'.format(package_name),
+                get_output=True
+            )
             return response.splitlines()[-1]
-        except:
+        except Exception:  # pylint: disable=broad-except
             return None
 
     def try_uninstall(self):
@@ -44,13 +48,16 @@ class InstallCommand(Command):
 
         if version:
             logger.info("Uninstalling the app first.")
-            self.device.run_command('pkcon remove \\"{};{};all;local:click\\"'.format(package_name, version))
+            self.device.run_command(
+                'pkcon remove \\"{};{};all;local:click\\"'.format(package_name, version)
+            )
 
     def run(self):
         if self.config.is_desktop_mode():
             logger.debug('Skipping install, running in desktop mode')
             return
-        elif self.config.container_mode:
+
+        if self.config.container_mode:
             logger.debug('Skipping install, running in container mode')
             return
 
@@ -70,7 +77,10 @@ class InstallCommand(Command):
             self.device.check_any_attached()
 
             if self.config.device_serial_number:
-                command = 'adb -s {} push {} /home/phablet/'.format(self.config.device_serial_number, self.click_path)
+                command = 'adb -s {} push {} /home/phablet/'.format(
+                    self.config.device_serial_number,
+                    self.click_path
+                )
             else:
                 self.device.check_multiple_attached()
                 command = 'adb push {} /home/phablet/'.format(self.click_path)
@@ -83,6 +93,9 @@ class InstallCommand(Command):
             self.try_uninstall()
 
         logger.info("Installing the app.")
-        self.device.run_command('pkcon install-local --allow-untrusted /home/phablet/{}'.format(click), cwd=cwd)
+        self.device.run_command(
+            'pkcon install-local --allow-untrusted /home/phablet/{}'.format(click),
+            cwd=cwd
+        )
         logger.info("Cleaning up.")
         self.device.run_command('rm /home/phablet/{}'.format(click), cwd=cwd)

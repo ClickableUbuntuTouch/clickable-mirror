@@ -1,5 +1,6 @@
-from .base import Command
 from clickable.logger import logger
+
+from .base import Command
 
 
 class LaunchCommand(Command):
@@ -25,7 +26,8 @@ class LaunchCommand(Command):
         )
         parser.add_argument(
             '--kill',
-            help='Command to kill (defaults to the "kill" field defined in the project configuration)'
+            help='Command to kill (defaults to the "kill" field defined in the '
+                 'project configuration)'
         )
 
     def configure(self, args):
@@ -49,7 +51,7 @@ class LaunchCommand(Command):
             # spurious error when running `pkill -f` over `adb`
             kill = '[' + self.kill[:1] + ']' + self.kill[1:]
             self.device.run_command('pkill -f \\"{}\\"'.format(kill))
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             logger.warning("Could not kill app. Maybe it wasn't running.")
 
     def run(self):

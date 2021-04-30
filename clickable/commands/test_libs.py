@@ -1,9 +1,10 @@
 import os
 
-from .base import Command
 from clickable.logger import logger
 from clickable.container import Container
 from clickable.exceptions import ClickableException
+
+from .base import Command
 
 
 class TestLibsCommand(Command):
@@ -28,7 +29,11 @@ class TestLibsCommand(Command):
 
         for lib in self.libs:
             if lib not in existing_libs:
-                raise ClickableException('Cannot test unknown library "{}", which is not in your clickable.json'.format(lib))
+                raise ClickableException(
+                    'Cannot test unknown library "{}", which is not in your clickable.json'.format(
+                        lib
+                    )
+                )
 
     def run(self):
         if not self.config.lib_configs:
@@ -44,7 +49,9 @@ class TestLibsCommand(Command):
 
     def run_test(self, lib):
         if not os.path.exists(lib.build_dir):
-            logger.warning("Library {} has not yet been built for host architecture.".format(lib.name))
+            logger.warning(
+                "Library {} has not yet been built for host architecture.".format(lib.name)
+            )
         else:
             lib.container_mode = self.config.container_mode
             lib.docker_image = self.config.docker_image
@@ -58,4 +65,3 @@ class TestLibsCommand(Command):
 
             command = 'xvfb-startup {}'.format(lib.test)
             lib.container.run_command(command, use_build_dir=True)
-

@@ -1,8 +1,9 @@
 import os
 import subprocess
 
-from .base import Command
 from clickable.logger import logger
+
+from .base import Command
 
 
 class ReviewCommand(Command):
@@ -52,7 +53,11 @@ class ReviewCommand(Command):
 
         try:
             logger.info("Running review on {}".format(click_path))
-            self.container.run_command('click-review {}'.format(click_path), use_build_dir=False, cwd=cwd)
+            self.container.run_command(
+                'click-review {}'.format(click_path),
+                use_build_dir=False,
+                cwd=cwd
+            )
         except subprocess.CalledProcessError as e:
             if e.returncode == 2 and not raise_on_error:
                 pass

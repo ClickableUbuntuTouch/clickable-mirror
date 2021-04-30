@@ -1,8 +1,10 @@
-from .desktop import DesktopCommand
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
+
+from .desktop import DesktopCommand
 from .idedelegates.qtcreator import QtCreatorDelegate
 from .idedelegates.atom import AtomDelegate
+
 
 class IdeCommand(DesktopCommand):
     def __init__(self):
@@ -28,11 +30,13 @@ class IdeCommand(DesktopCommand):
         raise ClickableException("IDE command can't be nested in a chain.")
 
     def run(self):
-        #get the preprocessor according to command if any
+        # get the preprocessor according to command if any
         if 'qtcreator' in self.command.split():
             self.ide_delegate = QtCreatorDelegate(self.config)
             self.command = self.ide_delegate.override_command(self.command)
-            logger.debug('QtCreator command detected. Changing command to: {}'.format(self.command))
+            logger.debug(
+                'QtCreator command detected. Changing command to: {}'.format(self.command)
+            )
 
         if 'atom' in self.command.split():
             self.ide_delegate = AtomDelegate(self.config)

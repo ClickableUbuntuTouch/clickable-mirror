@@ -4,7 +4,8 @@ from clickable.config.project import ProjectConfig
 from clickable.config.command_cli import CommandCliConf
 from clickable.utils import let_user_confirm
 
-class Command(object):
+
+class Command():
     def __init__(self):
         self.device = None
         self.container = None
@@ -40,15 +41,15 @@ class Command(object):
 
     def setup_parser(self, parser):
         """ Set up command specific command line interface """
-        pass  # Implemented in subclasses
+        # Implemented in subclasses
 
     def configure(self, args):
         """ Configure from command line interface with arguments """
-        pass  # Implemented in subclasses
+        # Implemented in subclasses
 
     def configure_nested(self):
         """ Configure as nested command, e.g. when running chained """
-        pass  # Implemented in subclasses
+        # Implemented in subclasses
 
     def run(self):
         """ Run command """

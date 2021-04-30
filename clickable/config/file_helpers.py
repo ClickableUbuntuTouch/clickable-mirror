@@ -9,7 +9,8 @@ from ..utils import (
     find
 )
 
-class ProjectFiles(object):
+
+class ProjectFiles():
     def __init__(self, project_dir):
         self.project_dir = project_dir
         self.desktop = None
@@ -20,8 +21,14 @@ class ProjectFiles(object):
 
         self.desktop = {}
 
-        desktop_file = find(['.desktop', '.desktop.in', '.desktop.in.in'],
-                self.project_dir, temp_dir, build_dir, extensions_only=True, depth=3)
+        desktop_file = find(
+            ['.desktop', '.desktop.in', '.desktop.in.in'],
+            self.project_dir,
+            temp_dir,
+            build_dir,
+            extensions_only=True,
+            depth=3
+        )
 
         if desktop_file:
             with open(desktop_file, 'r') as f:
@@ -56,7 +63,7 @@ class ProjectFiles(object):
 
         return executable
 
-    def find_any_exec_args(self, remove_proc_U=True):
+    def find_any_exec_args(self, remove_proc_u=True):
         exec_line = self.find_any_exec_line()
         executable = self.find_any_executable()
 
@@ -66,12 +73,15 @@ class ProjectFiles(object):
             pos = exec_list.index(executable)
             exec_args = exec_list[pos+1:]
 
-            if '%U' in exec_args and remove_proc_U:
+            if '%U' in exec_args and remove_proc_u:
                 exec_args.remove('%U')
 
             return exec_args
 
-class InstallFiles(object):
+        return None
+
+
+class InstallFiles():
     def __init__(self, install_dir, builder, arch):
         self.install_dir = install_dir
         self.builder = builder
@@ -100,7 +110,9 @@ class InstallFiles(object):
             package = self.get_manifest().get('name', None)
 
             if not package:
-                raise ClickableException('No package name specified in manifest.json or clickable.json')
+                raise ClickableException(
+                    'No package name specified in manifest.json or clickable.json'
+                )
 
         return package
 
@@ -153,15 +165,15 @@ class InstallFiles(object):
         with open(os.path.join(self.install_dir, "manifest.json"), 'w') as writer:
             json.dump(manifest, writer, indent=4)
 
-
     def load_manifest(self, manifest_path):
         manifest = {}
         with open(manifest_path, 'r') as f:
             try:
                 manifest = json.load(f)
-            except ValueError:
+            except ValueError as err:
                 raise ClickableException(
-                    'Failed reading "manifest.json", it is not valid json')
+                    'Failed reading "manifest.json", it is not valid json'
+                ) from err
 
         return manifest
 
@@ -174,7 +186,14 @@ class InstallFiles(object):
     def get_desktop(self, cwd, temp_dir=None, build_dir=None):
         desktop = {}
 
-        desktop_file = find(['.desktop', '.desktop.in'], cwd, temp_dir, build_dir, extensions_only=True, depth=3)
+        desktop_file = find(
+            ['.desktop', '.desktop.in'],
+            cwd,
+            temp_dir,
+            build_dir,
+            extensions_only=True,
+            depth=3
+        )
 
         if desktop_file:
             with open(desktop_file, 'r') as f:
