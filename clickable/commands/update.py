@@ -1,13 +1,11 @@
-import subprocess
-import shlex
-
 from clickable.config.constants import Constants
-from .base import Command
 from clickable.utils import (
     run_subprocess_check_call,
-    run_subprocess_check_output,
     image_exists,
 )
+
+from .base import Command
+
 
 def update_image(image):
     if image_exists(image):

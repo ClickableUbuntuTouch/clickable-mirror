@@ -1,11 +1,8 @@
 from unittest import TestCase, mock
-from unittest.mock import ANY
 import multiprocessing
 
-from clickable.commands.clean import CleanCommand
-from clickable.container import Container
 from clickable.config.project import Constants
-from ..mocks import ConfigMock, empty_fn, true_fn
+from ..mocks import ConfigMock, true_fn
 
 
 class TestConfigCommand(TestCase):

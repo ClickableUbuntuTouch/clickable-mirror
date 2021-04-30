@@ -1,5 +1,6 @@
-from .base import Command
 from clickable.logger import logger
+
+from .base import Command
 
 
 class NoLockCommand(Command):

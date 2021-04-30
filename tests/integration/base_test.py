@@ -5,10 +5,10 @@ import shutil
 from clickable.cli import Cli
 from clickable.container import Container
 from clickable.device import Device
-from clickable.commands.create import CreateCommand
 from clickable.exceptions import ClickableException
 from clickable.command_utils import get_commands
 from ..mocks import ConfigMock
+
 
 class IntegrationTest(TestCase):
     def setUpConfig(self,
@@ -55,9 +55,11 @@ class IntegrationTest(TestCase):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
 
-    def run_command(self,
-                 cli_args=[],
-                 expect_exception=False):
+    def run_command(
+        self,
+        cli_args=[],
+        expect_exception=False
+    ):
         """
         Generic test run function
 

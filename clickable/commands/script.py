@@ -1,7 +1,8 @@
-from .base import Command
-
 from clickable.utils import run_subprocess_check_call
 from clickable.exceptions import ClickableException
+
+from .base import Command
+
 
 class ScriptCommand(Command):
     def __init__(self):
@@ -20,7 +21,7 @@ class ScriptCommand(Command):
     def configure(self, args):
         self.script_name = args.name
 
-    def configure_nested(self, args):
+    def configure_nested(self):
         raise ClickableException("Script command can't be nested in a chain.")
 
     def run(self):
@@ -29,4 +30,6 @@ class ScriptCommand(Command):
         if command:
             run_subprocess_check_call(command)
         else:
-            raise ClickableException('{} is not a script defined in the clickable.json.'.format(self.script_name))
+            raise ClickableException(
+                '{} is not a script defined in the clickable.json.'.format(self.script_name)
+            )

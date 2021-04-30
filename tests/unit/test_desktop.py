@@ -1,5 +1,3 @@
-from unittest import mock
-
 from clickable.commands.desktop import DesktopCommand
 from .base_test import UnitTest
 
@@ -9,5 +7,6 @@ class TestCreateCommand(UnitTest):
         self.command = DesktopCommand()
         self.setUpConfig()
 
-# TODO test that `CLICKABLE_NVIDIA=1 clickable desktop` yields the same command as `clickable desktop --nvidia`
+# TODO test that `CLICKABLE_NVIDIA=1 clickable desktop` yields the same
+# command as `clickable desktop --nvidia`
 # TODO implement this

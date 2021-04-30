@@ -2,11 +2,10 @@ import os
 import glob
 import shutil
 
-from .base import Builder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
-from clickable.utils import find
+
+from .base import Builder
 
 
 rust_arch_target_mapping = {

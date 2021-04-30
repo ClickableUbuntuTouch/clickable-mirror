@@ -1,11 +1,6 @@
 import subprocess
-import shutil
-import sys
-import os
 
 from .base import Builder
-from clickable.logger import logger
-from clickable.config.project import ProjectConfig
 
 
 class MakeBuilder(Builder):

@@ -4,7 +4,7 @@ import requests
 import sys
 
 sys.path.insert(0, '../clickable')
-from clickable.commands.create import TEMPLATE_MAP
+from clickable.commands.create import TEMPLATE_MAP  # noqa=E402
 
 response = requests.get(
     'https://gitlab.com/clickable/ut-app-meta-template/-/raw/master/cookiecutter.json',

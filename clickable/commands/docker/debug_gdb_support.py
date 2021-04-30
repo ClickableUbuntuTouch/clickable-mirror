@@ -8,7 +8,10 @@ class DebugGdbSupport(DockerSupport):
 
     def update(self, docker_config: DockerConfig):
         if self.port:
-            docker_config.execute = 'gdbserver localhost:{} {}'.format(self.port, docker_config.execute)
+            docker_config.execute = 'gdbserver localhost:{} {}'.format(
+                self.port,
+                docker_config.execute
+            )
             docker_config.add_extra_options({
                 '--publish': '{port}:{port}'.format(port=self.port)
             })
@@ -18,4 +21,3 @@ class DebugGdbSupport(DockerSupport):
                 '--cap-add': 'SYS_PTRACE',
                 '--security-opt seccomp': 'unconfined'
             })
-

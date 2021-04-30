@@ -1,15 +1,12 @@
-import json
 import shutil
 import os
 
+from clickable.logger import logger
+from clickable.config.constants import Constants
+
 from .base import Builder
-from .make import MakeBuilder
 from .cmake import CMakeBuilder
 from .qmake import QMakeBuilder
-from clickable.logger import logger
-from clickable.config.project import ProjectConfig
-from clickable.config.constants import Constants
-from clickable.exceptions import ClickableException
 
 
 class PureQMLQMakeBuilder(QMakeBuilder):
@@ -46,5 +43,5 @@ class PureBuilder(Builder):
 
 
 class PrecompiledBuilder(PureBuilder):
-    # The only difference between this and the Pure builder is that this doesn't force the "all" arch
+    # The only difference between this and PureBuilder is that this doesn't force the "all" arch
     name = Constants.PRECOMPILED

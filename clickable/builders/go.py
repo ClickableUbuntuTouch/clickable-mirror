@@ -1,10 +1,9 @@
-import json
 import shutil
 import os
 
-from .base import Builder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
+
+from .base import Builder
 
 
 class GoBuilder(Builder):
@@ -32,9 +31,10 @@ class GoBuilder(Builder):
             shutil.rmtree(self.config.install_dir)
         shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
 
-        gocommand = '/usr/local/go/bin/go build -pkgdir {cwd}/.clickable/go -i -o {install_dir}/{app_name} ../../..'.format(
-            cwd=self.config.cwd,
-            install_dir=self.config.install_dir,
-            app_name=self.config.install_files.find_app_name(),
-        )
+        gocommand = '/usr/local/go/bin/go build -pkgdir {cwd}/.clickable/go -i ' \
+                    '-o {install_dir}/{app_name} ../../..'.format(
+                        cwd=self.config.cwd,
+                        install_dir=self.config.install_dir,
+                        app_name=self.config.install_files.find_app_name(),
+                    )
         self.container.run_command(gocommand)

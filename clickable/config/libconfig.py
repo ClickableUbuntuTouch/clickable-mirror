@@ -1,20 +1,20 @@
 import os
+import multiprocessing
+import platform
+from collections import OrderedDict
 
 from clickable.utils import (
     merge_make_jobs_into_args,
-    get_make_jobs_from_args,
     flexible_string_to_list,
     make_absolute,
 )
-import multiprocessing
 from clickable.exceptions import ClickableException
 from clickable.logger import logger
+
 from .constants import Constants
-from collections import OrderedDict
-import platform
 
 
-class LibConfig(object):
+class LibConfig():
     cwd = os.getcwd()
     config = {}
 
@@ -38,7 +38,7 @@ class LibConfig(object):
     required = ['builder']
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
-                      'dependencies_ppa', 'build_args', 'make_args']
+                           'dependencies_ppa', 'build_args', 'make_args']
     # If specified as a string convert it to a list of size 1
     flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
     builders = [Constants.QMAKE, Constants.CMAKE, Constants.CUSTOM]
@@ -140,9 +140,13 @@ class LibConfig(object):
     def substitute(self, sub, rep, key):
         if self.config[key]:
             if isinstance(self.config[key], dict):
-                self.config[key] = {k: val.replace(sub, rep) for (k, val) in self.config[key].items()}
+                self.config[key] = {
+                    k: val.replace(sub, rep) for (k, val) in self.config[key].items()
+                }
             elif isinstance(self.config[key], list):
-                self.config[key] = [val.replace(sub, rep) for val in self.config[key]]
+                self.config[key] = [
+                    val.replace(sub, rep) for val in self.config[key]
+                ]
             else:
                 self.config[key] = self.config[key].replace(sub, rep)
 
@@ -169,11 +173,15 @@ class LibConfig(object):
     def check_config_errors(self):
         if not self.config['builder']:
             raise ClickableException(
-                'The clickable.json is missing a "builder" in library "{}".'.format(self.config["name"]))
+                'The clickable.json is missing a "builder" in library "{}".'.format(
+                    self.config["name"]
+                )
+            )
 
         if self.config['builder'] == Constants.CUSTOM and not self.config['build']:
             raise ClickableException(
-                'When using the "custom" builder you must specify a "build" in one the lib configs')
+                'When using the "custom" builder you must specify a "build" in one the lib configs'
+            )
 
         if self.is_custom_docker_image:
             if self.dependencies_host or self.dependencies_target or self.dependencies_ppa:

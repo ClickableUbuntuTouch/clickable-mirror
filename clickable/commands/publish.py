@@ -1,16 +1,18 @@
 import os
 import urllib.parse
 
-requests_available = True
-try:
-    import requests
-except ImportError:
-    requests_available = False
-
-from .base import Command
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 from clickable.utils import env
+
+from .base import Command
+
+REQUESTS_AVAILABLE = True
+try:
+    import requests
+except ImportError:
+    REQUESTS_AVAILABLE = False
+
 
 OPENSTORE_API = 'https://open-store.io'
 OPENSTORE_API_PATH = '/api/v3/manage/{}/revision'
@@ -50,8 +52,10 @@ class PublishCommand(Command):
             self.api_key = env('OPENSTORE_API_KEY')
 
     def run(self):
-        if not requests_available:
-            raise ClickableException('Unable to publish app, python requests module is not installed')
+        if not REQUESTS_AVAILABLE:
+            raise ClickableException(
+                'Unable to publish app, python requests module is not installed'
+            )
 
         if not self.api_key:
             raise ClickableException('No api key specified, use OPENSTORE_API_KEY or --apikey')
@@ -80,12 +84,13 @@ class PublishCommand(Command):
             self.config.arch,
         ))
         response = requests.post(url, files=files, data=data, params=params)
-        if response.status_code == requests.codes.ok:
+        if response.status_code == 200:
             logger.info('Upload successful')
-        elif response.status_code == requests.codes.not_found:
+        elif response.status_code == 404:
             title = urllib.parse.quote(self.config.install_files.find_package_title())
             raise ClickableException(
-                'App needs to be created in the OpenStore before you can publish it. Visit {}/submit?appId={}&name={}'.format(
+                'App needs to be created in the OpenStore before you can publish it. '
+                'Visit {}/submit?appId={}&name={}'.format(
                     OPENSTORE_API,
                     package_name,
                     title,
@@ -94,8 +99,10 @@ class PublishCommand(Command):
         else:
             try:
                 message = response.json()['message']
-            except:
+            except Exception:  # pylint: disable=broad-except
                 message = 'Unspecified Error'
                 logger.debug("Publish failed with: {}".format(response.text))
 
-            raise ClickableException('Failed to upload click: {} ({})'.format(message, response.status_code))
+            raise ClickableException(
+                'Failed to upload click: {} ({})'.format(message, response.status_code)
+            )

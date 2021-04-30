@@ -1,10 +1,9 @@
 from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
 from clickable.config.file_helpers import InstallFiles
-from clickable import __version__
-from unittest.mock import Mock
 
 import os
+
 
 class InstallFilesMock(InstallFiles):
     def write_manifest(self, *args):
@@ -34,7 +33,7 @@ class ConfigMock(ProjectConfig):
 
         if respect_container_mode:
             if (mock_config_env is not None and
-                    not container_mode_key in mock_config_env and
+                    container_mode_key not in mock_config_env and
                     container_mode_key in os.environ):
                 mock_config_env[container_mode_key] = os.environ[container_mode_key]
         self.mock_config_json = mock_config_json

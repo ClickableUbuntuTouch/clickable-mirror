@@ -1,6 +1,6 @@
-from .base import Builder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
+
+from .base import Builder
 
 
 class CustomBuilder(Builder):

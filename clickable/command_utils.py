@@ -10,14 +10,18 @@ def get_commands():
     scr_dir = dirname(__file__)
     modules = glob.glob(join(scr_dir, 'commands/*.py'))
     command_modules = [
-            basename(f)[:-3] for f in modules
-                    if isfile(f) and not f.endswith('__init__.py')
+        basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')
     ]
 
     for name in command_modules:
-        command_submodule = __import__('clickable.commands.{}'.format(name),
-                globals(), locals(), [name])
-        for name, cls in inspect.getmembers(command_submodule):
+        command_submodule = __import__(
+            'clickable.commands.{}'.format(name),
+            globals(),
+            locals(),
+            [name]
+        )
+
+        for _, cls in inspect.getmembers(command_submodule):
             if (inspect.isclass(cls)
                     and issubclass(cls, Command)
                     and cls != Command):

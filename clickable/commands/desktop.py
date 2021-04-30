@@ -4,7 +4,6 @@ import subprocess
 from pathlib import Path
 
 from clickable.utils import (
-    check_command,
     is_command,
     makedirs,
     run_subprocess_check_output,
@@ -13,6 +12,7 @@ from clickable.utils import (
 from clickable.config.constants import Constants
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
+
 from .base import Command
 from .build import BuildCommand
 from .docker.debug_gdb_support import DebugGdbSupport
@@ -109,7 +109,9 @@ class DesktopCommand(Command):
             self.config.debug_build = True
 
         if self.valgrind and self.gdb:
-            raise ClickableException("Valgrind (--valgrind) and GDB (--gdb or --gdbserver) can not be combined.")
+            raise ClickableException(
+                "Valgrind (--valgrind) and GDB (--gdb or --gdbserver) can not be combined."
+            )
 
         if self.desktop_locale != "C" and "." not in self.desktop_locale:
             self.desktop_locale = "{}.UTF-8".format(self.desktop_locale)
@@ -193,7 +195,7 @@ class DesktopCommand(Command):
             if app in hooks and 'desktop' in hooks[app]:
                 desktop_path = hooks[app]['desktop']
         except ClickableException:
-            for key, value in hooks.items():
+            for _, value in hooks.items():
                 if 'desktop' in value:
                     desktop_path = value['desktop']
                     break
@@ -203,7 +205,11 @@ class DesktopCommand(Command):
 
         desktop_path = os.path.join(self.config.install_dir, desktop_path)
         if not os.path.exists(desktop_path):
-            raise ClickableException('Could not determine executable. Desktop file does not exist: "{}"'.format(desktop_path))
+            raise ClickableException(
+                'Could not determine executable. Desktop file does not exist: "{}"'.format(
+                    desktop_path
+                )
+            )
 
         return desktop_path
 
@@ -216,7 +222,9 @@ class DesktopCommand(Command):
                     break
 
         if not execute:
-            raise ClickableException('No "Exec" line found in the desktop file {}'.format(desktop_path))
+            raise ClickableException('No "Exec" line found in the desktop file {}'.format(
+                desktop_path
+            ))
 
         return execute[len('Exec='):].strip()
 
@@ -225,9 +233,10 @@ class DesktopCommand(Command):
             return run_subprocess_check_output(
                 'timedatectl show -p Timezone --value',
                 stderr=subprocess.DEVNULL)
-        except:
+        except Exception:  # pylint: disable=broad-except
             logger.debug(
-                'timedatectl show command failed. Falling back to alternative way to detect timezone...'
+                'timedatectl show command failed. Falling back to alternative way '
+                'to detect timezone...'
             )
 
         if os.path.exists('/etc/timezone'):
@@ -235,7 +244,8 @@ class DesktopCommand(Command):
                 return host_timezone_file.readline().strip()
         else:
             logger.debug(
-                '/etc/timezone does not exist. Falling back to alternative way to detect timezone...'
+                '/etc/timezone does not exist. Falling back to alternative way '
+                'to detect timezone...'
             )
 
         try:
@@ -246,7 +256,7 @@ class DesktopCommand(Command):
                     start = line.find(':') + 1
                     end = line.find('(')
                     return line[start:end].strip()
-        except:
+        except Exception:  # pylint: disable=broad-except
             logger.debug(
                 "timedatctl status method failed to set timezone from host in desktop mode..."
             )

@@ -1,5 +1,4 @@
 from unittest import mock
-from unittest.mock import ANY
 
 from clickable.commands.devices import DevicesCommand
 from ..mocks import empty_fn
@@ -29,7 +28,7 @@ class TestDevicesCommand(UnitTest):
 
     @mock.patch('clickable.device.Device.detect_attached', side_effect=devices)
     @mock.patch('clickable.commands.devices.logger.info', side_effect=empty_fn)
-    def test_no_devices(self, mock_logger_info, mock_detect_attached):
+    def test_devices(self, mock_logger_info, mock_detect_attached):
         self.command.run()
 
         mock_detect_attached.assert_called_once_with()

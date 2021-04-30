@@ -1,13 +1,12 @@
 import os
 
-from .base import Command
 from clickable.exceptions import ClickableException
 from clickable.logger import logger
-from clickable.config.constants import Constants
-
 from clickable.utils import (
     run_subprocess_check_call,
 )
+
+from .base import Command
 
 gdb_arch_target_mapping = {
     'amd64': 'i386:x86-64',
@@ -15,11 +14,13 @@ gdb_arch_target_mapping = {
     'arm64': 'aarch64',
 }
 
+
 class GdbCommand(Command):
     def __init__(self):
         super().__init__()
         self.cli_conf.name = 'gdb'
-        self.cli_conf.help_msg = 'Connects to a remote gdb session on the device opened via the gdbserver command.'
+        self.cli_conf.help_msg = 'Connects to a remote gdb session on the device ' \
+                                 'opened via the gdbserver command.'
 
         self.script = None
         self.export_script = None
@@ -38,7 +39,8 @@ class GdbCommand(Command):
         )
         parser.add_argument(
             '--export',
-            help='Export system debug symbols from docker image (most useful in combination with --script)'
+            help='Export system debug symbols from docker image (most useful in '
+                 'combination with --script)'
         )
         parser.add_argument(
             '--port',
@@ -52,18 +54,21 @@ class GdbCommand(Command):
         parser.add_argument(
             '--no-app-config',
             action='store_true',
-            help='Do not configure gdb with source and solib directories from the app and its libraries.'
+            help='Do not configure gdb with source and solib directories from the '
+                 'app and its libraries.'
         )
         parser.add_argument(
             '--no-sysroot',
             action='store_true',
-            help='Do not configure a host side sysroot containing system libraries (be aware that this slows down app startup).'
+            help='Do not configure a host side sysroot containing system libraries '
+                 '(be aware that this slows down app startup).'
         )
         parser.add_argument(
             'forward',
             nargs='*',
             metavar='gdb-param',
-            help='Params forwarded to gdb-multiarch directly. Prepend with "--" to make sure they are not interpreted by Clickable.'
+            help='Params forwarded to gdb-multiarch directly. Prepend with "--" to '
+                 'make sure they are not interpreted by Clickable.'
         )
 
     def configure(self, args):
@@ -84,7 +89,7 @@ class GdbCommand(Command):
         try:
             run_subprocess_check_call("readelf {} -l > /dev/null 2>&1".format(path), shell=True)
             return True
-        except:
+        except Exception:  # pylint: disable=broad-except
             return False
 
     def choose_executable(self, dirs, filename):
@@ -109,13 +114,23 @@ class GdbCommand(Command):
         if path:
             if self.is_elf_file(path):
                 return path
-            else:
-                raise ClickableException('App executable "{}" is not an ELF file suitable for GDB debugging.'.format(path))
+
+            raise ClickableException(
+                'App executable "{}" is not an ELF file suitable for GDB debugging.'.format(
+                    path
+                )
+            )
 
         if binary == "qmlscene":
-            raise ClickableException('Apps started via "qmlscene" are not supported by this debug method.')
-        else:
-            raise ClickableException('App binary "{}" found in desktop file could not be found in the app install directory. Please specify the path as "clickable gdb path/to/binary"'.format(binary))
+            raise ClickableException(
+                'Apps started via "qmlscene" are not supported by this debug method.'
+            )
+
+        raise ClickableException(
+            'App binary "{}" found in desktop file could not be found in the '
+            'app install directory. Please specify the path as '
+            '"clickable gdb path/to/binary"'.format(binary)
+        )
 
     def create_script(self):
         self.script = []
@@ -152,8 +167,10 @@ class GdbCommand(Command):
         self.container.pull_files([self.debug_symbols], dst)
 
     def write_script(self):
-        logger.info("Writing GDB init script to {0}. Run it from a multiarch GDB shell via 'source {0}'.".format(
-            self.export_script))
+        logger.info(
+            "Writing GDB init script to {0}. Run it from a multiarch GDB shell "
+            "via 'source {0}'.".format(self.export_script)
+        )
 
         with open(self.export_script, 'w') as script_file:
             for command in self.script:
@@ -166,8 +183,12 @@ class GdbCommand(Command):
         command = 'gdb-multiarch {}'.format(' '.join(args))
 
         logger.info('Starting GDB for "{}".'.format(self.binary))
-        self.container.run_command(command, localhost=True,
-                tty=self.config.interactive, use_build_dir=False)
+        self.container.run_command(
+            command,
+            localhost=True,
+            tty=self.config.interactive,
+            use_build_dir=False
+        )
 
     def run(self):
         if not self.binary:
@@ -177,7 +198,7 @@ class GdbCommand(Command):
         self.create_script()
 
         run_gdb = not self.export_script and not self.export_debug_symbols
-        
+
         if run_gdb or self.export_debug_symbols:
             self.container.setup()
 

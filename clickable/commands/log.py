@@ -1,5 +1,6 @@
-from .base import Command
 from clickable.logger import logger
+
+from .base import Command
 
 
 class LogCommand(Command):
@@ -12,7 +13,8 @@ class LogCommand(Command):
         if self.config.is_desktop_mode():
             logger.debug('Skipping log, running in desktop mode')
             return
-        elif self.config.container_mode:
+
+        if self.config.container_mode:
             logger.debug('Skipping log, running in container mode')
             return
 

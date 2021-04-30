@@ -1,9 +1,10 @@
-from .base import Command
 from clickable.exceptions import ClickableException
 from clickable.utils import env
 from clickable.command_utils import get_commands
 from clickable.config.project import ProjectConfig
 from clickable.logger import logger
+
+from .base import Command
 
 
 class ChainCommand(Command):
@@ -26,8 +27,8 @@ class ChainCommand(Command):
         parser.add_argument(
             'commands',
             nargs='*',
-            help=
-            'List of commands to run (defaults to "build", "install", "launch" if not set otherwise)',
+            help='List of commands to run (defaults to "build", "install", "launch" '
+                 'if not set otherwise)',
         )
 
     def parse_common_options(self, args):

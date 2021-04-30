@@ -30,12 +30,12 @@ Compile, build, and deploy Ubuntu Touch click packages all from the command line
 
 ## Docs
 
-- [Getting Started](https://clickable-ut.dev/en/latest/getting-started.html)
-- [Usage](https://clickable-ut.dev/en/latest/usage.html)
-- [Commands](https://clickable-ut.dev/en/latest/commands.html)
-- [clickable.json Format](https://clickable-ut.dev/en/latest/clickable-json.html)
-- [App Templates](https://clickable-ut.dev/en/latest/app-templates.html)
-- [Builders](https://clickable-ut.dev/en/latest/builders.html)
+* [Getting Started](https://clickable-ut.dev/en/latest/getting-started.html)
+* [Usage](https://clickable-ut.dev/en/latest/usage.html)
+* [Commands](https://clickable-ut.dev/en/latest/commands.html)
+* [clickable.json Format](https://clickable-ut.dev/en/latest/clickable-json.html)
+* [App Templates](https://clickable-ut.dev/en/latest/app-templates.html)
+* [Builders](https://clickable-ut.dev/en/latest/builders.html)
 
 ## Code Editor Integrations
 
@@ -57,24 +57,24 @@ To enable configuration validation either install **jsonschema** via pip
 (`pip3 install jsonschema`) or apt (`apt install python3-jsonschema`). If you
 got clickable regularly installed, you already have jsonschema, too.
 
+### Linting
+
+Clickable uses flake8 and pylint for linting. Install them using `pip3 install flake8 pylint`.
+To run both of them, simply use the command `make lint`.
+
 ### Run the tests
 
 Install nose and the coverage modules: `pip3 install nose coverage`.
 
-Run nose to complete the tests: `nosetests`.
+Run nose to complete the tests: `make test`.
 
 ### Related Repositories
 
 * [Clickable docker images and app templates](https://gitlab.com/clickable)
 
-## Donate
-
-If you like Clickable, consider giving a small donation over at my
-[Liberapay page](https://liberapay.com/bhdouglass).
-
 ## License
 
-Copyright (C) 2020 [Brian Douglass](http://bhdouglass.com/)
+Copyright (C) 2021 Clickable Team
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as published
 by the Free Software Foundation.

@@ -2,25 +2,27 @@ from os.path import expanduser, isfile
 from datetime import datetime, timedelta
 import json
 
-from clickable.logger import logger, log_file, console_handler
+from clickable.logger import logger
 
-requests_available = True
+REQUESTS_AVAILABLE = True
 try:
     import requests
 except ImportError:
-    requests_available = False
+    REQUESTS_AVAILABLE = False
 
 __version__ = '6.24.1'
 __container_minimum_required__ = 2
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
+
 def show_version():
     logger.info('clickable ' + __version__)
     check_version()
 
+
 def check_version(quiet=False):
-    if requests_available:
+    if REQUESTS_AVAILABLE:
         version = None
         check = True
         version_check = expanduser('~/.clickable/version_check.json')
@@ -31,12 +33,17 @@ def check_version(quiet=False):
                 except ValueError:
                     version_check_data = None
 
-            if version_check_data and 'version' in version_check_data and 'datetime' in version_check_data:
+            if (
+                version_check_data and
+                'version' in version_check_data and
+                'datetime' in version_check_data
+            ):
                 last_check = datetime.strptime(version_check_data['datetime'], DATE_FORMAT)
-                if last_check > (datetime.now() - timedelta(days=2)) and \
-                    'current_version' in version_check_data and \
-                    version_check_data['current_version'] == __version__:
-
+                if (
+                    last_check > (datetime.now() - timedelta(days=2)) and
+                    'current_version' in version_check_data and
+                    version_check_data['current_version'] == __version__
+                ):
                     check = False
                     version = version_check_data['version']
                     logger.debug('Using cached version check')
@@ -53,11 +60,13 @@ def check_version(quiet=False):
 
                 data = response.json()
                 version = data['version']
-            except requests.exceptions.Timeout as e:
+            except requests.exceptions.Timeout:
                 logger.warning('Unable to check for updates to clickable, the request timedout')
-            except Exception as e:
-                logger.debug('Version check failed:' + str(e.cmd), exc_info=e)
-                logger.warning('Unable to check for updates to clickable, an unknown error occurred')
+            except Exception as e:  # pylint: disable=broad-except
+                logger.debug('Version check failed:' + str(e), exc_info=e)
+                logger.warning(
+                    'Unable to check for updates to clickable, an unknown error occurred'
+                )
 
             if version:
                 with open(version_check, 'w') as f:
@@ -69,11 +78,13 @@ def check_version(quiet=False):
 
         if version:
             if version != __version__:
-                logger.info('v{} of clickable is available, update to get the latest features and improvements!'.format(version))
+                logger.info(
+                    'v{} of clickable is available, update to get the latest features '
+                    'and improvements!'.format(version)
+                )
             else:
                 if not quiet:
                     logger.info('You are running the latest version of clickable!')
     else:
         if not quiet:
             logger.warning('Unable to check for updates to clickable, please install "requests"')
-

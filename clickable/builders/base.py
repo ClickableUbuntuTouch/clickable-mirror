@@ -1,4 +1,4 @@
-class Builder(object):
+class Builder():
     name = None
 
     def __init__(self, config, container, debug_build):

@@ -2,7 +2,7 @@ from clickable.logger import logger
 from .query import Query
 
 
-class Require(object):
+class Require():
     def __init__(self, query: Query):
         self.query = query
 

@@ -21,7 +21,7 @@ class TestBuildCommand(UnitTest):
                 }
             }
         }
-        self.setUpConfig(mock_config_json = config_json)
+        self.setUpConfig(mock_config_json=config_json)
 
         self.click_cmd = 'click build {} --no-validate'.format(self.config.install_dir)
 
@@ -45,7 +45,13 @@ class TestBuildCommand(UnitTest):
     @mock.patch('os.path.exists', side_effect=false_fn)
     @mock.patch('os.makedirs', side_effect=empty_fn)
     @mock.patch('shutil.copyfile', side_effect=empty_fn)
-    def test_click_build_click_output(self, mock_copyfile, mock_makedirs, mock_exists, mock_run_command):
+    def test_click_build_click_output(
+        self,
+        mock_copyfile,
+        mock_makedirs,
+        mock_exists,
+        mock_run_command
+    ):
         self.command.output_path = '/foo/bar'
         self.command.click_build()
 

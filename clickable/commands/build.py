@@ -2,12 +2,8 @@ import os
 import sys
 import shutil
 
-from .base import Command
-from .review import ReviewCommand
-from .clean import CleanCommand
 from clickable.utils import (
     get_builders,
-    run_subprocess_check_call,
     makedirs,
     is_sub_dir,
     env,
@@ -16,8 +12,14 @@ from clickable.container import Container
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 
+from .base import Command
+from .review import ReviewCommand
+from .clean import CleanCommand
+
 
 class BuildCommand(Command):
+    click_path = ''
+
     def __init__(self):
         super().__init__()
         self.cli_conf.name = 'build'
@@ -80,7 +82,10 @@ class BuildCommand(Command):
             existing_libs = [lib.name for lib in self.config.lib_configs]
             for lib in self.libs:
                 if lib not in existing_libs:
-                    raise ClickableException('Cannot build unknown library "{}", which is not in your clickable.json'.format(lib))
+                    raise ClickableException(
+                        'Cannot build unknown library "{}", which is not in your '
+                        'clickable.json'.format(lib)
+                    )
 
         self.parse_env()
 
@@ -154,21 +159,27 @@ class BuildCommand(Command):
     def build(self, config, container, is_app=True):
         try:
             makedirs(config.build_dir)
-        except Exception:
-            logger.warning('Failed to create the build directory: {}'.format(str(sys.exc_info()[0])))
+        except Exception:  # pylint: disable=broad-except
+            logger.warning(
+                'Failed to create the build directory: {}'.format(str(sys.exc_info()[0]))
+            )
 
         try:
             makedirs(config.build_home)
-        except Exception:
-            logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
+        except Exception:  # pylint: disable=broad-except
+            logger.warning(
+                'Failed to create the build home directory: {}'.format(str(sys.exc_info()[0]))
+            )
 
         if os.path.isdir(config.install_dir):
             shutil.rmtree(config.install_dir)
 
         try:
             makedirs(config.install_dir)
-        except Exception:
-            logger.warning('Failed to create the build home directory: {}'.format(str(sys.exc_info()[0])))
+        except Exception:  # pylint: disable=broad-except
+            logger.warning(
+                'Failed to create the build home directory: {}'.format(str(sys.exc_info()[0]))
+            )
 
         container.setup()
 
@@ -190,7 +201,9 @@ class BuildCommand(Command):
         makedirs(dest_dir)
         if '"' in pattern:
             # Make sure one cannot run random bash code through the "ls" command
-            raise ClickableException("install_* patterns must not contain any '\"' quotation character.")
+            raise ClickableException(
+                "install_* patterns must not contain any '\"' quotation character."
+            )
 
         command = 'ls -d "{}"'.format(pattern)
         files = self.container.run_command(command, get_output=True).split()
@@ -224,28 +237,35 @@ class BuildCommand(Command):
             self.install_files(p, os.path.join(self.config.install_dir,
                                                self.config.app_bin_dir))
         for p in self.config.install_qml:
-            self.install_qml_files(p, os.path.join(self.config.install_dir,
-                                               self.config.app_qml_dir))
+            self.install_qml_files(p, os.path.join(
+                self.config.install_dir,
+                self.config.app_qml_dir
+            ))
         for p, dest in self.config.install_data.items():
             self.install_files(p, dest)
 
     def set_arch(self, manifest):
         arch = manifest.get('architecture', None)
 
-        if arch == '@CLICK_ARCH@' or arch == '':
+        if arch in ['@CLICK_ARCH@', '']:
             manifest['architecture'] = self.config.arch
             return True
 
         if arch != self.config.arch:
-            raise ClickableException('Clickable is building for architecture "{}", but "{}" is specified in the manifest. You can set the architecture field to @CLICK_ARCH@ to let Clickable set the architecture field automatically.'.format(
-                self.config.arch, arch))
+            raise ClickableException(
+                'Clickable is building for architecture "{}", but "{}" is specified in '
+                'the manifest. You can set the architecture field to @CLICK_ARCH@ to '
+                'let Clickable set the architecture field automatically.'.format(
+                    self.config.arch, arch
+                )
+            )
 
         return False
 
     def set_framework(self, manifest):
         framework = manifest.get('framework', None)
 
-        if framework == '@CLICK_FRAMEWORK@' or framework == '':
+        if framework in ['@CLICK_FRAMEWORK@', '']:
             manifest['framework'] = self.config.framework
             return True
 
