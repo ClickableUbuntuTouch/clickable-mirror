@@ -21,6 +21,7 @@ from ..utils import (
     validate_clickable_json,
     make_absolute,
     make_env_var_conform,
+    is_path_sane,
     let_user_confirm,
 )
 from ..logger import logger
@@ -777,12 +778,21 @@ class ProjectConfig():
             if self.container_mode:
                 raise ClickableException('Desktop Mode in Container Mode is not supported.')
 
+    def check_path_sanity(self):
+        for path in self.path_keys:
+            if self.config[path] and not is_path_sane(self.config[path]):
+                raise ClickableException(
+                    'The "{}" config contains special characters (e.g. spaces):\n{}'
+                    .format(path, self.config[path])
+                )
+
     def check_config_errors(self):
         self.check_clickable_version()
         self.check_arch_restrictions()
         self.check_builder_rules()
         self.check_docker_configs()
         self.check_desktop_configs()
+        self.check_path_sanity()
 
     def set_builder_interactive(self):
         if self.config['builder'] or not self.needs_builder():
