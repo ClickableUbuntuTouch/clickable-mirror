@@ -110,7 +110,7 @@ class GdbCommand(Command):
                 break
 
         path = self.choose_executable(
-                [self.config.install_dir, self.config.app_bin_dir], binary)
+            [self.config.install_dir, self.config.app_bin_dir], binary)
         if path:
             if self.is_elf_file(path):
                 return path

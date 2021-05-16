@@ -71,7 +71,7 @@ class ProjectFiles():
         if exec_line and executable:
             exec_list = exec_line.split()
             pos = exec_list.index(executable)
-            exec_args = exec_list[pos+1:]
+            exec_args = exec_list[pos + 1:]
 
             if '%U' in exec_args and remove_proc_u:
                 exec_args.remove('%U')
@@ -154,9 +154,9 @@ class InstallFiles():
 
     def find_full_package_name(self):
         return '{}_{}_{}'.format(
-                self.find_package_name(),
-                self.find_app_name(),
-                self.find_version())
+            self.find_package_name(),
+            self.find_app_name(),
+            self.find_version())
 
     def get_click_filename(self):
         return '{}_{}_{}.click'.format(self.find_package_name(), self.find_version(), self.arch)

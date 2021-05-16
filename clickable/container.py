@@ -285,15 +285,15 @@ class Container():
 
             wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} ' \
                               '{network} -i {image} bash -c "{cmd}"'.format(
-                                mounts=mounts,
-                                env=env_vars,
-                                go=go_config,
-                                cwd=self.config.build_dir if use_build_dir else cwd,
-                                user=user,
-                                image=self.docker_image,
-                                cmd=command,
-                                tty="-t" if tty else "",
-                                network='--network="host"' if localhost else "",
+                                  mounts=mounts,
+                                  env=env_vars,
+                                  go=go_config,
+                                  cwd=self.config.build_dir if use_build_dir else cwd,
+                                  user=user,
+                                  image=self.docker_image,
+                                  cmd=command,
+                                  tty="-t" if tty else "",
+                                  network='--network="host"' if localhost else "",
                               )
 
         kwargs = {}
@@ -387,7 +387,7 @@ FROM {}
 
     def get_apt_install_cmd(self, dependencies):
         return 'apt-get install -y --force-yes --no-install-recommends {}'.format(
-                ' '.join(dependencies))
+            ' '.join(dependencies))
 
     def setup_customized_image(self):
         logger.debug('Checking dependencies and container setup')

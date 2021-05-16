@@ -154,7 +154,7 @@ class LibConfig():
         for key in self.accepts_placeholders:
             for sub in self.placeholders:
                 rep = self.config[self.placeholders[sub]]
-                self.substitute("${"+sub+"}", rep, key)
+                self.substitute("${" + sub + "}", rep, key)
             if key in self.path_keys and self.config[key]:
                 self.config[key] = make_absolute(self.config[key])
 

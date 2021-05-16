@@ -63,6 +63,6 @@ class ConfigMock(ProjectConfig):
         super().setup_helpers()
         if self.mock_install_files:
             self.install_files = InstallFilesMock(
-                    self.config['install_dir'],
-                    self.config['builder'],
-                    self.config['arch'])
+                self.config['install_dir'],
+                self.config['builder'],
+                self.config['arch'])

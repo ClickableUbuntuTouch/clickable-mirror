@@ -72,7 +72,7 @@ class SetupCommand(Command):
 
         argcomplete_command = self.find_argcomplete_command()
         activation = '\n# Enable bash completion for Clickable\neval "$({} clickable)"'.format(
-                argcomplete_command)
+            argcomplete_command)
 
         run_subprocess_check_call("echo '{}' >> ~/.bashrc".format(activation), shell=True)
         logger.info('Bash completion is set up. Open a new terminal to apply changes.')
