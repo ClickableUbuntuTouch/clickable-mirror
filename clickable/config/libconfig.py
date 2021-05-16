@@ -16,13 +16,14 @@ from .constants import Constants
 
 class LibInitConfig:
     def __init__(self):
-        self.name = None,
-        self.json_config = None,
-        self.arch = None,
-        self.root_dir = None,
-        self.qt_version = None,
+        self.name = None
+        self.json_config = None
+        self.arch = None
+        self.root_dir = None
+        self.qt_version = None
         self.verbose = None
         self.libs_placeholders = None
+        self.lib_configs = None
 
 
 class LibConfig():
@@ -59,6 +60,7 @@ class LibConfig():
     use_nvidia = False
     gopath = None
     verbose = False
+    lib_configs = []
 
     def __init__(self, config):
         self.qt_version = config.qt_version
@@ -66,6 +68,7 @@ class LibConfig():
         self.placeholders = {}
         self.placeholders.update(self.static_placeholders)
         self.placeholders.update(config.libs_placeholders)
+        self.lib_configs = config.lib_configs
 
         self.set_host_arch()
         self.container_list = list(Constants.container_mapping[self.host_arch].values())
@@ -143,6 +146,10 @@ class LibConfig():
 
     def get_env_vars(self):
         env_vars = {}
+
+        if self.lib_configs:
+            install_dirs = [lib.install_dir for lib in self.lib_configs]
+            env_vars['CMAKE_PREFIX_PATH'] = ':'.join(install_dirs)
 
         for key, conf in self.placeholders.items():
             env_vars[key] = self.config[conf]

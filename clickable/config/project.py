@@ -610,6 +610,7 @@ class ProjectConfig():
             lib_init.qt_version = self.config['qt_version']
             lib_init.verbose = self.verbose
             lib_init.libs_placeholders = placeholders
+            lib_init.lib_configs = self.lib_configs
 
             lib = LibConfig(lib_init)
             self.lib_configs.append(lib)
