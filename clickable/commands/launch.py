@@ -17,7 +17,8 @@ class LaunchCommand(Command):
         parser.add_argument(
             'package',
             nargs='?',
-            help='Full click package name to be started (defaults to the one created by Clickable)'
+            help='Full click package name to be started '
+            '(defaults to the one created by Clickable)'
         )
         parser.add_argument(
             '--skip-kill',
@@ -52,7 +53,8 @@ class LaunchCommand(Command):
             kill = '[' + self.kill[:1] + ']' + self.kill[1:]
             self.device.run_command('pkill -f \\"{}\\"'.format(kill))
         except Exception:  # pylint: disable=broad-except
-            logger.warning("Could not kill app. Maybe it wasn't running.")
+            logger.warning("Could not kill app. Maybe the device is not accessible '\
+                    'or the app wasn't running.")
 
     def run(self):
         if self.skip_kill or not self.kill:

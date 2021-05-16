@@ -35,7 +35,9 @@ class PublishCommand(Command):
         parser.add_argument(
             'changelog',
             nargs='*',
-            help='Change log message to be appended in OpenStore app changelog',
+            help='Change log message to be appended in OpenStore app changelog '
+            '(prepend with a -- to make sure Clickable does not interpret part '
+            'of the changelog)',
         )
 
     def configure(self, args):

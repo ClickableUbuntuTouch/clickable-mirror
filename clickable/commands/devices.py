@@ -7,7 +7,7 @@ class DevicesCommand(Command):
     def __init__(self):
         super().__init__()
         self.cli_conf.name = 'devices'
-        self.cli_conf.help_msg = 'Lists all connected devices'
+        self.cli_conf.help_msg = 'Lists all ADB devices'
 
     def run(self):
         devices = self.device.detect_attached()
