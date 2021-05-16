@@ -14,11 +14,22 @@ from clickable.logger import logger
 from .constants import Constants
 
 
+class LibInitConfig:
+    def __init__(self):
+        self.name = None,
+        self.json_config = None,
+        self.arch = None,
+        self.root_dir = None,
+        self.qt_version = None,
+        self.verbose = None
+        self.libs_placeholders = None
+
+
 class LibConfig():
     cwd = os.getcwd()
     config = {}
 
-    placeholders = OrderedDict({
+    static_placeholders = OrderedDict({
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
         "NAME": "name",
@@ -49,16 +60,19 @@ class LibConfig():
     gopath = None
     verbose = False
 
-    def __init__(self, name, json_config, arch, root_dir, qt_version, verbose):
-        self.qt_version = qt_version
-        self.verbose = verbose
+    def __init__(self, config):
+        self.qt_version = config.qt_version
+        self.verbose = config.verbose
+        self.placeholders = {}
+        self.placeholders.update(self.static_placeholders)
+        self.placeholders.update(config.libs_placeholders)
 
         self.set_host_arch()
         self.container_list = list(Constants.container_mapping[self.host_arch].values())
 
         self.config = {
-            'name': name,
-            'arch': arch,
+            'name': config.name,
+            'arch': config.arch,
             'arch_triplet': None,
             'builder': None,
             'postmake': None,
@@ -68,7 +82,7 @@ class LibConfig():
             'build_dir': '${ROOT}/build/${ARCH_TRIPLET}/${NAME}',
             'build_home': '${BUILD_DIR}/.clickable/home',
             'src_dir': '${ROOT}/libs/${NAME}',
-            'root_dir': root_dir,
+            'root_dir': config.root_dir,
             'dependencies_host': [],
             'dependencies_target': [],
             'dependencies_ppa': [],
@@ -82,7 +96,7 @@ class LibConfig():
             'test': 'ctest',
         }
 
-        self.config.update(json_config)
+        self.config.update(config.json_config)
         if self.config["docker_image"]:
             self.is_custom_docker_image = True
         else:
@@ -102,7 +116,7 @@ class LibConfig():
         self.check_config_errors()
 
         for key, value in self.config.items():
-            logger.debug('Lib {} config value {}: {}'.format(name, key, value))
+            logger.debug('Lib {} config value {}: {}'.format(config.name, key, value))
 
     def __getattr__(self, name):
         return self.config[name]
