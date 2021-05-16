@@ -35,7 +35,6 @@ class DesktopCommand(Command):
         self.command = None
         self.custom_mode = False
         self.ide_delegate = None
-        self.clean = False
         self.skip_build = False
         self.gdb_port = None
         self.gdb = False
@@ -43,13 +42,11 @@ class DesktopCommand(Command):
         self.dark_mode = False
         self.desktop_locale = 'C'
 
+        self.builder = BuildCommand()
+
     def setup_parser(self, parser):
-        parser.add_argument(
-            '--clean',
-            action='store_true',
-            help='Clean build directory before building',
-            default=False,
-        )
+        self.builder.setup_parser(parser)
+
         parser.add_argument(
             '--skip-build',
             action='store_true',
@@ -80,12 +77,14 @@ class DesktopCommand(Command):
         )
         parser.add_argument(
             '--lang',
-            help='Start app in with the given language code',
+            help='Start app with the given language code',
             default=os.getenv('LANG', 'C')
         )
 
     def configure(self, args):
-        self.clean = args.clean
+        self.builder.init_from_command(self)
+        self.builder.configure(args)
+
         self.skip_build = args.skip_build
         self.gdb_port = args.gdbserver
         self.gdb = args.gdb or self.gdb_port
@@ -96,12 +95,11 @@ class DesktopCommand(Command):
         self.configure_common()
 
     def configure_nested(self):
+        self.builder.init_from_command(self)
+        self.builder.configure_nested()
         self.configure_common()
 
     def configure_common(self):
-        if self.config.always_clean:
-            self.clean = True
-
         if env('CLICKABLE_DARK_MODE'):
             self.dark_mode = True
 
@@ -124,10 +122,7 @@ class DesktopCommand(Command):
         if self.skip_build or self.custom_mode:
             self.container.setup()
         else:
-            builder = BuildCommand()
-            builder.init_from_command(self)
-            builder.clean = self.clean
-            builder.run()
+            self.builder.run()
 
     def setup_docker(self):
         self.container.check_docker()
