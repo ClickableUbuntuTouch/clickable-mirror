@@ -139,6 +139,10 @@ class QtCreatorDelegate(IdeCommandDelegate):
         clickable_env_path = '{}:{}'.format(env_vars["PATH"], env_vars["CLICK_PATH"])
         clickable_ld_library_path='{}:{}'.format(env_vars["LD_LIBRARY_PATH"], env_vars["CLICK_LD_LIBRARY_PATH"])
         clickable_qml2_import_path='{}:{}:{}'.format(env_vars["QML2_IMPORT_PATH"], env_vars["CLICK_QML2_IMPORT_PATH"], os.path.join(config.install_dir, 'lib') )
+        build_args = ''
+        if config.build_args:
+            build_args = ' '.join(self.config.build_args)
+        clickable_build_args= '{} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(build_args)
 
         template_replacement = {
             "CLICKABLE_LD_LIBRARY_PATH": clickable_ld_library_path,
@@ -148,7 +152,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
             "CLICKABLE_EXEC_CMD": executable,
             "CLICKABLE_EXEC_ARGS": exec_args,
             "CLICKABLE_SRC_DIR": config.src_dir,
-            "CLICKABLE_BUILD_ARGS": " ".join(config.build_args),
+            "CLICKABLE_BUILD_ARGS": clickable_build_args,
             "CLICKABLE_PATH":clickable_env_path
         }
 
