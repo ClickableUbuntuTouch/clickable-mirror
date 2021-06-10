@@ -85,6 +85,12 @@ Run clickable with the ``--verbose`` flag to see the executed command for your s
 Will run ``custom_command`` inside ide container wrapper.
 e.g. Launch qtcreator: ``clickable ide qtcreator``.
 
+
+``clickable ci <custom_command>``
+---------------------------------
+
+Will run ``custom_command`` inside a Clickable CI container.
+
 ``clickable create``
 --------------------
 
