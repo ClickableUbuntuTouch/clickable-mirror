@@ -261,7 +261,13 @@ def make_env_var_conform(name):
 
 
 def is_path_sane(path):
-    return re.match(r"^[\w\d_\.\-/]+$", path)
+    if isinstance(path, list):
+        for p in path:
+            if not is_path_sane(p):
+                return False
+        return True
+
+    return re.match(r"^[\w\d_\.\-\*/]+$", path)
 
 
 def is_sub_dir(path, parent):
