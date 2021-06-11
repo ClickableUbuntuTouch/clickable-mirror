@@ -4,7 +4,8 @@ Commands
 ========
 
 From the root directory of your project you have multiple sub-commands available. Run
-``clickable --help`` to list them all. Some of the most common ones are explained below.
+``clickable --help`` to list them all. ``clickable <cmd> --help`` explains a single command in
+detail. Some of the most common ones are explained below.
 
 A pure ``clickable`` call is equivalent to ``clickable chain``.
 
@@ -20,7 +21,8 @@ A clean build can be enforced by running ``clickable chain --clean``.
 ``clickable desktop``
 ---------------------
 
-Compile and run the app on the desktop.
+Compile and run the app on the desktop. Accepts the same arguments as the ``build`` command plus
+some desktop mode specific ones.
 
 Note: ArchLinux user might need to run ``xhost +local:clickable`` before using
 desktop mode.
