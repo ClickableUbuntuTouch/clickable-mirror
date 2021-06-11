@@ -1,5 +1,6 @@
 import shutil
 import os
+import fnmatch
 
 from clickable.logger import logger
 from clickable.config.constants import Constants
@@ -20,7 +21,13 @@ class PureQMLCMakeBuilder(CMakeBuilder):
 class PureBuilder(Builder):
     name = Constants.PURE
 
-    def _ignore(self, path, contents):
+    def matches_ignore_list(self, path):
+        for pattern in self.config.ignore:
+            if fnmatch.fnmatch(path, pattern):
+                return True
+        return False
+
+    def ignore(self, path, contents):
         ignored = []
         for content in contents:
             cpath = os.path.abspath(os.path.join(path, content))
@@ -28,7 +35,7 @@ class PureBuilder(Builder):
             if (
                 cpath == os.path.abspath(self.config.install_dir) or
                 cpath == os.path.abspath(self.config.build_dir) or
-                content in self.config.ignore or
+                self.matches_ignore_list(content) or
                 content == 'clickable.json'
             ):
                 ignored.append(content)
@@ -38,7 +45,7 @@ class PureBuilder(Builder):
     def build(self):
         if os.path.isdir(self.config.install_dir):
             shutil.rmtree(self.config.install_dir)
-        shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
+        shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self.ignore)
         logger.info('Copied files to install directory for click building')
 
 
