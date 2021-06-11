@@ -63,6 +63,10 @@ If no command is provided to ``chain`` it will run the default chain
 And finally a pure ``clickable`` is equivalent to ``clickable chain``. So not much
 changed after all.
 
+Due to the way how Python's ``argparse`` works, common command line arguments like
+``--config`` are not available when running ``clickable`` without a sub-command.
+Just use the ``chain`` command instead.
+
 Libraries
 ^^^^^^^^^
 
