@@ -8,7 +8,7 @@ from .exceptions import ClickableException
 from .logger import logger
 
 
-class Device(object):
+class Device():
     def __init__(self, config):
         self.config = config
 
@@ -20,7 +20,10 @@ class Device(object):
                 device = line.split(' ')[0]
                 for part in line.split(' '):
                     if part.startswith('model:'):
-                        device = '{} - {}'.format(device, part.replace('model:', '').replace('_', ' ').strip())
+                        device = '{} - {}'.format(
+                            device,
+                            part.replace('model:', '').replace('_', ' ').strip()
+                        )
 
                 devices.append(device)
 
@@ -29,7 +32,10 @@ class Device(object):
     def check_any_attached(self):
         devices = self.detect_attached()
         if len(devices) == 0:
-            raise ClickableException('Cannot access device.\nADB: No devices attached\nSSH: no IP address specified (--ssh)')
+            raise ClickableException(
+                'Cannot access device.\nADB: No devices attached\nSSH: no IP address '
+                'specified (--ssh)'
+            )
 
     def check_multiple_attached(self):
         devices = self.detect_attached()
@@ -40,9 +46,9 @@ class Device(object):
         self.check_any_attached()
         if self.config.device_serial_number:
             return '-s {}'.format(self.config.device_serial_number)
-        else:
-            self.check_multiple_attached()
-            return ''
+
+        self.check_multiple_attached()
+        return ''
 
     def forward_port_adb(self, port, adb_args):
         command = 'adb {0} forward tcp:{1} tcp:{1}'.format(adb_args, port)
@@ -85,10 +91,10 @@ class Device(object):
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if self.config.container_mode:
             logger.debug('Skipping device command, running in container mode')
-            return
+            return None
 
         if not cwd:
-            cwd = self.config.build_dir
+            cwd = os.getcwd()
 
         wrapped_command = ''
         if self.config.ssh:
@@ -100,5 +106,6 @@ class Device(object):
 
         if get_output:
             return run_subprocess_check_output(wrapped_command, cwd=cwd, shell=True)
-        else:
-            run_subprocess_check_call(wrapped_command, cwd=cwd, shell=True)
+
+        run_subprocess_check_call(wrapped_command, cwd=cwd, shell=True)
+        return None

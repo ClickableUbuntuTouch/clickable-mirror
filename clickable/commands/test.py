@@ -1,15 +1,13 @@
-import os
-import shutil
-
 from .base import Command
 
 
 class TestCommand(Command):
-    aliases = []
-    name = 'test'
-    help = 'Run tests on a virtual screen'
+    def __init__(self):
+        Command.__init__(self)
+        self.cli_conf.name = 'test'
+        self.cli_conf.help_msg = 'Run the configured tests command on a virtual screen'
 
-    def run(self, path_arg=None):
+    def run(self):
         command = 'xvfb-startup {}'.format(self.config.test)
 
-        self.config.container.run_command(command, use_build_dir=False)
+        self.container.run_command(command)

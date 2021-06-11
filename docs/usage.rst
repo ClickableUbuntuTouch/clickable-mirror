@@ -17,8 +17,8 @@ or you can start fresh by running ``clickable create`` which is outlined in more
 detail on the previous :ref:`getting started <getting-started>` page.
 
 To run the default set of sub-commands, simply run ``clickable`` in the root directory
-of your app's code. Clickable will attempt to auto detect the
-:ref:`build template <builders>` and other configuration options.
+of your app's code. Clickable will attempt to auto detect which
+:ref:`builder <builders>` is able to build your app.
 
 Note: The first time you run ``clickable`` in your app directory, behind the
 scenes it will download a new Docker container which is about 1GB in size - so
@@ -28,12 +28,14 @@ the first time you build your app for a specific architecture and when you run
 
 Running the default sub-commands will:
 
-1) Clean the build directory (by default ``./build/<arch_triplet>/app``)
-2) Build the app
-3) Build the click package (can be found in the build directory)
-4) Install the app on your phone (By default this uses adb, see below if you want to use ssh)
+1) Build the app
+2) Build the click package (can be found in the build directory)
+3) Uninstall the app from your phone
+4) Install the newly built app on your phone
 5) Kill the running app on the phone
 6) Launch the app on your phone
+
+By default the access is accessed using adb, see below if you want to use ssh)
 
 Note: ensure your device is in `developer mode <http://docs.ubports.com/en/latest/userguide/advanceduse/adb.html?highlight=mode#enable-developer-mode>`__
 for the app to be installed when using adb or `enable ssh <http://docs.ubports.com/en/latest/userguide/advanceduse/ssh.html>`__

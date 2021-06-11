@@ -3,20 +3,26 @@
 Commands
 ========
 
-From the root directory of your project you have the following sub-commands available:
+From the root directory of your project you have multiple sub-commands available. Run
+``clickable --help`` to list them all. ``clickable <cmd> --help`` explains a single command in
+detail. Some of the most common ones are explained below.
 
+A pure ``clickable`` call is equivalent to ``clickable chain``.
 
-``clickable``
--------------
+``clickable chain``
+-------------------
 
-Runs the default sub-commands specified in the "default" config. A dirty build
-without cleaning the build dir can be achieved by running
-``clickable --dirty``.
+Chains multiple commands that can be specified. The default chain can be configured via the
+:ref:`default <clickable-json-default>` field. The default chain itself defaults to
+``build install launch``.
+
+A clean build can be enforced by running ``clickable chain --clean``.
 
 ``clickable desktop``
 ---------------------
 
-Compile and run the app on the desktop.
+Compile and run the app on the desktop. Accepts the same arguments as the ``build`` command plus
+some desktop mode specific ones.
 
 Note: ArchLinux user might need to run ``xhost +local:clickable`` before using
 desktop mode.
@@ -75,7 +81,6 @@ Run clickable with the ``--verbose`` flag to see the executed command for your s
 
 .. _commands-ide:
 
-
 ``clickable ide <custom_command>``
 ----------------------------------
 
@@ -96,20 +101,10 @@ Generate a new app from an :ref:`app template <app-templates>` by name.
 
 Opens a shell on the device via ssh. This is similar to the ``phablet-shell`` command.
 
-``clickable clean-libs``
-------------------------
-
-Cleans out all library build dirs.
-
-``clickable build-libs``
-------------------------
-
-Builds the dependency libraries specified in the clickable.json.
-
 ``clickable clean``
 -------------------
 
-Cleans out the build dir.
+Cleans out the app build dir. Can by applied to libraries by appending ``--libs``.
 
 ``clickable build``
 -------------------
@@ -118,20 +113,19 @@ Builds the project using the specified builder, build dir, and build commands.
 Then it takes the built files and compiles them into a click package (you can
 find it in the build dir).
 
-Set the manifest architecture field to ``@CLICK_ARCH@`` to have Clickable replace
-it with the appropriate value.
+Set the manifest architecture field to ``@CLICK_ARCH@`` and the framework field
+to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate values.
+
+``clickable build --libs``
+--------------------------
+
+Builds libraries specified in the clickable.json.
 
 ``clickable build --output=/path/to/some/diretory``
 ---------------------------------------------------
 
 Takes the built files and compiles them into a click package, outputting the
 compiled click to the directory specified by ``--output``.
-
-``clickable clean-build``
--------------------------
-
-Cleans out the build dir before building the project as outlined in the
-``clickable build`` docs.
 
 ``clickable review``
 --------------------
@@ -142,7 +136,7 @@ to review your click without installing click-review on your computer.
 .. _commands-test:
 
 ``clickable test``
---------------------
+------------------
 
 Run your test suite in with a virtual screen. By default this runs qmltestrunner,
 but you can specify a custom command by setting the :ref:`test <clickable-json-test>`
@@ -190,13 +184,13 @@ Publish your click app to the OpenStore with a message to add to the changelog.
 --------------------------------
 
 Runs an arbitrary command in the clickable container. Changes do not persist.
-This is only meant to inspect the container. Opens a root bash shell if not
+This is only meant to inspect the container. Opens a root bash shell if no
 command is specified.
 
 ``clickable update``
----------------------------
+--------------------
 
-Update the docker container for use with clickable.
+Update the docker images for use with clickable.
 
 ``clickable no-lock``
 ---------------------
@@ -216,8 +210,8 @@ Lists the serial numbers and model names for attached devices. Useful when
 multiple devices are attached and you need to know what to use for the ``-s``
 argument.
 
-``clickable <custom command>``
-------------------------------
+``clickable script <custom command>``
+-------------------------------------
 
 Runs a custom command specified in the "scripts" config
 

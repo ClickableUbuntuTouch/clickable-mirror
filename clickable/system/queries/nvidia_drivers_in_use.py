@@ -2,6 +2,7 @@ from clickable.system.access import is_program_installed
 from clickable.system.query import Query
 from clickable.utils import run_subprocess_check_output
 
+
 class NvidiaDriversInUse(Query):
     def is_met(self):
         if not is_program_installed('nvidia-smi'):

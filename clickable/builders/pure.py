@@ -1,38 +1,33 @@
-import json
 import shutil
 import os
+import fnmatch
+
+from clickable.logger import logger
+from clickable.config.constants import Constants
 
 from .base import Builder
-from .make import MakeBuilder
 from .cmake import CMakeBuilder
 from .qmake import QMakeBuilder
-from clickable.logger import logger
-from clickable.config.project import ProjectConfig
-from clickable.config.constants import Constants
-from clickable.exceptions import ClickableException
 
 
-class PureQMLMakeBuilder(MakeBuilder):
-    def post_make_install(self):
-        super().post_make_install()
-
-        manifest = self.config.install_files.get_manifest()
-        manifest['architecture'] = 'all'
-        self.config.install_files.write_manifest(manifest)
-
-
-class PureQMLQMakeBuilder(PureQMLMakeBuilder, QMakeBuilder):
+class PureQMLQMakeBuilder(QMakeBuilder):
     name = Constants.PURE_QML_QMAKE
 
 
-class PureQMLCMakeBuilder(PureQMLMakeBuilder, CMakeBuilder):
+class PureQMLCMakeBuilder(CMakeBuilder):
     name = Constants.PURE_QML_CMAKE
 
 
 class PureBuilder(Builder):
     name = Constants.PURE
 
-    def _ignore(self, path, contents):
+    def matches_ignore_list(self, path):
+        for pattern in self.config.ignore:
+            if fnmatch.fnmatch(path, pattern):
+                return True
+        return False
+
+    def ignore(self, path, contents):
         ignored = []
         for content in contents:
             cpath = os.path.abspath(os.path.join(path, content))
@@ -40,7 +35,7 @@ class PureBuilder(Builder):
             if (
                 cpath == os.path.abspath(self.config.install_dir) or
                 cpath == os.path.abspath(self.config.build_dir) or
-                content in self.config.ignore or
+                self.matches_ignore_list(content) or
                 content == 'clickable.json'
             ):
                 ignored.append(content)
@@ -49,20 +44,11 @@ class PureBuilder(Builder):
 
     def build(self):
         if os.path.isdir(self.config.install_dir):
-            raise ClickableException('Build directory already exists. Please run "clickable clean" before building again!')
-        shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self._ignore)
+            shutil.rmtree(self.config.install_dir)
+        shutil.copytree(self.config.cwd, self.config.install_dir, ignore=self.ignore)
         logger.info('Copied files to install directory for click building')
 
 
-class PythonBuilder(PureBuilder):
-    # The only difference between this and the Pure builder is that this doesn't force the "all" arch
-    name = Constants.PYTHON
-
-    def build(self):
-        logger.warn('The "python" builder is deprecated, please use "precompiled" instead')
-        super().build()
-
-
 class PrecompiledBuilder(PureBuilder):
-    # The only difference between this and the Pure builder is that this doesn't force the "all" arch
+    # The only difference between this and PureBuilder is that this doesn't force the "all" arch
     name = Constants.PRECOMPILED

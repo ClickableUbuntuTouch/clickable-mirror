@@ -1,14 +1,11 @@
-import subprocess
-import shlex
 import json
 import shutil
-import sys
 import os
 from distutils.dir_util import copy_tree
 
-from .cmake import CMakeBuilder
-from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
+
+from .cmake import CMakeBuilder
 
 
 class CordovaBuilder(CMakeBuilder):
@@ -25,7 +22,7 @@ class CordovaBuilder(CMakeBuilder):
         self.config.src_dir = os.path.join(self.platform_dir, 'build')
 
         if not os.path.isdir(self.platform_dir):
-            command = self.config.container.run_command("cordova platform add ubuntu")
+            self.container.run_command("cordova platform add ubuntu")
 
     def make_install(self):
         super().make_install()
@@ -53,13 +50,6 @@ class CordovaBuilder(CMakeBuilder):
                 copy_tree(full_source_path, full_dest_path)
             else:
                 shutil.copy(full_source_path, full_dest_path)
-
-        # Modify default files with updated settings
-        # taken straing from cordova build.js
-        manifest = self.config.install_files.get_manifest()
-        manifest['architecture'] = self.config.build_arch
-        manifest['framework'] = self.sdk
-        self.config.install_files.write_manifest(manifest)
 
         apparmor_file = os.path.join(self.config.install_dir, 'apparmor.json')
         with open(apparmor_file, 'r') as apparmor_reader:

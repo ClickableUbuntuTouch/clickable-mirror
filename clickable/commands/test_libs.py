@@ -1,36 +1,57 @@
 import os
 
-from .base import Command
 from clickable.logger import logger
 from clickable.container import Container
 from clickable.exceptions import ClickableException
 
+from .base import Command
+
 
 class TestLibsCommand(Command):
-    aliases = []
-    name = 'test-libs'
-    help = 'Run tests on libraries'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'test-libs'
+        self.cli_conf.help_msg = 'Run tests on libraries'
 
-    def run(self, path_arg=""):
+        self.libs = []
+
+    def setup_parser(self, parser):
+        parser.add_argument(
+            'libs',
+            nargs='*',
+            help='Only test specified libs'
+        )
+
+    def configure(self, args):
+        self.libs = args.libs
+
+        existing_libs = [lib.name for lib in self.config.lib_configs]
+
+        for lib in self.libs:
+            if lib not in existing_libs:
+                raise ClickableException(
+                    'Cannot test unknown library "{}", which is not in your clickable.json'.format(
+                        lib
+                    )
+                )
+
+    def run(self):
         if not self.config.lib_configs:
             logger.warning('No libraries defined.')
 
-        single_lib = path_arg
-        found = False
+        filter_libs = self.libs
 
         for lib in self.config.lib_configs:
-            if not single_lib or single_lib == lib.name:
+            if lib.name in filter_libs or not filter_libs:
                 logger.info("Running tests on {}".format(lib.name))
-                found = True
 
                 self.run_test(lib)
 
-        if single_lib and not found:
-            raise ClickableException('Cannot test unknown library {}. You may add it to the clickable.json'.format(single_lib))
-
     def run_test(self, lib):
         if not os.path.exists(lib.build_dir):
-            logger.warning("Library {} has not yet been built for host architecture.".format(lib.name))
+            logger.warning(
+                "Library {} has not yet been built for host architecture.".format(lib.name)
+            )
         else:
             lib.container_mode = self.config.container_mode
             lib.docker_image = self.config.docker_image
@@ -44,4 +65,3 @@ class TestLibsCommand(Command):
 
             command = 'xvfb-startup {}'.format(lib.test)
             lib.container.run_command(command, use_build_dir=True)
-

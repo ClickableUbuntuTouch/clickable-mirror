@@ -10,8 +10,8 @@ The easiest way to do GDB Debugging via Clickable is desktop mode and can be sta
 by running ``clickable desktop --gdb``.
 
 Alternatively a GDB Server can be started with ``clickable desktop --gdbserver <port>``
-(just choose any port, e.g. ``3333``). Check for an option to do GDB Remote Debugging in your IDE
-and connect to ``localhost:<port>``. To connect a GDB Client run
+(just choose any port, e.g. ``3333``). Check for an option to do GDB Remote Debugging
+in your IDE and connect to ``localhost:<port>``. To connect a GDB Client run
 ``gdb <app-binary> -ex 'target remote localhost:<port>'``.
 
 To analyze errors in memory access run ``clickable desktop --valgrind``.
@@ -26,9 +26,10 @@ and the other one to start ``gdb``. In the first terminal run ``clickable gdbser
 and in the second one ``clickable gdb``. This method is limited to
 apps that are started via their own binary file.
 
-The ``clickable gdbserver`` command provides the server at ``localhost:3333``. In theory
-one could connect to that one from within any IDE. But to actually make it work, one needs
-to provide the corresponding libc6 debug symbols. Otherwise the App won't start due to a
-segfault.
+For Debugging in your IDE, run ``clickable gdb --script debug.gdbinit``. This creates
+a GDB script that can be configured as init script in your IDE's GDB Remote Debugging
+feature. To execute the script from a gdb shell (e.g. gdb-multiarch) run
+``source debug.gdbinit``.
 
-For detailed instructions on how to use gdb check out `gdb documentation <https://sourceware.org/gdb/current/onlinedocs/gdb/>`__.
+For detailed instructions on how to use gdb check out
+`gdb documentation <https://sourceware.org/gdb/current/onlinedocs/gdb/>`__.

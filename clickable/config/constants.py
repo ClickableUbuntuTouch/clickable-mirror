@@ -1,6 +1,8 @@
 import os
+import platform
 
-class Constants(object):
+
+class Constants():
     PURE_QML_QMAKE = 'pure-qml-qmake'
     QMAKE = 'qmake'
     PURE_QML_CMAKE = 'pure-qml-cmake'
@@ -8,12 +10,22 @@ class Constants(object):
     CUSTOM = 'custom'
     CORDOVA = 'cordova'
     PURE = 'pure'
-    PYTHON = 'python'
     GO = 'go'
     RUST = 'rust'
     PRECOMPILED = 'precompiled'
 
-    builders = [PURE_QML_QMAKE, QMAKE, PURE_QML_CMAKE, CMAKE, CUSTOM, CORDOVA, PURE, PYTHON, GO, RUST, PRECOMPILED]
+    builders = [
+        PURE_QML_QMAKE,
+        QMAKE,
+        PURE_QML_CMAKE,
+        CMAKE,
+        CUSTOM,
+        CORDOVA,
+        PURE,
+        GO,
+        RUST,
+        PRECOMPILED
+    ]
     arch_agnostic_builders = [PURE_QML_QMAKE, PURE_QML_CMAKE, PURE]
 
     container_mapping = {
@@ -31,7 +43,8 @@ class Constants(object):
             ('16.04.4', 'amd64'): 'clickable/amd64-16.04-amd64:16.04.4-qt5.9',
             ('16.04.4', 'amd64-nvidia'): 'clickable/amd64-16.04-amd64-nvidia:16.04.4-qt5.9',
             ('16.04.4', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.4-qt5.9',
-            ('16.04.4', 'amd64-nvidia-ide'): 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.4-qt5.9',
+            ('16.04.4', 'amd64-nvidia-ide'):
+                'clickable/amd64-16.04-amd64-nvidia-ide:16.04.4-qt5.9',
             ('16.04.5', 'armhf'): 'clickable/amd64-16.04-armhf:16.04.5',
             ('16.04.5', 'arm64'): 'clickable/amd64-16.04-arm64:16.04.5',
             ('16.04.5', 'amd64'): 'clickable/amd64-16.04-amd64:16.04.5',
@@ -71,6 +84,8 @@ class Constants(object):
         'aarch64': 'arm64',
         'armv7l': 'armhf',
     }
+    host_arch = host_arch_mapping.get(platform.machine(), None)
 
-    desktop_device_home = os.path.expanduser('~/.clickable/home')
+    clickable_dir = os.path.expanduser('~/.clickable')
+    desktop_device_home = os.path.join(clickable_dir, 'home')
     device_home = '/home/phablet'

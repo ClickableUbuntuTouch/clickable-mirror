@@ -4,6 +4,7 @@
 import ast
 import re
 
+
 try:
     from setuptools import setup
 except ImportError:
@@ -13,7 +14,7 @@ readme = open('README.md').read()
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('clickable/__init__.py', 'rb') as f:
+with open('clickable/version.py', 'rb') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
@@ -21,12 +22,14 @@ requirements = [
     'cookiecutter',
     'requests',
     'jsonschema',
+    'argcomplete',
 ]
 
 setup(
     name='clickable-ut',
     version=version,
-    description='Compile, build, and deploy Ubuntu Touch click packages all from the command line.',
+    description='Compile, build, and deploy Ubuntu Touch click packages all '
+                'from the command line.',
     long_description=readme,
     long_description_content_type='text/markdown',
     author='Brian Douglass',

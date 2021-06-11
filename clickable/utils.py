@@ -1,17 +1,24 @@
 import itertools
 import subprocess
 import re
-import json
 import os
 import shlex
 import glob
-import shutil
 import inspect
 from os.path import dirname, basename, isfile, join
 
 from clickable.builders.base import Builder
 from clickable.logger import logger
 from clickable.exceptions import FileNotFoundException, ClickableException
+from clickable.config.constants import Constants
+from clickable.logger import Colors
+
+JSONSCHEMA_AVAILABLE = True
+try:
+    from jsonschema import validate, ValidationError
+except ImportError:
+    JSONSCHEMA_AVAILABLE = False
+
 
 # TODO use these subprocess functions everywhere
 
@@ -31,6 +38,17 @@ def prepare_command(cmd, shell=False):
     return cmd
 
 
+def get_container_mapping():
+    if Constants.host_arch in Constants.container_mapping:
+        return Constants.container_mapping[Constants.host_arch]
+
+    return {}
+
+
+def get_container_list():
+    return list(get_container_mapping().values())
+
+
 def run_subprocess_call(cmd, shell=False, **args):
     return subprocess.call(prepare_command(cmd, shell), shell=shell, **args)
 
@@ -43,7 +61,15 @@ def run_subprocess_check_output(cmd, shell=False, **args):
     return subprocess.check_output(prepare_command(cmd, shell), shell=shell, **args).decode()
 
 
-def find(names, cwd, temp_dir=None, build_dir=None, ignore_dir=None, extensions_only=False, depth=None):
+def find(
+    names,
+    cwd,
+    temp_dir=None,
+    build_dir=None,
+    ignore_dir=None,
+    extensions_only=False,
+    depth=None
+):
     found = []
     searchpaths = []
     searchpaths.append(cwd)
@@ -53,12 +79,14 @@ def find(names, cwd, temp_dir=None, build_dir=None, ignore_dir=None, extensions_
         include_build_dir = True
         searchpaths.append(build_dir)
 
-    for (root, dirs, files) in itertools.chain.from_iterable(os.walk(path, topdown=True) for path in searchpaths):
+    for (root, dirs, files) in itertools.chain.from_iterable(
+        os.walk(path, topdown=True) for path in searchpaths
+    ):
         # Ignore hidden directories
         new_dirs = []
-        for dir in dirs:
-            if os.path.join(root, dir) == build_dir or not dir[0] == '.':
-                new_dirs.append(dir)
+        for d in dirs:
+            if os.path.join(root, d) == build_dir or not d[0] == '.':
+                new_dirs.append(d)
 
         dirs[:] = new_dirs
 
@@ -85,7 +113,8 @@ def find(names, cwd, temp_dir=None, build_dir=None, ignore_dir=None, extensions_
     if not found:
         raise FileNotFoundException('Could not find {}'.format(', '.join(names)))
 
-    # Favor the manifest in the install dir first, then fall back to the build dir and finally the source dir
+    # Favor the manifest in the install dir first, then fall back to the build dir and
+    # finally the source dir
     file = ''
     for f in found:
         if temp_dir and f.startswith(os.path.realpath(temp_dir) + os.sep):
@@ -103,14 +132,21 @@ def find(names, cwd, temp_dir=None, build_dir=None, ignore_dir=None, extensions_
 
 
 def is_command(command):
-    error_code = run_subprocess_call(shlex.split('which {}'.format(command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    error_code = run_subprocess_call(
+        shlex.split('which {}'.format(command)),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
 
     return error_code == 0
 
 
 def check_command(command):
     if not is_command(command):
-        raise ClickableException('The command "{}" does not exist on this system, please install it for clickable to work properly"'.format(command))
+        raise ClickableException(
+            'The command "{}" does not exist on this system, please install it for '
+            'clickable to work properly"'.format(command)
+        )
 
 
 def env(name):
@@ -125,11 +161,15 @@ def get_builders():
     builder_classes = {}
     builder_dir = join(dirname(__file__), 'builders')
     modules = glob.glob(join(builder_dir, '*.py'))
-    builder_modules = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+    builder_modules = [
+        basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')
+    ]
 
     for name in builder_modules:
-        builder_submodule = __import__('clickable.builders.{}'.format(name), globals(), locals(), [name])
-        for name, cls in inspect.getmembers(builder_submodule):
+        builder_submodule = __import__(
+            'clickable.builders.{}'.format(name), globals(), locals(), [name]
+        )
+        for _, cls in inspect.getmembers(builder_submodule):
             if inspect.isclass(cls) and issubclass(cls, Builder) and cls.name:
                 builder_classes[cls.name] = cls
 
@@ -137,13 +177,15 @@ def get_builders():
 
 
 def get_make_jobs_from_args(make_args):
-    for arg in flexible_string_to_list(make_args):
+    for arg in flexible_string_to_list(make_args, split=True):
         if arg.startswith('-j'):
             jobs_str = arg[2:]
             try:
                 return int(jobs_str)
-            except ValueError:
-                raise ClickableException('"{}" in "make_args" is not a number, but it should be.')
+            except ValueError as err:
+                raise ClickableException(
+                    '"{}" in "make_args" is not a number, but it should be.'
+                ) from err
 
     return None
 
@@ -153,19 +195,21 @@ def merge_make_jobs_into_args(make_args, make_jobs):
 
     if make_args:
         return '{} {}'.format(make_args, make_jobs_arg)
-    else:
-        return make_jobs_arg
+
+    return make_jobs_arg
 
 
-def flexible_string_to_list(variable):
+def flexible_string_to_list(variable, split=False):
     if isinstance(variable, (str, bytes)):
-        return variable.split(' ')
+        if split:
+            return variable.split(' ')
+
+        return [variable]
     return variable
 
 
 def validate_clickable_json(config, schema):
-    try:
-        from jsonschema import validate, ValidationError
+    if JSONSCHEMA_AVAILABLE:
         try:
             validate(instance=config, schema=schema)
         except ValidationError as e:
@@ -177,16 +221,18 @@ def validate_clickable_json(config, schema):
                     error_message = "{} (in '{}')".format(error_message, e.path[-2])
                 else:
                     error_message = "{} (in '{}')".format(error_message, e.path[-1])
-            raise ClickableException(error_message)
-    except ImportError:
+            raise ClickableException(error_message) from e
+    else:
         logger.warning("Dependency 'jsonschema' not found. Could not validate clickable.json.")
-        pass
 
 
 def image_exists(image):
     command = 'docker image inspect {}'.format(image)
-    return run_subprocess_call(command,
-            stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL) == 0
+    return run_subprocess_call(
+        command,
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL
+    ) == 0
 
 
 def makedirs(path):
@@ -194,22 +240,43 @@ def makedirs(path):
     return path
 
 
-def make_absolute(path):
+def make_absolute(path, change_keys=False):
+    if not path:
+        return path
+
     if isinstance(path, list):
         return [make_absolute(p) for p in path]
+
     if isinstance(path, dict):
-        abs_dict = {}
-        for key in path:
-            abs_dict[key] = make_absolute(path[key])
-        return abs_dict
+        if change_keys:
+            return {make_absolute(key): path[key] for key in path}
+
+        return {key: make_absolute(path[key]) for key in path}
+
     return os.path.abspath(path)
 
 
 def make_env_var_conform(name):
-    return re.sub("[^A-Z0-9_]", "_", name.upper())
+    return re.sub(r"[^A-Z0-9_]", "_", name.upper())
+
+
+def is_path_sane(path):
+    return re.match(r"^[\w\d_\.\-/]+$", path)
 
 
 def is_sub_dir(path, parent):
-    p1 = os.path.abspath(path)
-    p2 = os.path.abspath(parent)
-    return os.path.commonpath([p1, p2]).startswith(p2)
+    path1 = os.path.abspath(path)
+    path2 = os.path.abspath(parent)
+    return os.path.commonpath([path1, path2]).startswith(path2)
+
+
+def let_user_confirm(message, default=True):
+    options = 'Y/n' if default else 'y/N'
+    question = '{} [{}]: '.format(message, options)
+
+    choice = input(Colors.INFO + question + Colors.CLEAR).strip().lower()
+
+    if choice == '':
+        return default
+
+    return choice in ['y', 'yes']

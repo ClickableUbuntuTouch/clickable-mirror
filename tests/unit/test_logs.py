@@ -8,14 +8,16 @@ from .base_test import UnitTest
 
 class TestLogsCommand(UnitTest):
     def setUp(self):
+        self.command = LogsCommand()
         self.setUpConfig()
-        self.command = LogsCommand(self.config)
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_logs(self, mock_run_command):
         self.command.run()
 
-        mock_run_command.assert_called_once_with('tail -f ~/.cache/upstart/application-click-foo.bar_foo_1.2.3.log')
+        mock_run_command.assert_called_once_with(
+            'tail -f ~/.cache/upstart/application-click-foo.bar_foo_1.2.3.log'
+        )
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_custom_log_file(self, mock_run_command):

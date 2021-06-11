@@ -1,17 +1,17 @@
-from unittest import TestCase
 import os
 import shutil
 
-from clickable import Clickable
 from clickable.commands.create import CreateCommand
+from clickable.commands.build import BuildCommand
 from clickable.utils import run_subprocess_call
-from ..mocks import ConfigMock
 from .base_test import IntegrationTest
 
 
 class TestTemplates(IntegrationTest):
     def setUp(self):
-        super().setUpConfig()
+        self.command = BuildCommand()
+        self.setUpConfig(mock_config_env={'GOPATH': '/tmp/gopath'})
+
         self.original_path = os.getcwd()
         self.app_path = os.path.abspath(os.path.join(self.test_dir, 'appname'))
 
@@ -33,22 +33,29 @@ class TestTemplates(IntegrationTest):
             shutil.move(self.tmp_config_file, self.config_file)
 
     def create_and_run(self, template, arch):
-        command = CreateCommand(self.config)
-        command.run(path_arg=template)
+        create_command = CreateCommand()
+        create_command.config = self.config
+        create_command.extra_context['Template'] = template
+        create_command.run()
+
         os.chdir(self.app_path)
 
         if template == 'Go':
-            run_subprocess_call('GOPATH=/tmp/gopath /usr/local/go/bin/go get', cwd=self.app_path, shell=True)
+            run_subprocess_call(
+                'GOPATH=/tmp/gopath /usr/local/go/bin/go get',
+                cwd=self.app_path,
+                shell=True
+            )
 
-        self.run_clickable(
-            cli_args=['clean', 'build', 'review', '--arch', arch],
-            config_env={
-                'GOPATH': '/tmp/gopath',
-            },
+        self.run_command(
+            cli_args=['--arch', arch, '--clean'],
         )
 
     def assertClickExists(self, arch):
-        click = os.path.join(self.app_path, 'build/x86_64-linux-gnu/app/appname.yourname_1.0.0_amd64.click')
+        click = os.path.join(
+            self.app_path,
+            'build/x86_64-linux-gnu/app/appname.yourname_1.0.0_amd64.click'
+        )
         if arch == 'all':
             click = os.path.join(self.app_path, 'build/all/app/appname.yourname_1.0.0_all.click')
 

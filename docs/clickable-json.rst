@@ -23,7 +23,7 @@ Placeholders & Environment Variables
 ------------------------------------
 
 Placeholders are values provided by Clickable that can be used in some
-configuration fields as ``${PLACEHOLDER}`` (``$PLACEHOLDER`` is deprecated syntax).
+configuration fields as ``${PLACEHOLDER}``.
 All placeholders are provided as environment variables during build, additionally.
 For custom environment variables see :ref:`env_vars <clickable-json-env_vars>`.
 
@@ -32,6 +32,8 @@ The following table lists all available placeholders.
 ======================= ======
 Placeholder             Output
 ======================= ======
+SDK_FRAMEWORK           Target framework (``ubuntu-sdk-16.04.5`` by default)
+QT_VERSION              Qt version within target framework (``5.12`` by default)
 ARCH                    Target architecture (``armhf``, ``arm64``, ``amd64`` or ``all``)
 ARCH_TRIPLET            Target architecture triplet (``arm-linux-gnueabihf``, ``aarch63-linux-gnu``, ``x86_64-linux-gnu`` or ``all``)
 NUM_PROCS               Number of build jobs recommended (``make_jobs``) and used by the CMake and QMake builders
@@ -103,11 +105,6 @@ This prevents the app from being build for other architectures and may also prev
 
 To specify the architecture for building use the cli argument instead (ex: ``--arch arm64``).
 
-arch
-----
-
-Deprecated, use ``restricted_arch`` instead.
-
 .. _clickable-json-builder:
 
 builder
@@ -115,15 +112,12 @@ builder
 
 Optional, see :ref:`builders <builders>` for the full list of options.
 
-template
---------
-
-Deprecated, use :ref:`builder <clickable-json-builder>` instead.
-
 prebuild
 --------
 
 Optional, a custom command to run from the root dir, before a build.
+
+Can be specified as a string or a list of strings.
 
 build
 -----
@@ -131,15 +125,22 @@ build
 A custom command to run from the build dir. Required if using the ``custom``
 builder, ignored otherwise.
 
+Can be specified as a string or a list of strings.
+
 postmake
 ---------
 
-Optional, a custom command to execute from the build directory, after make (during build).
+Optional, a custom command to execute from the build directory, after make (during build). Only
+used for Make-based builders.
+
+Can be specified as a string or a list of strings.
 
 postbuild
 ---------
 
-Optional, a custom command to execute from the build dir, after build and before click packaging.
+Optional, a custom command to execute from the root dir, after build, but before click packaging.
+
+Can be specified as a string or a list of strings.
 
 .. _clickable-json-env_vars:
 
@@ -223,6 +224,8 @@ The destination directory is ``${CLICK_LD_LIBRARY_PATH}``. Ex:
         "/usr/lib/${ARCH_TRIPLET}/libasound.so*"
     ]
 
+Relative paths are prepended with the project root dir.
+
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
 
@@ -237,6 +240,9 @@ Optional, additional QML files or directories that should be installed with the 
     "install_qml": [
         "/usr/lib/${ARCH_TRIPLET}/qt5/qml/Qt/labs/calendar"
     ]
+
+
+Relative paths are prepended with the project root dir.
 
 QML modules will be installed to the correct directory based on the name of the module.
 In the above example it will be installed to ``lib/${ARCH_TRIPLET}/Qt/labs/calendar``
@@ -256,6 +262,8 @@ The destination directory is ``${CLICK_PATH}``. Ex:
         "/usr/bin/htop"
     ]
 
+Relative paths are prepended with the project root dir.
+
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
 
@@ -268,9 +276,12 @@ Needs to be specified as a dictionary with absolute source paths as keys and des
 .. code-block:: javascript
 
     "install_data": {
-        "${ROOT}/packaging/manifest.json": "${INSTALL_DIR}",
-        "${ROOT}/packaging/myapp.desktop": "${INSTALL_DIR}"
+        "icons/logo.svg": "assets/logo.svg",
+        "packaging/myapp.desktop": "${INSTALL_DIR}"
     },
+
+Relative source paths are prepended with the project root dir and destination paths with
+the install dir.
 
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<src>"`` in a bash. ``${INSTALL_DIR}`` is
@@ -294,26 +305,27 @@ Optional, an object detailing custom commands to run. For example:
         "echo": "echo ${ARCH_TRIPLET}"
     }
 
-That enables the use of ``clickable fetch`` and ``clickable echo``.
+That enables the use of ``clickable script fetch`` and ``clickable script echo``.
 
 .. _clickable-json-default:
 
 default
 -------
 
-Optional, sub-commands to run when no sub-commands are
-specified (running simply ``clickable``). Defaults to ``clean build install launch``.
-The ``--dirty`` cli argument removes ``clean`` from that list.
+Optional, sub-commands to run when with the ``chain`` command when no
+sub-commands are specified. Defaults to ``build install launch``.
+The ``--clean`` cli argument prepends ``clean`` to that list.
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-dirty:
+.. _clickable-json-always-clean:
 
-dirty
------
+always_clean
+------------
 
-Optional, whether or not do a dirty build, avoiding to clean the build directory
-before building. You may also specify this as a cli arg (``--dirty``).
+Optional, whether or not to always clean app build directory before building,
+disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` command.
+Does not affect libraries.
 The default is ``false``.
 
 .. _clickable-json-dependencies_host:
@@ -326,11 +338,6 @@ Optional, a list of dependencies that will be installed in the build container.
 Add tools here that are part of your build tool chain.
 
 Can be specified as a string or a list of strings.
-
-dependencies_build
-------------------
-
-Deprecated, use :ref:`dependencies_host <clickable-json-dependencies_host>` instead.
 
 .. _clickable-json-dependencies_target:
 
@@ -524,3 +531,7 @@ The following keywords are no longer supported:
 - ``sdk``
 - ``package``
 - ``app``
+- ``dirty`` (use ``always_clean`` for the opposite case instead)
+- ``arch`` (use program option ``--arch`` instead)
+- ``template`` (use ``builder`` instead)
+- ``dependencies_build`` (use ``dependencies_host`` instead)

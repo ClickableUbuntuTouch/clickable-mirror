@@ -18,15 +18,7 @@
         "all"
       ]
     },
-    "arch": {
-      "type": "string",
-      "enum": [
-        "armhf",
-        "arm64",
-        "amd64",
-        "all"
-      ]
-    },
+    "arch": {"type": "string"},
     "builder": {
       "type": "string",
       "enum": [
@@ -37,35 +29,30 @@
         "custom",
         "cordova",
         "pure",
-        "python",
         "go",
         "rust",
         "precompiled"
       ]
     },
-    "template": {
-      "type": "string",
-      "enum": [
-        "pure-qml-qmake",
-        "qmake",
-        "pure-qml-cmake",
-        "cmake",
-        "custom",
-        "cordova",
-        "pure",
-        "python",
-        "go",
-        "rust",
-        "precompiled",
-        ""
-      ]
-    },
+    "template": {"type": "string"},
     "framework": {"type": "string"},
     "qt_version": {"type": "string"},
-    "prebuild": {"type": "string"},
-    "build": {"type": "string"},
-    "postbuild": {"type": "string"},
-    "postmake": {"type": "string"},
+    "prebuild": {
+      "type": ["string","array"],
+      "items": {"type": "string"}
+    },
+    "build": {
+      "type": ["string","array"],
+      "items": {"type": "string"}
+    },
+    "postbuild": {
+      "type": ["string","array"],
+      "items": {"type": "string"}
+    },
+    "postmake": {
+      "type": ["string","array"],
+      "items": {"type": "string"}
+    },
     "launch": {"type": "string"},
     "build_dir": {"type": "string"},
     "src_dir": {"type": "string"},
@@ -119,6 +106,7 @@
     },
     "gopath": {"type": "string"},
     "cargo_home": {"type": "string"},
+    "rustup_home": {"type": "string"},
     "build_args": {
       "type": ["string","array"],
       "items": {"type": "string"}
@@ -136,6 +124,7 @@
       "minimum": 1
     },
     "dirty": {"type": "boolean"},
+    "always_clean": {"type": "boolean"},
     "test": {"type": "string"},
     "image_setup": {
       "type": ["object"],
@@ -176,10 +165,6 @@
             "minimum": 1
           },
           "docker_image": {"type": "string"},
-          "dependencies_build": {
-            "type": ["string","array"],
-            "items": {"type": "string"}
-          },
           "dependencies_host": {
             "type": ["string","array"],
             "items": {"type": "string"}
@@ -193,14 +178,6 @@
             "items": {"type": "string"}
           },
           "builder": {
-            "type": "string",
-            "enum":  [
-              "cmake",
-              "qmake",
-              "custom"
-            ]
-          },
-          "template": {
             "type": "string",
             "enum":  [
               "cmake",

@@ -13,4 +13,3 @@ class LegacyNvidiaSupport(DockerSupport):
     def validate_system_requirements_are_met(self):
         Require(NvidiaModprobe()).or_exit()
         Require(NvidiaDocker()).or_exit()
-

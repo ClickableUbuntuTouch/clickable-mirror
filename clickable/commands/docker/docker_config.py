@@ -1,5 +1,7 @@
 import shlex
-class DockerConfig(object):
+
+
+class DockerConfig():
     docker_executable = 'docker'
     volumes = {}
     environment = {}
@@ -74,8 +76,13 @@ class DockerConfig(object):
         # --my-flag --my-other-flag
         return ' '.join(self.extra_flags)
 
-    def render_command_string(self, volumes_string, environment_string,
-            extra_options_string, extra_flags_string):
+    def render_command_string(
+        self,
+        volumes_string,
+        environment_string,
+        extra_options_string,
+        extra_flags_string
+    ):
         return (
             '{docker} run --privileged --net=host {volumes} {env} {extra_options} '
             '{extra_flags} -w {working_dir} --user={uid} '

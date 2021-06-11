@@ -105,10 +105,10 @@ Same as :ref:`--nvidia <nvidia>`.
 
 Same as :ref:`--no-nvidia <nvidia>`.
 
-``CLICKABLE_DIRTY``
--------------------
+``CLICKABLE_ALWAYS_CLEAN``
+--------------------------
 
-Overrides the clickable.json's :ref:`dirty <clickable-json-dirty>`.
+Overrides the clickable.json's :ref:`always_clean <clickable-json-always-clean>`.
 
 ``CLICKABLE_NON_INTERACTIVE``
 -----------------------------

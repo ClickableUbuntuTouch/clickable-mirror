@@ -29,8 +29,6 @@ class ColorFormatter(logging.Formatter):
         return super().format(record)
 
 
-# TODO log to a file
-
 logger = logging.getLogger('clickable')
 logger.setLevel(logging.DEBUG)
 
@@ -51,6 +49,5 @@ try:
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
-except Exception as e:
+except Exception as e:  # pylint: disable=broad-except
     logger.warning('Failed to setup logging to ~/.clickable/clickable.log', exc_info=e)
-

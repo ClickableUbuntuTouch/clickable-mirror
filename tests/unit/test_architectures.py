@@ -1,5 +1,8 @@
-from clickable import Clickable
+from clickable.cli import Cli
 from .base_test import UnitTest
+from clickable.commands.build import BuildCommand
+from clickable.commands.create import CreateCommand
+
 
 class TestArchitectures(UnitTest):
     def run_arch_test(self,
@@ -21,23 +24,28 @@ class TestArchitectures(UnitTest):
         if restrict_arch:
             config_json["restrict_arch"] = restrict_arch
 
-        cli_args = []
+        commands = []
+
+        if build_cmd:
+            commands.append('build')
+        else:
+            commands.append('create')
+
+        cli_args = commands
         if arch:
             cli_args += ["--arch", arch]
 
-        parser = Clickable.create_parser("Unit Test Call")
-        run_args = parser.parse_args(cli_args)
-
-        commands = ['no_command']
-        if build_cmd:
-            commands.append('build')
+        cli = Cli()
+        cli.add_cmd_parser(BuildCommand())
+        cli.add_cmd_parser(CreateCommand())
+        run_args = cli.parse_args(cli_args)
 
         self.setUpConfig(
-            expect_exception = expect_exception,
-            mock_config_json = config_json,
-            mock_config_env = config_env,
-            args = run_args,
-            commands = commands,
+            expect_exception=expect_exception,
+            mock_config_json=config_json,
+            mock_config_env=config_env,
+            args=run_args,
+            commands=commands,
         )
 
         if arch:
@@ -65,10 +73,16 @@ class TestArchitectures(UnitTest):
         self.run_arch_test(arch=None)
         self.run_arch_test(arch=None, restrict_arch_env='arm64')
         self.run_arch_test(arch=None, restrict_arch_env='arm64')
-        self.run_arch_test(arch=None, restrict_arch_env='arm64',
-                arch_agnostic_builder=True)
-        self.run_arch_test(arch=None, restrict_arch_env='arm64',
-                restrict_arch='all')
+        self.run_arch_test(
+            arch=None,
+            restrict_arch_env='arm64',
+            arch_agnostic_builder=True
+        )
+        self.run_arch_test(
+            arch=None,
+            restrict_arch_env='arm64',
+            restrict_arch='all'
+        )
         self.run_arch_test(arch='all', restrict_arch_env='arm64')
 
     def test_arch_agnostic(self):
@@ -76,35 +90,66 @@ class TestArchitectures(UnitTest):
         self.run_arch_test(arch=None, arch_agnostic_builder=True)
 
     def test_fail_arch_agnostic(self):
-        self.run_arch_test('armhf', arch_agnostic_builder=True,
-                expect_exception=True)
-        self.run_arch_test('armhf', arch_agnostic_builder=True,
-                build_cmd=False, expect_exception=True)
+        self.run_arch_test(
+            'armhf',
+            arch_agnostic_builder=True,
+            expect_exception=True
+        )
+        self.run_arch_test(
+            'armhf',
+            arch_agnostic_builder=True,
+            build_cmd=False,
+            expect_exception=True
+        )
 
     def test_restricted_arch_env(self):
         self.run_arch_test('all', restrict_arch_env='armhf')
-        self.run_arch_test(arch=None, arch_agnostic_builder=True,
-                restrict_arch_env='arm64')
+        self.run_arch_test(
+            arch=None,
+            arch_agnostic_builder=True,
+            restrict_arch_env='arm64'
+        )
         self.run_arch_test('amd64', restrict_arch_env='armhf', build_cmd=False)
         self.run_arch_test('arm64', restrict_arch_env='armhf', build_cmd=False)
         self.run_arch_test('armhf', restrict_arch_env='arm64', build_cmd=False)
 
     def test_fail_in_restricted_arch_env(self):
-        self.run_arch_test('amd64', restrict_arch_env='armhf',
-                expect_exception=True)
-        self.run_arch_test('amd64', restrict_arch_env='all',
-                expect_exception=True)
+        self.run_arch_test(
+            'amd64',
+            restrict_arch_env='armhf',
+            expect_exception=True
+        )
+        self.run_arch_test(
+            'amd64',
+            restrict_arch_env='all',
+            expect_exception=True
+        )
 
     def test_restricted_arch(self):
         self.run_arch_test('all', restrict_arch='all')
         self.run_arch_test('amd64', restrict_arch='amd64')
 
     def test_fail_in_restricted_arch(self):
-        self.run_arch_test('amd64', restrict_arch='armhf',
-                expect_exception=True)
-        self.run_arch_test('amd64', restrict_arch='armhf', build_cmd=False,
-                expect_exception=True)
-        self.run_arch_test('all', restrict_arch='arm64', build_cmd=False,
-                expect_exception=True)
-        self.run_arch_test('arm64', restrict_arch='all', build_cmd=False,
-                expect_exception=True)
+        self.run_arch_test(
+            'amd64',
+            restrict_arch='armhf',
+            expect_exception=True
+        )
+        self.run_arch_test(
+            'amd64',
+            restrict_arch='armhf',
+            build_cmd=False,
+            expect_exception=True
+        )
+        self.run_arch_test(
+            'all',
+            restrict_arch='arm64',
+            build_cmd=False,
+            expect_exception=True
+        )
+        self.run_arch_test(
+            'arm64',
+            restrict_arch='all',
+            build_cmd=False,
+            expect_exception=True
+        )

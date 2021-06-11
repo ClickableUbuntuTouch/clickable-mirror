@@ -1,4 +1,7 @@
 import os
+import multiprocessing
+import platform
+from collections import OrderedDict
 
 from clickable.utils import (
     merge_make_jobs_into_args,
@@ -7,17 +10,16 @@ from clickable.utils import (
 )
 from clickable.exceptions import ClickableException
 from clickable.logger import logger
+
 from .constants import Constants
-from collections import OrderedDict
-import multiprocessing
-import platform
 
 
-class LibConfig(object):
+class LibConfig():
     cwd = os.getcwd()
     config = {}
 
     placeholders = OrderedDict({
+        "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
         "NAME": "name",
         "ROOT": "root_dir",
@@ -34,9 +36,11 @@ class LibConfig(object):
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'build_home']
     required = ['builder']
-    flexible_lists = ['dependencies_host', 'dependencies_target',
-                      'dependencies_ppa', 'dependencies_build',
-                      'build_args', 'make_args']
+    # If specified as a string split at spaces
+    flexible_split_list = ['dependencies_host', 'dependencies_target',
+                           'dependencies_ppa', 'build_args', 'make_args']
+    # If specified as a string convert it to a list of size 1
+    flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
     builders = [Constants.QMAKE, Constants.CMAKE, Constants.CUSTOM]
 
     first_docker_info = True
@@ -45,12 +49,8 @@ class LibConfig(object):
     gopath = None
     verbose = False
 
-    def __init__(self, name, json_config, arch, root_dir, qt_version, debug_build, verbose):
-        # Must come after ARCH_TRIPLET to avoid breaking it
-        self.placeholders.update({"ARCH": "arch"})
-
+    def __init__(self, name, json_config, arch, root_dir, qt_version, verbose):
         self.qt_version = qt_version
-        self.debug_build = debug_build
         self.verbose = verbose
 
         self.set_host_arch()
@@ -60,7 +60,6 @@ class LibConfig(object):
             'name': name,
             'arch': arch,
             'arch_triplet': None,
-            'template': None,
             'builder': None,
             'postmake': None,
             'prebuild': None,
@@ -70,7 +69,6 @@ class LibConfig(object):
             'build_home': '${BUILD_DIR}/.clickable/home',
             'src_dir': '${ROOT}/libs/${NAME}',
             'root_dir': root_dir,
-            'dependencies_build': [],
             'dependencies_host': [],
             'dependencies_target': [],
             'dependencies_ppa': [],
@@ -83,12 +81,6 @@ class LibConfig(object):
             'image_setup': {},
             'test': 'ctest',
         }
-
-        # TODO remove support for deprecated "template" in clickable.json
-        if "template" in json_config:
-            logger.warning('Parameter "template" is deprecated in clickable.json. Use "builder" as drop-in replacement instead.')
-            json_config["builder"] = json_config["template"]
-            json_config["template"] = None
 
         self.config.update(json_config)
         if self.config["docker_image"]:
@@ -138,9 +130,6 @@ class LibConfig(object):
     def get_env_vars(self):
         env_vars = {}
 
-        if self.debug_build:
-            env_vars['DEBUG_BUILD'] = '1'
-
         for key, conf in self.placeholders.items():
             env_vars[key] = self.config[conf]
 
@@ -151,9 +140,13 @@ class LibConfig(object):
     def substitute(self, sub, rep, key):
         if self.config[key]:
             if isinstance(self.config[key], dict):
-                self.config[key] = {k: val.replace(sub, rep) for (k, val) in self.config[key].items()}
+                self.config[key] = {
+                    k: val.replace(sub, rep) for (k, val) in self.config[key].items()
+                }
             elif isinstance(self.config[key], list):
-                self.config[key] = [val.replace(sub, rep) for val in self.config[key]]
+                self.config[key] = [
+                    val.replace(sub, rep) for val in self.config[key]
+                ]
             else:
                 self.config[key] = self.config[key].replace(sub, rep)
 
@@ -162,8 +155,6 @@ class LibConfig(object):
             for sub in self.placeholders:
                 rep = self.config[self.placeholders[sub]]
                 self.substitute("${"+sub+"}", rep, key)
-                # TODO remove deprecated syntax $VAR
-                self.substitute("$"+sub, rep, key)
             if key in self.path_keys and self.config[key]:
                 self.config[key] = make_absolute(self.config[key])
 
@@ -173,22 +164,24 @@ class LibConfig(object):
         self.make_args = merge_make_jobs_into_args(
             make_args=self.make_args, make_jobs=self.make_jobs)
 
-        if self.config['dependencies_build']:
-            self.config['dependencies_host'] += self.config['dependencies_build']
-            self.config['dependencies_build'] = []
-            logger.warning('"dependencies_build" is deprecated. Use "dependencies_host" instead!')
+        for key in self.flexible_split_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=True)
 
-        for key in self.flexible_lists:
-            self.config[key] = flexible_string_to_list(self.config[key])
+        for key in self.flexible_list:
+            self.config[key] = flexible_string_to_list(self.config[key], split=False)
 
     def check_config_errors(self):
         if not self.config['builder']:
             raise ClickableException(
-                'The clickable.json is missing a "builder" in library "{}".'.format(self.config["name"]))
+                'The clickable.json is missing a "builder" in library "{}".'.format(
+                    self.config["name"]
+                )
+            )
 
         if self.config['builder'] == Constants.CUSTOM and not self.config['build']:
             raise ClickableException(
-                'When using the "custom" builder you must specify a "build" in one the lib configs')
+                'When using the "custom" builder you must specify a "build" in one the lib configs'
+            )
 
         if self.is_custom_docker_image:
             if self.dependencies_host or self.dependencies_target or self.dependencies_ppa:

@@ -4,17 +4,17 @@ import subprocess
 from pathlib import Path
 
 from clickable.utils import (
-    check_command,
     is_command,
     makedirs,
     run_subprocess_check_output,
+    env,
 )
 from clickable.config.constants import Constants
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
+
 from .base import Command
 from .build import BuildCommand
-from .clean import CleanCommand
 from .docker.debug_gdb_support import DebugGdbSupport
 from .docker.debug_valgrind_support import DebugValgrindSupport
 from .docker.docker_config import DockerConfig
@@ -27,30 +27,105 @@ from .docker.multimedia_support import MultimediaSupport
 
 
 class DesktopCommand(Command):
-    aliases = []
-    name = 'desktop'
-    help = 'Run the app on your desktop'
+    def __init__(self):
+        super().__init__()
+        self.cli_conf.name = 'desktop'
+        self.cli_conf.help_msg = 'Run the app on your desktop'
 
-    def __init__(self, config):
-        super().__init__(config)
         self.command = None
         self.custom_mode = False
         self.ide_delegate = None
+        self.skip_build = False
+        self.gdb_port = None
+        self.gdb = False
+        self.valgrind = False
+        self.dark_mode = False
+        self.desktop_locale = 'C'
 
-    def run(self, path_arg=None):
+        self.builder = BuildCommand()
+
+    def setup_parser(self, parser):
+        self.builder.setup_parser(parser)
+
+        parser.add_argument(
+            '--skip-build',
+            action='store_true',
+            help='Start app without building it first',
+            default=False,
+        )
+        parser.add_argument(
+            '--gdbserver',
+            help='Start gdbserver at the given port to debug the app remotely via any IDE',
+        )
+        parser.add_argument(
+            '--gdb',
+            action='store_true',
+            help='Start gdb to debug the app',
+            default=False,
+        )
+        parser.add_argument(
+            '--valgrind',
+            action='store_true',
+            help='Start valgrind to debug the app',
+            default=False,
+        )
+        parser.add_argument(
+            '--dark-mode',
+            action='store_true',
+            help='Use the dark theme when running apps',
+            default=False,
+        )
+        parser.add_argument(
+            '--lang',
+            help='Start app with the given language code',
+            default=os.getenv('LANG', 'C')
+        )
+
+    def configure(self, args):
+        self.builder.init_from_command(self)
+        self.builder.configure(args)
+
+        self.skip_build = args.skip_build
+        self.gdb_port = args.gdbserver
+        self.gdb = args.gdb or self.gdb_port
+        self.valgrind = args.valgrind
+        self.dark_mode = args.dark_mode
+        self.desktop_locale = args.lang
+
+        self.configure_common()
+
+    def configure_nested(self):
+        self.builder.init_from_command(self)
+        self.builder.configure_nested()
+        self.configure_common()
+
+    def configure_common(self):
+        if env('CLICKABLE_DARK_MODE'):
+            self.dark_mode = True
+
+        if self.gdb or self.valgrind:
+            self.config.debug_build = True
+
+        if self.valgrind and self.gdb:
+            raise ClickableException(
+                "Valgrind (--valgrind) and GDB (--gdb or --gdbserver) can not be combined."
+            )
+
+        if self.desktop_locale != "C" and "." not in self.desktop_locale:
+            self.desktop_locale = "{}.UTF-8".format(self.desktop_locale)
+
+    def run(self):
         self.prepare_run()
         self.run_app()
 
     def prepare_run(self):
-        if self.config.desktop_skip_build or self.custom_mode:
-            self.config.container.setup()
+        if self.skip_build or self.custom_mode:
+            self.container.setup()
         else:
-            if not self.config.dirty:
-                CleanCommand(self.config).run()
-            BuildCommand(self.config).run()
+            self.builder.run()
 
     def setup_docker(self):
-        self.config.container.check_docker()
+        self.container.check_docker()
         if is_command('xhost'):
             subprocess.check_call(shlex.split('xhost +local:docker'))
         else:
@@ -62,7 +137,7 @@ class DesktopCommand(Command):
         docker_config = DockerConfig()
 
         docker_config.uid = os.getuid()
-        docker_config.docker_image = self.config.container.docker_image
+        docker_config.docker_image = self.container.docker_image
         docker_config.use_nvidia = self.config.use_nvidia
 
         if self.custom_mode:
@@ -79,17 +154,19 @@ class DesktopCommand(Command):
                         "CLICK_EXEC_PARAMS": " ".join(exec_args),
                     })
         else:
-            docker_config.pseudo_tty = self.config.debug_gdb
+            docker_config.pseudo_tty = self.gdb
             docker_config.execute = self.determine_executable(
                 self.find_desktop_file()
             )
             docker_config.working_directory = self.config.install_dir
 
             WebappSupport(self.config.install_files.find_package_name()).update(docker_config)
-            ThemeSupport(self.config).update(docker_config)
+            ThemeSupport(self.config, self.dark_mode).update(docker_config)
 
-            DebugGdbSupport(self.config).update(docker_config)
-            DebugValgrindSupport(self.config).update(docker_config)
+            if self.gdb:
+                DebugGdbSupport(self.gdb_port).update(docker_config)
+            if self.valgrind:
+                DebugValgrindSupport().update(docker_config)
 
         docker_config.add_volume_mappings(self.setup_volume_mappings())
 
@@ -113,7 +190,7 @@ class DesktopCommand(Command):
             if app in hooks and 'desktop' in hooks[app]:
                 desktop_path = hooks[app]['desktop']
         except ClickableException:
-            for key, value in hooks.items():
+            for _, value in hooks.items():
                 if 'desktop' in value:
                     desktop_path = value['desktop']
                     break
@@ -123,7 +200,11 @@ class DesktopCommand(Command):
 
         desktop_path = os.path.join(self.config.install_dir, desktop_path)
         if not os.path.exists(desktop_path):
-            raise ClickableException('Could not determine executable. Desktop file does not exist: "{}"'.format(desktop_path))
+            raise ClickableException(
+                'Could not determine executable. Desktop file does not exist: "{}"'.format(
+                    desktop_path
+                )
+            )
 
         return desktop_path
 
@@ -136,7 +217,9 @@ class DesktopCommand(Command):
                     break
 
         if not execute:
-            raise ClickableException('No "Exec" line found in the desktop file {}'.format(desktop_path))
+            raise ClickableException('No "Exec" line found in the desktop file {}'.format(
+                desktop_path
+            ))
 
         return execute[len('Exec='):].strip()
 
@@ -145,9 +228,10 @@ class DesktopCommand(Command):
             return run_subprocess_check_output(
                 'timedatectl show -p Timezone --value',
                 stderr=subprocess.DEVNULL)
-        except:
+        except Exception:  # pylint: disable=broad-except
             logger.debug(
-                'timedatectl show command failed. Falling back to alternative way to detect timezone...'
+                'timedatectl show command failed. Falling back to alternative way '
+                'to detect timezone...'
             )
 
         if os.path.exists('/etc/timezone'):
@@ -155,7 +239,8 @@ class DesktopCommand(Command):
                 return host_timezone_file.readline().strip()
         else:
             logger.debug(
-                '/etc/timezone does not exist. Falling back to alternative way to detect timezone...'
+                '/etc/timezone does not exist. Falling back to alternative way '
+                'to detect timezone...'
             )
 
         try:
@@ -166,7 +251,7 @@ class DesktopCommand(Command):
                     start = line.find(':') + 1
                     end = line.find('(')
                     return line[start:end].strip()
-        except:
+        except Exception:  # pylint: disable=broad-except
             logger.debug(
                 "timedatctl status method failed to set timezone from host in desktop mode..."
             )
@@ -178,21 +263,21 @@ class DesktopCommand(Command):
         lib_path = self.get_docker_lib_path_env(working_directory)
 
         env_vars = {
-            'LANG': self.config.desktop_locale,
-            'LANGUAGE': self.config.desktop_locale,
-            'LC_CTYPE': self.config.desktop_locale,
-            'LC_NUMERIC': self.config.desktop_locale,
-            'LC_TIME': self.config.desktop_locale,
-            'LC_COLLATE': self.config.desktop_locale,
-            'LC_MONETARY': self.config.desktop_locale,
-            'LC_MESSAGES': self.config.desktop_locale,
-            'LC_PAPER': self.config.desktop_locale,
-            'LC_NAME': self.config.desktop_locale,
-            'LC_ADDRESS': self.config.desktop_locale,
-            'LC_TELEPHONE': self.config.desktop_locale,
-            'LC_MEASUREMENT': self.config.desktop_locale,
-            'LC_IDENTIFICATION': self.config.desktop_locale,
-            'LC_ALL': self.config.desktop_locale,
+            'LANG': self.desktop_locale,
+            'LANGUAGE': self.desktop_locale,
+            'LC_CTYPE': self.desktop_locale,
+            'LC_NUMERIC': self.desktop_locale,
+            'LC_TIME': self.desktop_locale,
+            'LC_COLLATE': self.desktop_locale,
+            'LC_MONETARY': self.desktop_locale,
+            'LC_MESSAGES': self.desktop_locale,
+            'LC_PAPER': self.desktop_locale,
+            'LC_NAME': self.desktop_locale,
+            'LC_ADDRESS': self.desktop_locale,
+            'LC_TELEPHONE': self.desktop_locale,
+            'LC_MEASUREMENT': self.desktop_locale,
+            'LC_IDENTIFICATION': self.desktop_locale,
+            'LC_ALL': self.desktop_locale,
             'TZ': self.get_time_zone(),
             'APP_DIR': self.config.install_dir,
             'TEXTDOMAINDIR': self.config.install_files.try_find_locale(),

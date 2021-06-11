@@ -1,8 +1,9 @@
-from clickable import ProjectConfig
+from clickable.config.project import ProjectConfig
 from clickable.commands.docker.docker_config import DockerConfig
 from .docker_support import DockerSupport
 import os
 import getpass
+
 
 class MultimediaSupport(DockerSupport):
     config = None
@@ -13,7 +14,7 @@ class MultimediaSupport(DockerSupport):
     def update(self, docker_config: DockerConfig):
         uid = os.getuid()
         user = getpass.getuser()
-        
+
         docker_config.volumes.update({
             '/dev/shm': '/dev/shm',
             '/etc/machine-id': '/etc/machine-id',
@@ -22,4 +23,3 @@ class MultimediaSupport(DockerSupport):
             '/home/{}/.pulse'.format(user): '/home/phablet/.pulse',
             '/dev/snd': '/dev/snd',
         })
-

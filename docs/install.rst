@@ -30,5 +30,5 @@ Install Via AUR (Arch Linux)
 After install
 =============
 
-* Let Clickable setup docker (it could ask for the sudo password): ``clickable setup``
-* Log out or restart to apply changes
+* Let Clickable setup docker (asking for root permissions) and bash completion: ``clickable setup``
+* Log out or restart to apply changes if requested
