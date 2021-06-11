@@ -55,7 +55,7 @@ Parameters accepting placeholders:
 ``gopath``, ``cargo_home``, ``scripts``, ``build``,
 ``build_args``, ``make_args``, ``postmake``, ``postbuild``,
 ``prebuild``,
-``install_lib``, ``install_qml``, ``install_bin``,
+``install_lib``, ``install_qml``, ``install_bin``, ``install_root_data``,
 ``install_data`` and ``env_vars``.
 
 This is an ordered list. Parameters that are used as placeholders themselves accept only predecessors.
@@ -263,6 +263,22 @@ The destination directory is ``${CLICK_PATH}``. Ex:
     ]
 
 Relative paths are prepended with the project root dir.
+
+Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
+Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
+
+install_root_data
+-----------------
+
+Optional, additional files or directories that should be installed with the app and be in the app
+root dir. Ex:
+
+.. code-block:: javascript
+
+    "install_root_data": [
+        "packaging/manifest.json",
+        "packaging/myapp.desktop"
+    ],
 
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.

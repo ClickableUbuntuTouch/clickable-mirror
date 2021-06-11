@@ -83,6 +83,10 @@
       "type": ["string","array"],
       "items": {"type": "string"}
     },
+    "install_root_data": {
+      "type": ["string","array"],
+      "items": {"type": "string"}
+    },
     "install_lib": {
       "type": ["string","array"],
       "items": {"type": "string"}

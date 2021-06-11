@@ -66,7 +66,7 @@ class ProjectConfig():
                             "gopath", "cargo_home", "scripts", "build",
                             "build_args", "make_args", "postmake", "postbuild",
                             "prebuild", "rustup_home",
-                            "install_lib", "install_qml", "install_bin",
+                            "install_lib", "install_qml", "install_bin", "install_root_data",
                             "install_data", "env_vars", "build_home"]
 
     # Dicts where keys accept placeholders
@@ -76,7 +76,7 @@ class ProjectConfig():
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
                  'app_qml_dir', 'build_home', 'rustup_home',
-                 'install_qml', 'install_bin', 'install_lib']
+                 'install_qml', 'install_bin', 'install_lib', 'install_root_data']
     # Same as for path_keys, except that for dicts the keys are made
     # absolute, not the values
     path_dict_keys = ['install_data']
@@ -84,7 +84,7 @@ class ProjectConfig():
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
                            'dependencies_ppa',
-                           'install_lib', 'install_bin', 'install_qml',
+                           'install_lib', 'install_bin', 'install_qml', 'install_root_data',
                            'build_args', 'make_args', 'default', 'ignore']
     # If specified as a string convert it to a list of size 1
     flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
@@ -154,6 +154,7 @@ class ProjectConfig():
             'install_lib': [],
             'install_bin': [],
             'install_qml': [],
+            'install_root_data': [],
             'install_data': {},
             'app_lib_dir': '${INSTALL_DIR}/lib/${ARCH_TRIPLET}',
             'app_bin_dir': '${INSTALL_DIR}/lib/${ARCH_TRIPLET}/bin',
