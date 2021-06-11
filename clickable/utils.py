@@ -257,7 +257,11 @@ def make_absolute(path, change_keys=False):
 
 
 def make_env_var_conform(name):
-    return re.sub("[^A-Z0-9_]", "_", name.upper())
+    return re.sub(r"[^A-Z0-9_]", "_", name.upper())
+
+
+def is_path_sane(path):
+    return re.match(r"^[\w\d_\.\-/]+$", path)
 
 
 def is_sub_dir(path, parent):
