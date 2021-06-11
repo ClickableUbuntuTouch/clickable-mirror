@@ -230,6 +230,8 @@ class BuildCommand(Command):
                 self.install_files(pattern, dest_dir)
 
     def install_additional_files(self):
+        for p in self.config.install_root_data:
+            self.install_files(p, self.config.install_dir)
         for p in self.config.install_lib:
             self.install_files(p, os.path.join(self.config.install_dir,
                                                self.config.app_lib_dir))
