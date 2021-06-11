@@ -157,7 +157,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
         build_args = ''
         if config.build_args:
             build_args = ' '.join(self.config.build_args)
-        clickable_build_args= '{} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(build_args)
+        clickable_build_args = '{} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(build_args)
 
         template_replacement = {
             "CLICKABLE_LD_LIBRARY_PATH": clickable_ld_library_path,
