@@ -224,6 +224,8 @@ The destination directory is ``${CLICK_LD_LIBRARY_PATH}``. Ex:
         "/usr/lib/${ARCH_TRIPLET}/libasound.so*"
     ]
 
+Relative paths are prepended with the project root dir.
+
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
 
@@ -238,6 +240,9 @@ Optional, additional QML files or directories that should be installed with the 
     "install_qml": [
         "/usr/lib/${ARCH_TRIPLET}/qt5/qml/Qt/labs/calendar"
     ]
+
+
+Relative paths are prepended with the project root dir.
 
 QML modules will be installed to the correct directory based on the name of the module.
 In the above example it will be installed to ``lib/${ARCH_TRIPLET}/Qt/labs/calendar``
@@ -257,6 +262,8 @@ The destination directory is ``${CLICK_PATH}``. Ex:
         "/usr/bin/htop"
     ]
 
+Relative paths are prepended with the project root dir.
+
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
 
@@ -269,9 +276,12 @@ Needs to be specified as a dictionary with absolute source paths as keys and des
 .. code-block:: javascript
 
     "install_data": {
-        "${ROOT}/packaging/manifest.json": "${INSTALL_DIR}",
-        "${ROOT}/packaging/myapp.desktop": "${INSTALL_DIR}"
+        "icons/logo.svg": "assets/logo.svg",
+        "packaging/myapp.desktop": "${INSTALL_DIR}"
     },
+
+Relative source paths are prepended with the project root dir and destination paths with
+the install dir.
 
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<src>"`` in a bash. ``${INSTALL_DIR}`` is

@@ -68,14 +68,23 @@ class ProjectConfig():
                             "install_lib", "install_qml", "install_bin",
                             "install_data", "env_vars", "build_home"]
 
+    # Dicts where keys accept placeholders
+    accepts_placeholders_keys = ["install_data", "env_vars"]
+
+    # Paths to be made absolute, iterates and recurses lists and dicts
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
-                 'app_qml_dir', 'build_home', 'rustup_home']
+                 'app_qml_dir', 'build_home', 'rustup_home',
+                 'install_qml', 'install_bin', 'install_lib']
+    # Same as for path_keys, except that for dicts the keys are made
+    # absolute, not the values
+    path_dict_keys = ['install_data']
+
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
-                           'dependencies_ppa', 'install_lib', 'install_bin',
-                           'install_qml', 'build_args', 'make_args', 'default',
-                           'ignore']
+                           'dependencies_ppa',
+                           'install_lib', 'install_bin', 'install_qml',
+                           'build_args', 'make_args', 'default', 'ignore']
     # If specified as a string convert it to a list of size 1
     flexible_list = ['prebuild', 'build', 'postmake', 'postbuild']
     removed_keywords = ['chroot', 'sdk', 'package', 'app', 'premake', 'ssh',
@@ -511,28 +520,58 @@ class ProjectConfig():
 
         return env_vars
 
-    def substitute(self, sub, rep, key):
+    def substitute(self, sub, rep, key, change_keys=False):
         if self.config[key]:
             if isinstance(self.config[key], dict):
-                self.config[key] = {
-                    k: val.replace(sub, rep) for (k, val) in self.config[key].items()
-                }
+                items = self.config[key].items()
+                if change_keys:
+                    self.config[key] = {
+                        k.replace(sub, rep): val for (k, val) in items
+                    }
+                else:
+                    self.config[key] = {
+                        k: val.replace(sub, rep) for (k, val) in items
+                    }
             elif isinstance(self.config[key], list):
                 self.config[key] = [val.replace(sub, rep) for val in self.config[key]]
             else:
                 self.config[key] = self.config[key].replace(sub, rep)
 
-    def handle_path_keys_and_placeholders(self):
-        for key in self.path_keys:
-            if key not in self.accepts_placeholders and self.config[key]:
-                self.config[key] = make_absolute(self.config[key])
+    def handle_accepting_key(self, key, change_keys=False):
+        if not self.config[key]:
+            return
 
-        for key in self.accepts_placeholders:
-            for sub in self.placeholders:
-                rep = self.config[self.placeholders[sub]]
-                self.substitute("${"+sub+"}", rep, key)
-            if key in self.path_keys and self.config[key]:
-                self.config[key] = make_absolute(self.config[key])
+        for sub in self.placeholders:
+            rep = self.config[self.placeholders[sub]]
+            if rep is None:
+                logger.warning("Placeholder '{}' used in '{}' is not set. Skipping..."
+                               .format(sub, key))
+            else:
+                self.substitute("${"+sub+"}", rep, key, change_keys)
+
+    def handle_path_keys_and_placeholders(self):
+        # Merge lists preserving order within 'accepts_placeholders'
+        accepting = self.accepts_placeholders
+        accepting += list(set(accepting) - set(self.accepts_placeholders_keys))
+
+        # Make paths absolute that don't accept placeholders.
+        # They may be used as placeholders themselves.
+        for key in set(self.path_keys) - set(accepting):
+            self.config[key] = make_absolute(self.config[key], change_keys=False)
+        for key in set(self.path_dict_keys) - set(accepting):
+            self.config[key] = make_absolute(self.config[key], change_keys=True)
+
+        # One by one inject placeholders and then make paths absolute
+        for key in accepting:
+            if key in self.accepts_placeholders:
+                self.handle_accepting_key(key, change_keys=False)
+            if key in self.accepts_placeholders_keys:
+                self.handle_accepting_key(key, change_keys=True)
+
+            if key in self.path_keys:
+                self.config[key] = make_absolute(self.config[key], change_keys=False)
+            if key in self.path_dict_keys:
+                self.config[key] = make_absolute(self.config[key], change_keys=True)
 
     def set_build_arch(self):
         if self.config['arch'] == 'all':

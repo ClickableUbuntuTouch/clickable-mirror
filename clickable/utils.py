@@ -240,14 +240,19 @@ def makedirs(path):
     return path
 
 
-def make_absolute(path):
+def make_absolute(path, change_keys=False):
+    if not path:
+        return path
+
     if isinstance(path, list):
         return [make_absolute(p) for p in path]
+
     if isinstance(path, dict):
-        abs_dict = {}
-        for key in path:
-            abs_dict[key] = make_absolute(path[key])
-        return abs_dict
+        if change_keys:
+            return {make_absolute(key): path[key] for key in path}
+
+        return {key: make_absolute(path[key]) for key in path}
+
     return os.path.abspath(path)
 
 
