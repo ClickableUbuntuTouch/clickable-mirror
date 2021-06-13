@@ -60,8 +60,9 @@ class GdbCommand(Command):
         parser.add_argument(
             '--no-sysroot',
             action='store_true',
-            help='Do not configure a host side sysroot containing system libraries '
-                 '(be aware that this slows down app startup).'
+            help='Do not configure a host side sysroot containing system libraries. '
+                 'This is useful when having debug symbols installed on the target device. '
+                 'But be aware that this slows down app startup.'
         )
         parser.add_argument(
             'forward',

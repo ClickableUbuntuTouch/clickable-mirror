@@ -9,7 +9,7 @@ class SetupCommand(Command):
     def __init__(self):
         Command.__init__(self)
         self.cli_conf.name = 'setup'
-        self.cli_conf.help_msg = 'Initial docker setup'
+        self.cli_conf.help_msg = 'Interactively set up autocompletion and docker'
 
         self.setups = ['docker', 'completion', []]
 
@@ -18,7 +18,7 @@ class SetupCommand(Command):
             'setups',
             nargs='*',
             choices=self.setups,
-            help='What to setup (defaults to everything)'
+            help='What to set up (defaults to everything)'
         )
 
     def configure(self, args):

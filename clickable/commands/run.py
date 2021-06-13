@@ -7,7 +7,8 @@ class RunCommand(Command):
     def __init__(self):
         Command.__init__(self)
         self.cli_conf.name = 'run'
-        self.cli_conf.help_msg = 'Runs an arbitrary command in a temporary clickable container'
+        self.cli_conf.help_msg = 'Runs an arbitrary command or opens a shell '\
+            'in a temporary clickable container'
 
         self.root_user = True
         self.command = 'bash'

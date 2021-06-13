@@ -81,7 +81,7 @@ Rust
 
 In Clickable 6 the Rust builder would install files such as the manifest or assets.
 In order to be more flexible and better aligned with the other builds, this behaviour
-was removed from the builder and added as ``install_data`` field in the Rust app
+was removed from the builder and added as ``install_root_data`` field in the Rust app
 template. For existing Rust apps adding that field might be necessary as well.
 
 The Rust builder now configures the target directory to the build directory configured
@@ -92,12 +92,12 @@ Pure and Cordova
 
 In Clickable 6 pure and cordova builders would silently override ``architecture`` and
 ``framework`` fields in the app manifest. This behaviour was removed. For existing apps
-relying on the removed behaviour one might need to set those fields correctly or let
+relying on the old behaviour one might need to set those fields correctly or let
 Clickable override it by setting the fields to ``@CLICK_ARCH@`` or ``@CLICK_FRAMEWORK@``
 accordingly.
 
 Some time in the past, the pure builder app template contained a CMake configuration
-that would configure the manifest ``architecture`` field to ``amd`` when it actually
+that would configure the manifest ``architecture`` field to ``amd64`` when it actually
 should be ``all``. If that is the case for your app, just remove the command that
 sets the variable ``CLICK_ARCH``.
 
@@ -109,7 +109,7 @@ commands within the build container, making it independent of tools installed on
 side.
 
 Clickable 7 lets you specify a list of commands for ``prebuild``, ``build``,
-``postmake`` and ``postbuild``.
+``postmake`` and ``postbuild`` besides the possibility of specifying a single string.
 
 Removal of Deprecated Things
 ----------------------------

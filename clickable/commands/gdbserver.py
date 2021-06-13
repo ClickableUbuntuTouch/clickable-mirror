@@ -13,7 +13,7 @@ class GdbserverCommand(Command):
         super().__init__()
         self.cli_conf.name = 'gdbserver'
         self.cli_conf.help_msg = 'Opens a gdbserver session on the device accessible ' \
-                                 'at localhost:3333'
+            'at localhost:<port> (port 3333 by default)'
 
         self.port = 3333
         self.app_dir = None
