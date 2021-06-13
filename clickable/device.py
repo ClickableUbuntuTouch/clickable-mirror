@@ -75,7 +75,7 @@ class Device():
             command = " && ".join(command)
 
         return 'echo "{}" | ssh {} phablet@{}'.format(
-                command, ssh_args, self.config.ssh)
+            command, ssh_args, self.config.ssh)
 
     def get_adb_command(self, command, forward_port=None):
         adb_args = self.get_adb_args()

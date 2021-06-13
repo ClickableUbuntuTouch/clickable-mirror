@@ -315,7 +315,7 @@ class ProjectConfig():
                 self.config['make_jobs'] = multiprocessing.cpu_count()
 
             self.config['make_args'] = merge_make_jobs_into_args(
-                    self.config['make_args'], self.config['make_jobs'])
+                self.config['make_args'], self.config['make_jobs'])
 
         self.config['make_jobs'] = str(self.config['make_jobs'])
 
@@ -344,7 +344,7 @@ class ProjectConfig():
                 self.build_arch = "{}-ide".format(self.build_arch)
 
             image_framework = Constants.framework_image_mapping.get(
-                    self.config['framework'], Constants.framework_fallback)
+                self.config['framework'], Constants.framework_fallback)
 
             container_mapping_host = Constants.container_mapping[Constants.host_arch]
             if (image_framework, self.build_arch) not in container_mapping_host:
@@ -361,9 +361,9 @@ class ProjectConfig():
 
     def setup_helpers(self):
         self.install_files = InstallFiles(
-                self.config['install_dir'],
-                self.config['builder'],
-                self.config['arch'])
+            self.config['install_dir'],
+            self.config['builder'],
+            self.config['arch'])
 
     def is_arch_agnostic(self):
         return self.config["builder"] in Constants.arch_agnostic_builders
@@ -549,7 +549,7 @@ class ProjectConfig():
                 logger.warning("Placeholder '{}' used in '{}' is not set. Skipping..."
                                .format(sub, key))
             else:
-                self.substitute("${"+sub+"}", rep, key, change_keys)
+                self.substitute("${" + sub + "}", rep, key, change_keys)
 
     def handle_path_keys_and_placeholders(self):
         # Merge lists preserving order within 'accepts_placeholders'
