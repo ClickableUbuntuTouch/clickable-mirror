@@ -663,6 +663,8 @@ class ProjectConfig():
                 (self.needs_clickable_image() or self.is_custom_docker_image))
 
     def check_clickable_version(self):
+        migration_link = 'https://clickable-ut.dev/en/dev/migration.html'
+
         if self.config['clickable_minimum_required']:
             # Check if specified version string is valid
             if not re.fullmatch(r"\d+(\.\d+)*", self.config['clickable_minimum_required']):
@@ -698,6 +700,16 @@ class ProjectConfig():
                             __version__
                         )
                     )
+
+            if clickable_required_numbers[0] < 7:
+                logger.warning('This project is configured for Clickable version {} according to '
+                               'the "clickable_minimum_required" field. See {} for details about '
+                               'migration to Clickable 7.'.format(clickable_required_numbers[0],
+                                                                  migration_link))
+        else:
+            logger.warning('This project does not have a required Clickable version configured '
+                           '("clickable_minimum_required"). See {} for details about migration to '
+                           'Clickable 7 if you run into issues.'.format(migration_link))
 
     def check_arch_restrictions(self):
         if self.is_arch_agnostic():
