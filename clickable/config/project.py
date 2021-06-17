@@ -9,7 +9,7 @@ from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
 from clickable.version import __version__
 from clickable.exceptions import ClickableException
 
-from .libconfig import LibConfig
+from .libconfig import LibConfig, LibInitConfig
 from .file_helpers import InstallFiles, ProjectFiles
 from .constants import Constants
 
@@ -595,29 +595,34 @@ class ProjectConfig():
             self.use_nvidia = False
 
     def setup_libs(self):
-        self.lib_configs = [
-            LibConfig(
-                name,
-                lib,
-                self.config['arch'],
-                self.config['root_dir'],
-                self.config['qt_version'],
-                self.verbose,  # TODO check whether verbosity is handled by this config
-            ) for name, lib in self.config['libraries'].items()
-        ]
+        self.lib_configs = []
+        placeholders = {}
+        injected_config = {}
 
-        for lib in self.lib_configs:
-            name_conform = make_env_var_conform(lib.name)
-            key = '{}_lib_install_dir'.format(name_conform)
-            placeholder = '{}_LIB_INSTALL_DIR'.format(name_conform)
-            self.config[key] = lib.install_dir
-            self.placeholders.update({placeholder: key})
+        for name, config in self.config['libraries'].items():
+            config.update(injected_config)
+
+            lib_init = LibInitConfig()
+            lib_init.name = name
+            lib_init.json_config = config
+            lib_init.arch = self.config['arch']
+            lib_init.root_dir = self.config['root_dir']
+            lib_init.qt_version = self.config['qt_version']
+            lib_init.verbose = self.verbose
+            lib_init.libs_placeholders = placeholders
+            lib_init.lib_configs = self.lib_configs
+
+            lib = LibConfig(lib_init)
+            self.lib_configs.append(lib)
 
             for lp in self.libs_placeholders:
                 key = '{}_LIB_{}'.format(lib.name, lp)
                 placeholder = make_env_var_conform(key)
-                self.placeholders[placeholder] = key
-                self.config[key] = lib.config[lp]
+                placeholders[placeholder] = key
+                injected_config[key] = lib.config[lp]
+
+        self.placeholders.update(placeholders)
+        self.config.update(injected_config)
 
     def cleanup_config(self):
         for key in self.flexible_split_list:
