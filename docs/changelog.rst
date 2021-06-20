@@ -7,24 +7,58 @@ Changes in v7.0.0
 -----------------
 
 For information on breaking changes and how to migrate from Clickable v6, check the :ref:`Migration Guide <migration>`.
+There is also a migration tool referenced in the guide.
 
-- Added new ``chain`` command to replace running multiple commands with Clickable
-- Added new ``script`` command to run scripts defined in the clickable.json config file
-- New ``ci`` command to open a shell in the Clickable CI container
-- Merged the ``build-libs`` command into ``build``
-- Merged the ``clean-libs`` command into ``clean``
-- Merged the ``test-libs`` command into ``test``
-- The rustup cache is mounted along with the cargo cache
-- Build parameters can be used with the ``desktop`` command
-- Improved ignored files to match with wildcard characters
-- Verifies paths in the config
-- Library placeholders get passed to the next library in the sequence
-- Fixed app icons not displaying in Qt Creator
-- Fixed confirmation name for Qt Creator
-- The default now it to do dirty builds, if you want to do a clean build use ``clickable build --clean``
-- Integrated bash completion, to setup run ``clickable setup completion``
-- Removed deprecated configuration
-- General polish and bug fixes
+New features
+^^^^^^^^^^^^
+
+- Configure Clickable globally with a new :ref:`configuration file <config.yaml>`.
+- Integrated bash completion, to set up run ``clickable setup completion``.
+- Added new ``chain`` command to run multiple Clickable commands in a chain.
+- Added new ``script`` command to run scripts defined in the clickable.json config file.
+- Added new ``ci`` command to open a shell in the Clickable CI container.
+- The ``create`` command allows to create apps non-interactively configuring the template with command line parameters.
+- The ``gdb`` command allows to export a GDB init script that can be used by any IDE's remote debugger.
+- The behavior of the ``gdb`` and ``gdbserver`` commands can be configured in detail via command line parameters.
+- The ``rust`` builder supports the ``build_args`` field in the project config (arguments are forwarded to cargo).
+- The ``rust`` builder supports ``--verbose`` flag (forwarded to cargo)
+- The ``rust`` builder supports Clickable libraries
+- Project configuration now uses yaml format and project config is called ``clickable.yaml`` (``clickale.json`` is used as fallback and json format can still be used as it is a subset of yaml)
+- Build commands can be either specified as a string or a list of strings (``prebuild``, ``build``, ``postmake``, ``postbuild``).
+- Added ``install_root_data`` config field to list files for installation into the click package root directory.
+- Improved ignored files field to match with wildcard characters.
+- Added sanity checks for paths in the config.
+- Added Desktop Mode env var to allow apps detecting Clickable Desktop Mode
+- Library placeholders are available to successive libraries in the sequence (useful for linking libraries against other libraries).
+- Library install directories are added to ``CMAKE_INSTALL_PREFIX`` for successive libraries in the sequence (to enable the usage of ``find_package()``).
+- Set ``CMAKE_INSTALL_PREFIX`` in Qt Creator run configurations.
+
+Breaking Changes
+^^^^^^^^^^^^^^^^
+
+- Overhauled command line interface with proper sub-commands, each providing specific options. See ``clickable --help`` and ``clickable <sub-command> --help``.
+- The default architecture changed from ``armhf`` to the host architecture. If you want the architecture of your test device as default, it can be configured in the :ref:`Clickable config <config.yaml>`.
+- The default now is to do dirty builds, if you want to do a clean build use ``clickable build --clean`` or set ``always_clean`` config field or ``CLICKABLE_ALWAYS_CLEAN=ON`` env var.
+- Merged the ``build-libs`` command into ``build``.
+- Merged the ``clean-libs`` command into ``clean``.
+- Merged the ``test-libs`` command into ``test``.
+- Scripts can only be executed through the ``script`` command.
+- The ``rust`` builder has been aligned to the other builders and does not try to install manifest and desktop file automatically anymore.
+- The ``rust`` builder runs ``cargo install`` instead of ``cargo build``
+- The ``rust`` builder configures the cargo target directory to match the build dir, fixing cleaning via the ``clean`` command.
+- The ``pure`` and ``cordova`` builders no longer override manifest ``architecture`` and ``framework`` fields, unless they are set to ``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@``.
+- ``prebuild`` and ``postbuild`` are executed within the build container.
+- Removed deprecated configuration fields.
+
+Bug Fixes
+^^^^^^^^^
+
+- The ``rust`` builder does not fail any more if the source dir (containing the Cargo.toml) is a sub-directory of the project dir.
+- The rustup cache is mounted along with the cargo cache to fix permission issues on accessing it.
+- Fixed app icons not displaying in Qt Creator.
+- Fixed run configuration name in Qt Creator.
+- Fixed crash for QtCreator when no exec args have been found
+- General polish and small bug fixes.
 
 Changes in v6.24.2
 ------------------
