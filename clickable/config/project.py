@@ -252,9 +252,9 @@ class ProjectConfig():
                     'Architecture set to "{}" due to container mode'.format(self.config['arch'])
                 )
             else:
-                self.config['arch'] = 'armhf'
+                self.config['arch'] = Constants.host_arch
                 logger.debug(
-                    'Architecture set to "{}" because no architecture was '
+                    'Architecture set to host arch "{}" because no architecture was '
                     'specified'.format(self.config['arch'])
                 )
 

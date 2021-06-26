@@ -2,6 +2,7 @@ from unittest import mock
 from unittest.mock import ANY
 
 from clickable.commands.install import InstallCommand
+from clickable.config.constants import Constants
 from ..mocks import empty_fn, true_fn
 from .base_test import UnitTest
 
@@ -27,7 +28,8 @@ class TestInstallCommand(UnitTest):
         mock_check_any_attached.assert_called_once_with()
         mock_check_multiple_attached.assert_called_once_with()
         mock_run_subprocess_check_call.assert_called_once_with(
-            'adb push /tmp/build/foo.bar_1.2.3_armhf.click /home/phablet/',
+            'adb push /tmp/build/foo.bar_1.2.3_{}.click /home/phablet/'
+            .format(Constants.host_arch),
             cwd='/tmp/build',
             shell=True
         )
@@ -47,7 +49,8 @@ class TestInstallCommand(UnitTest):
 
         mock_check_any_attached.assert_called_once_with()
         mock_run_subprocess_check_call.assert_called_once_with(
-            'adb -s foo push /tmp/build/foo.bar_1.2.3_armhf.click /home/phablet/',
+            'adb -s foo push /tmp/build/foo.bar_1.2.3_{}.click /home/phablet/'
+            .format(Constants.host_arch),
             cwd='/tmp/build',
             shell=True
         )
@@ -60,7 +63,8 @@ class TestInstallCommand(UnitTest):
         self.command.run()
 
         mock_run_subprocess_check_call.assert_called_once_with(
-            'scp /tmp/build/foo.bar_1.2.3_armhf.click phablet@foo:/home/phablet/',
+            'scp /tmp/build/foo.bar_1.2.3_{}.click phablet@foo:/home/phablet/'
+            .format(Constants.host_arch),
             cwd='/tmp/build',
             shell=True
         )
