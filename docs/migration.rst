@@ -71,7 +71,8 @@ Libraries
 ^^^^^^^^^
 
 Libraries are now cleaned and built by the same commands as the app itself. Run
-``clickable build --libs`` to build libraries and ``clickable clean --libs``.
+``clickable build --libs`` to build libraries, ``clickable clean --libs`` to clean them 
+and ``clickable test --libs`` for running unit tests.
 
 Builders
 --------
