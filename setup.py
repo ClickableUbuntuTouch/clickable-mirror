@@ -21,6 +21,7 @@ with open('clickable/version.py', 'rb') as f:
 requirements = [
     'cookiecutter',
     'requests',
+    'yaml',
     'jsonschema',
     'argcomplete',
 ]

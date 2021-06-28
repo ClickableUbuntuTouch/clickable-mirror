@@ -42,9 +42,9 @@ class ConfigMock(ProjectConfig):
 
         super().__init__(*args, **kwargs)
 
-    def load_json_config(self, config_path):
+    def load_project_config(self, config_path):
         if self.mock_config_json is None:
-            return super().load_json_config(config_path)
+            return super().load_project_config(config_path)
         else:
             config_json = self.mock_config_json
             return config_json

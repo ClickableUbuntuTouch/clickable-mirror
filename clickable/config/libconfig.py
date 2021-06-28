@@ -17,7 +17,7 @@ from .constants import Constants
 class LibInitConfig:
     def __init__(self):
         self.name = None
-        self.json_config = None
+        self.config_dict = None
         self.arch = None
         self.root_dir = None
         self.qt_version = None
@@ -99,7 +99,7 @@ class LibConfig():
             'test': 'ctest',
         }
 
-        self.config.update(config.json_config)
+        self.config.update(config.config_dict)
         if self.config["docker_image"]:
             self.is_custom_docker_image = True
         else:

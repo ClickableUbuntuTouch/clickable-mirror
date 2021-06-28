@@ -13,11 +13,11 @@ from clickable.exceptions import FileNotFoundException, ClickableException
 from clickable.config.constants import Constants
 from clickable.logger import Colors
 
-JSONSCHEMA_AVAILABLE = True
+SCHEMA_VALIDATOR_AVAILABLE = True
 try:
     from jsonschema import validate, ValidationError
 except ImportError:
-    JSONSCHEMA_AVAILABLE = False
+    SCHEMA_VALIDATOR_AVAILABLE = False
 
 
 # TODO use these subprocess functions everywhere
@@ -208,8 +208,8 @@ def flexible_string_to_list(variable, split=False):
     return variable
 
 
-def validate_clickable_json(config, schema):
-    if JSONSCHEMA_AVAILABLE:
+def validate_project_config_format(config, schema):
+    if SCHEMA_VALIDATOR_AVAILABLE:
         try:
             validate(instance=config, schema=schema)
         except ValidationError as e:

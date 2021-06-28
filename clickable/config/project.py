@@ -1,9 +1,10 @@
 import os
-import json
 import platform
 import re
 import multiprocessing
 from collections import OrderedDict
+
+import yaml
 
 from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
 from clickable.version import __version__
@@ -18,7 +19,7 @@ from ..utils import (
     get_make_jobs_from_args,
     flexible_string_to_list,
     env,
-    validate_clickable_json,
+    validate_project_config_format,
     make_absolute,
     make_env_var_conform,
     is_path_sane,
@@ -180,9 +181,9 @@ class ProjectConfig():
 
     def parse_configs(self, args, commands, always_clean):
         config_path = args.config if args else None
-        json_config = self.load_json_config(config_path)
+        config_dict = self.load_project_config(config_path)
 
-        self.config.update(json_config)
+        self.config.update(config_dict)
         env_config = self.load_env_config()
         self.config.update(env_config)
         self.config['env_vars'].update(self.config['env_env_vars'])
@@ -377,18 +378,18 @@ class ProjectConfig():
         else:
             super().__setattr__(name, value)
 
-    def load_json_schema(self):
+    def load_config_schema(self):
         schema_path = os.path.join(os.path.dirname(__file__), 'clickable.schema')
         with open(schema_path, 'r') as f:
             try:
-                return json.load(f)
+                return yaml.safe_load(f)
             except ValueError as err:
                 raise ClickableException(
-                    'Failed reading "clickable.schema", it is not valid json'
+                    'Failed reading "clickable.schema", it is not valid yaml file'
                 ) from err
             return None
 
-    def load_json_config(self, config_path):
+    def load_project_config(self, config_path):
         config = {}
         use_default_config = not config_path
         if use_default_config:
@@ -396,25 +397,25 @@ class ProjectConfig():
 
         if os.path.isfile(config_path):
             with open(config_path, 'r') as f:
-                config_json = {}
+                config_dict = {}
                 try:
-                    config_json = json.load(f)
+                    config_dict = yaml.safe_load(f)
                 except ValueError as err:
                     raise ClickableException(
-                        'Failed reading "clickable.json", it is not valid json'
+                        'Failed reading "clickable.json", it is not a valid yaml'
                     ) from err
 
                 for key in self.removed_keywords:
-                    if key in config_json:
+                    if key in config_dict:
                         raise ClickableException(
                             '"{}" is no longer a valid configuration option'.format(key)
                         )
 
-                schema = self.load_json_schema()
-                validate_clickable_json(config=config_json, schema=schema)
+                schema = self.load_config_schema()
+                validate_project_config_format(config=config_dict, schema=schema)
 
                 for key in self.config:
-                    value = config_json.get(key, None)
+                    value = config_dict.get(key, None)
 
                     if value:
                         config[key] = value
@@ -604,7 +605,7 @@ class ProjectConfig():
 
             lib_init = LibInitConfig()
             lib_init.name = name
-            lib_init.json_config = config
+            lib_init.config_dict = config
             lib_init.arch = self.config['arch']
             lib_init.root_dir = self.config['root_dir']
             lib_init.qt_version = self.config['qt_version']
