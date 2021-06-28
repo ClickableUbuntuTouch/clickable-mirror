@@ -26,10 +26,9 @@ class QtCreatorDelegate(IdeCommandDelegate):
         # share the same configuration
         # also add current project's dir to make qtcreator open directly the project
         p = ''
-        if self.is_cmake_project() or os.path.exists(os.path.join(
-            self.project_path,
-            'clickable.json'
-        )):
+        if (self.is_cmake_project() or
+                os.path.exists(os.path.join(self.project_path, 'clickable.yaml')) or
+                os.path.exists(os.path.join(self.project_path, 'clickable.json'))):
             p = self.project_path
         return path.replace('qtcreator', 'qtcreator -settingspath {} {}'.format(
             self.clickable_dir,

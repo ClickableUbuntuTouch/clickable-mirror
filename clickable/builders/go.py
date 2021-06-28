@@ -17,7 +17,7 @@ class GoBuilder(Builder):
                 cpath == os.path.abspath(self.config.install_dir) or
                 cpath == os.path.abspath(self.config.build_dir) or
                 content in self.config.ignore or
-                content == 'clickable.json' or
+                content in Constants.project_config_path_options or
 
                 # Don't copy the go files, they will be compiled from the source directory
                 os.path.splitext(content)[1] == '.go'

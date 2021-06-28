@@ -84,7 +84,7 @@ class BuildCommand(Command):
                 if lib not in existing_libs:
                     raise ClickableException(
                         'Cannot build unknown library "{}", which is not in your '
-                        'clickable.json'.format(lib)
+                        'project config'.format(lib)
                     )
 
         self.parse_env()

@@ -36,7 +36,7 @@ class PureBuilder(Builder):
                 cpath == os.path.abspath(self.config.install_dir) or
                 cpath == os.path.abspath(self.config.build_dir) or
                 self.matches_ignore_list(content) or
-                content == 'clickable.json'
+                content in Constants.project_config_path_options
             ):
                 ignored.append(content)
 

@@ -194,7 +194,7 @@ class LibConfig():
     def check_config_errors(self):
         if not self.config['builder']:
             raise ClickableException(
-                'The clickable.json is missing a "builder" in library "{}".'.format(
+                'The project config is missing a "builder" in library "{}".'.format(
                     self.config["name"]
                 )
             )

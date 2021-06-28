@@ -3,6 +3,7 @@ import sys
 
 from clickable.version import show_version
 from clickable.exceptions import ClickableException
+from clickable.config.constants import Constants
 
 
 class VersionAction(argparse.Action):
@@ -40,8 +41,9 @@ class Cli():
         parser.add_argument(
             '--config',
             '-c',
-            help='Use specified config file instead of looking for the optional "clickable.json" '
-                 'in the current directory',
+            help='Use specified config file instead of looking for one of [{}] '
+                 'in the current directory'.format(
+                     ", ".join(Constants.project_config_path_options)),
             default=None
         )
         parser.add_argument(

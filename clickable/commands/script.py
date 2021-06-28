@@ -15,7 +15,7 @@ class ScriptCommand(Command):
     def setup_parser(self, parser):
         parser.add_argument(
             'name',
-            help='One of the scripts defined in the clickable.json',
+            help='One of the scripts defined in the project config',
         )
 
     def configure(self, args):
@@ -31,5 +31,5 @@ class ScriptCommand(Command):
             run_subprocess_check_call(command)
         else:
             raise ClickableException(
-                '{} is not a script defined in the clickable.json.'.format(self.script_name)
+                '{} is not a script defined in the project config.'.format(self.script_name)
             )

@@ -40,7 +40,7 @@ class TestCommand(Command):
                 if lib not in existing_libs:
                     raise ClickableException(
                         'Cannot clean unknown library "{}", which is not in your '
-                        'clickable.json'.format(lib)
+                        'project config'.format(lib)
                     )
 
     def run(self):

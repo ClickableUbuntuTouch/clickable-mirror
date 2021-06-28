@@ -111,7 +111,7 @@ class InstallFiles():
 
             if not package:
                 raise ClickableException(
-                    'No package name specified in manifest.json or clickable.json'
+                    'No package name specified in manifest.json or project config'
                 )
 
         return package
@@ -130,7 +130,7 @@ class InstallFiles():
 
             if not title:
                 raise ClickableException(
-                    'No package title specified in manifest.json or clickable.json')
+                    'No package title specified in manifest.json or project config')
 
         return title
 

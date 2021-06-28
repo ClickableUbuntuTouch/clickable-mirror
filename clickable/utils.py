@@ -213,7 +213,7 @@ def validate_project_config_format(config, schema):
         try:
             validate(instance=config, schema=schema)
         except ValidationError as e:
-            logger.error("The clickable.json configuration file is invalid!")
+            logger.error("The project config configuration file is invalid!")
             error_message = e.message
             # Lets add the key to the invalid value
             if e.path:
@@ -223,7 +223,7 @@ def validate_project_config_format(config, schema):
                     error_message = "{} (in '{}')".format(error_message, e.path[-1])
             raise ClickableException(error_message) from e
     else:
-        logger.warning("Dependency 'jsonschema' not found. Could not validate clickable.json.")
+        logger.warning("Dependency 'jsonschema' not found. Could not validate project config.")
 
 
 def image_exists(image):

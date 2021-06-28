@@ -14,6 +14,11 @@ class Constants():
     RUST = 'rust'
     PRECOMPILED = 'precompiled'
 
+    project_config_path_options = [
+        "clickable.yaml",
+        "clickable.json"
+    ]
+
     builders = [
         PURE_QML_QMAKE,
         QMAKE,

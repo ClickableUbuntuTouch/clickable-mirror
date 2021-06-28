@@ -393,16 +393,24 @@ class ProjectConfig():
         config = {}
         use_default_config = not config_path
         if use_default_config:
-            config_path = os.path.join(self.cwd, 'clickable.json')
+            for option in Constants.project_config_path_options:
+                candidate = os.path.join(self.cwd, option)
 
-        if os.path.isfile(config_path):
+                if os.path.exists(candidate):
+                    config_path = candidate
+                    break
+
+        if config_path and os.path.isfile(config_path):
+            logger.debug("Loading config file {}".format(config_path))
+
             with open(config_path, 'r') as f:
                 config_dict = {}
                 try:
                     config_dict = yaml.safe_load(f)
                 except ValueError as err:
                     raise ClickableException(
-                        'Failed reading "clickable.json", it is not a valid yaml'
+                        'Project config {} is not a valid yaml file'.format(
+                            config_path)
                     ) from err
 
                 for key in self.removed_keywords:
@@ -421,7 +429,7 @@ class ProjectConfig():
                         config[key] = value
         elif not use_default_config:
             raise ClickableException(
-                'Specified config file {} does not exist.'.format(config_path)
+                'Specified config file "{}" does not exist.'.format(config_path)
             )
 
         return config
@@ -742,7 +750,7 @@ class ProjectConfig():
                 self.config['restrict_arch'] != self.config['arch']):
             raise ClickableException(
                 'Cannot build app for architecture "{}" as it is restricted to "{}" '
-                'in the clickable.json.'.format(self.config["arch"], self.config['restrict_arch'])
+                'in the project config.'.format(self.config["arch"], self.config['restrict_arch'])
             )
 
         if (self.config['restrict_arch_env'] and
@@ -857,7 +865,7 @@ class ProjectConfig():
             return
 
         if not self.interactive:
-            raise ClickableException('No builder specified. Add a builder to your clickable.json.')
+            raise ClickableException('No builder specified. Add a builder to your project config.')
 
         if not let_user_confirm(
                 'No builder was specified, would you like to auto detect the builder?',
