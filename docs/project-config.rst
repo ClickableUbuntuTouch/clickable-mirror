@@ -1,6 +1,6 @@
-.. _clickable-json:
+.. _project-config:
 
-clickable.json Format
+Project Config Format
 =====================
 
 Example:
@@ -17,7 +17,7 @@ Example:
         ]
     }
 
-.. _clickable-json-placeholders:
+.. _project-config-placeholders:
 
 Placeholders & Environment Variables
 ------------------------------------
@@ -25,7 +25,7 @@ Placeholders & Environment Variables
 Placeholders are values provided by Clickable that can be used in some
 configuration fields as ``${PLACEHOLDER}``.
 All placeholders are provided as environment variables during build, additionally.
-For custom environment variables see :ref:`env_vars <clickable-json-env_vars>`.
+For custom environment variables see :ref:`env_vars <project-config-env_vars>`.
 
 The following table lists all available placeholders.
 
@@ -44,7 +44,7 @@ INSTALL_DIR             Value of ``install_dir``
 CLICK_LD_LIBRARY_PATH   ``${INSTALL_DIR}/lib/${ARCH_TRIPLET}`` (will be in ``LD_LIBRARY_PATH`` at runtime) or ``${INSTALL_DIR}/lib`` for architecture independent apps
 CLICK_QML2_IMPORT_PATH  ``${INSTALL_DIR}/lib/${ARCH_TRIPLET}`` (will be in ``QML2_IMPORT_PATH`` at runtime) or ``${INSTALL_DIR}/qml`` for architecture independent apps
 CLICK_PATH              ``${INSTALL_DIR}/lib/${ARCH_TRIPLET}/bin`` or ``${INSTALL_DIR}`` for architecture independent apps (will be in ``PATH`` at runtime)
-<lib>_LIB_BUILD_DIR     Value of ``build_dir`` from library with name ``<lib>`` (see :ref:`libraries <clickable-json-libraries>`), where the library name consists solely of capital letters (e.g. from lib name ``my-libC++`` this env var would be ``MY_LIBC___LIB_BUILD_DIR``)
+<lib>_LIB_BUILD_DIR     Value of ``build_dir`` from library with name ``<lib>`` (see :ref:`libraries <project-config-libraries>`), where the library name consists solely of capital letters (e.g. from lib name ``my-libC++`` this env var would be ``MY_LIBC___LIB_BUILD_DIR``)
 <lib>_LIB_INSTALL_DIR   Value of ``install_dir`` from library with name ``<lib>`` (e.g. ``OPENCV_LIB_INSTALL_DIR``)
 <lib>_LIB_SRC_DIR       Value of ``src_dir`` from library with name ``<lib>`` (e.g. ``OPENCV_LIB_SRC_DIR``)
 ======================= ======
@@ -76,7 +76,7 @@ clickable_minimum_required
 Optional, a minimum Clickable version number required to build the project.
 Ex: ``"6"`` or ``"5.4.0"``
 
-.. _clickable-json-qt_version:
+.. _project-config-qt_version:
 
 qt_version
 ----------
@@ -85,7 +85,7 @@ Qt version consisting of major and minor version. This value is used to
 determine the framework automatically. Defaults to ``5.12``.
 Ex: ``5.9``
 
-.. _clickable-json-framework:
+.. _project-config-framework:
 
 framework
 ---------
@@ -95,7 +95,7 @@ choose the correct docker image and set the ``framework`` field in the manifest
 accordingly, if desired.
 Ex: ``ubuntu-sdk-16.04.4``
 
-.. _clickable-json-restrict_arch:
+.. _project-config-restrict_arch:
 
 restrict_arch
 -------------
@@ -105,7 +105,7 @@ This prevents the app from being build for other architectures and may also prev
 
 To specify the architecture for building use the cli argument instead (ex: ``--arch arm64``).
 
-.. _clickable-json-builder:
+.. _project-config-builder:
 
 builder
 -------
@@ -142,7 +142,7 @@ Optional, a custom command to execute from the root dir, after build, but before
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-env_vars:
+.. _project-config-env_vars:
 
 env_vars
 --------
@@ -166,7 +166,7 @@ Optional, arguments to pass to qmake or cmake. When using ``--debug``,
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-make-args:
+.. _project-config-make-args:
 
 make_args
 ---------
@@ -177,7 +177,7 @@ conflicts, the number of make jobs should not be specified here, but using
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-make-jobs:
+.. _project-config-make-jobs:
 
 make_jobs
 ---------
@@ -190,7 +190,7 @@ launch
 
 Optional, a custom command to launch the app, used by ``clickable launch``.
 
-.. _clickable-json-build_dir:
+.. _project-config-build_dir:
 
 build_dir
 ---------
@@ -210,7 +210,7 @@ install_dir
 Optional, a custom install directory (used to gather data that goes into the click package).
 Defaults to ``${BUILD_DIR}/install``
 
-.. _clickable-json-install_lib:
+.. _project-config-install_lib:
 
 install_lib
 -----------
@@ -323,7 +323,7 @@ Optional, an object detailing custom commands to run. For example:
 
 That enables the use of ``clickable script fetch`` and ``clickable script echo``.
 
-.. _clickable-json-default:
+.. _project-config-default:
 
 default
 -------
@@ -334,7 +334,7 @@ The ``--clean`` cli argument prepends ``clean`` to that list.
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-always-clean:
+.. _project-config-always-clean:
 
 always_clean
 ------------
@@ -344,7 +344,7 @@ disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` comm
 Does not affect libraries.
 The default is ``false``.
 
-.. _clickable-json-dependencies_host:
+.. _project-config-dependencies_host:
 
 dependencies_host
 -----------------
@@ -355,7 +355,7 @@ Add tools here that are part of your build tool chain.
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-dependencies_target:
+.. _project-config-dependencies_target:
 
 dependencies_target
 -------------------
@@ -369,7 +369,7 @@ Add dependencies here that your app depends on.
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-dependencies-ppa:
+.. _project-config-dependencies-ppa:
 
 dependencies_ppa
 ----------------
@@ -384,7 +384,7 @@ Optional, a list of PPAs, that will be enabled in the build container. Ex:
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-docker-image:
+.. _project-config-docker-image:
 
 image_setup
 -----------
@@ -416,7 +416,7 @@ Optional, a dictionary of env vars to add during image setup (each added as
 `ENV <key>="<val>"` to the corresponding Dockerfile).
 
 These are ignored in container mode (use
-:ref:`env_vars <clickable-json-env_vars>` instead).
+:ref:`env_vars <project-config-env_vars>` instead).
 
 docker_image
 ------------
@@ -442,14 +442,14 @@ Example:
 
 Can be specified as a string or a list of strings.
 
-.. _clickable-json-gopath:
+.. _project-config-gopath:
 
 gopath
 ------
 
 Optional, the gopath on the host machine. If left blank, the ``GOPATH`` env var will be used.
 
-.. _clickable-json-cargo_home:
+.. _project-config-cargo_home:
 
 cargo_home
 ----------
@@ -458,18 +458,18 @@ Optional, the Cargo home path on the host machine that is used for caching
 (namely its subdirs ``registry``, ``git`` and ``.package-cache``).
 Defaults to ``~/.clickable/cargo``.
 
-.. _clickable-json-build-args:
+.. _project-config-build-args:
 
 root_dir
 --------
 
 Optional, specify a different root directory for the project. For example,
-if you clickable.json file is in ``platforms/ubuntu_touch`` and you want to include
+if you project config file is in ``platforms/ubuntu_touch`` and you want to include
 code from root of your project you can set ``root_dir: "../.."``. Alternatively you can run
 clickable from the project root in that case via
-``clickable -c platforms/ubuntu_touch/clickable.json``.
+``clickable -c platforms/ubuntu_touch/clickable.yaml``.
 
-.. _clickable-json-test:
+.. _project-config-test:
 
 test
 ----
@@ -477,12 +477,12 @@ test
 Optional, specify a test command to be executed when running ``clickable test``.
 The default is ``qmltestrunner``.
 
-.. _clickable-json-libraries:
+.. _project-config-libraries:
 
 libraries
 ---------
 Optional, dependencies to be build by running ``clickable build-libs``.
-It's a dictionary of dictionaries similar to the clickable.json itself. Example:
+It's a dictionary of dictionaries similar to the project config itself. Example:
 
 .. code-block:: javascript
 
@@ -504,7 +504,7 @@ The keywords ``test``, ``install_dir``, ``prebuild``, ``build``, ``postbuild``,
 ``dependencies_host``, ``dependencies_target`` and ``dependencies_ppa``,
 can be used for a library the same way as described above for the app.
 
-In addition to the :ref:`placeholders <clickable-json-placeholders>` described above,
+In addition to the :ref:`placeholders <project-config-placeholders>` described above,
 the following placeholders are available:
 
 ============= ======

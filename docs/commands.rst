@@ -13,7 +13,7 @@ A pure ``clickable`` call is equivalent to ``clickable chain``.
 -------------------
 
 Chains multiple commands that can be specified. The default chain can be configured via the
-:ref:`default <clickable-json-default>` field. The default chain itself defaults to
+:ref:`default <project-config-default>` field. The default chain itself defaults to
 ``build install launch``.
 
 A clean build can be enforced by running ``clickable chain --clean``.
@@ -125,7 +125,7 @@ to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate val
 ``clickable build --libs``
 --------------------------
 
-Builds libraries specified in the clickable.json.
+Builds libraries specified in the project config.
 
 ``clickable build --output=/path/to/some/diretory``
 ---------------------------------------------------
@@ -145,8 +145,8 @@ to review your click without installing click-review on your computer.
 ------------------
 
 Run your test suite in with a virtual screen. By default this runs qmltestrunner,
-but you can specify a custom command by setting the :ref:`test <clickable-json-test>`
-property in your clickable.json.
+but you can specify a custom command by setting the :ref:`test <project-config-test>`
+property in your project config.
 
 ``clickable install``
 ---------------------

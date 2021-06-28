@@ -45,7 +45,7 @@ precompiled
 A project that does not need to be compiled. All files in the project root will
 be copied into the click. There may be precompiled binaries or libraries
 included in apps build with this builder. Specifying the
-:ref:`restrict_arch <clickable-json-restrict_arch>` in the clickable.json file
+:ref:`restrict_arch <project-config-restrict_arch>` in the project config file
 can be useful with this builder.
 
 python

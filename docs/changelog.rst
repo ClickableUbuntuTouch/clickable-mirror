@@ -313,8 +313,8 @@ Changes in v6.1.0
 - Added support for multimedia in desktop mode
 - Make app data, config and cache persistent in desktop mode by mounting phablet home folder to ~/.clickable/home
 - Added arm64 support and docker images (does not yet work for apps built with qmake)
-- :ref:`Added placeholders and env vars to commands and scripts run via clickable <clickable-json-placeholders>`
-- :ref:`Added option to install libs/qml/binaries from the docker image into the click package <clickable-json-install_lib>`
+- :ref:`Added placeholders and env vars to commands and scripts run via clickable <project-config-placeholders>`
+- :ref:`Added option to install libs/qml/binaries from the docker image into the click package <project-config-install_lib>`
 - Switched to a clickable specific Cargo home for Rust apps
 - Click packages are now deleted from the device after installing
 - Fixed ``dependencies_build`` not being allowed as a string
@@ -425,7 +425,7 @@ Changes in v5.12.1
 Changes in v5.12.0
 ------------------
 
-- clickable.json supports :ref:`placeholders <clickable-json-placeholders>` now
+- clickable.json supports :ref:`placeholders <project-config-placeholders>` now
 - Add new ``src_dir`` configuration option
 - Make build-libs respect ``root_dir``, too
 - Fix build-libs for architecture all
@@ -462,14 +462,14 @@ Changes in v5.8.1
 Changes in v5.8.0
 -----------------
 
-- New configuration option for automatically including ppas in the build environment: :ref:`dependencies_ppa <clickable-json-dependencies-ppa>`.
-- Changed :ref:`libraries <clickable-json-libraries>` format from a list to a dictionary (the old format is still supported for now)
+- New configuration option for automatically including ppas in the build environment: :ref:`dependencies_ppa <project-config-dependencies-ppa>`.
+- Changed :ref:`libraries <project-config-libraries>` format from a list to a dictionary (the old format is still supported for now)
 - The default ``cargo_home`` is now set to ``~/.cargo``
 
 Changes in v5.7.0
 -----------------
 
-- Introduced two new dependency options to separate `build <clickable-json-dependencies_build>` and `target <clickable-json-dependencies_target>` dependencies
+- Introduced two new dependency options to separate `build <project-config-dependencies_build>` and `target <project-config-dependencies_target>` dependencies
 
 Changes in v5.6.1
 -----------------
@@ -525,7 +525,7 @@ Changes in v5.3.1
 Changes in v5.3.0
 -----------------
 
-- :ref:`Added options for compiling libraries <clickable-json-libraries>`
+- :ref:`Added options for compiling libraries <project-config-libraries>`
 
 Changes in v5.2.0
 -----------------

@@ -43,10 +43,11 @@ when using ssh.
 
 Configuration
 -------------
-It is recommend to specify a configuration file in the
-:ref:`clickable.json format <clickable-json>` with ``--config``. If not
-specified, clickable will look for an optional configuration file called
-``clickable.json`` in the current directory. If there is none Clickable will
+One can specify the path to a :ref:`project config file <project-config>`
+with ``--config``. If not
+specified, Clickable will look for an optional configuration file called
+``clickable.yaml`` and then``clickable.json`` in the current directory.
+If there is none, Clickable will
 ask if it should attempt to detect the type of app and choose a fitting
 :ref:`builder <builders>` with default configuration.
 
@@ -77,7 +78,7 @@ App Manifest
 
 The ``architecture`` and ``framework`` fields in the ``manifest.json`` need to be set according
 to the architecture the app is build for (``--arch``) and the minimum framework version it
-requires, e.g. depending on the QT Version (:ref:`qt_version <clickable-json-qt_version>`).
+requires, e.g. depending on the QT Version (:ref:`qt_version <project-config-qt_version>`).
 To let Clickable automatically set those fields, leave them empty or set them to
 ``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@`` respectively.
 

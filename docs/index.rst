@@ -22,7 +22,7 @@ Using Clickable
     usage
     debugging
     commands
-    clickable-json
+    project-config
     env-vars
     app-templates
     builders

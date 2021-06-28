@@ -13,7 +13,7 @@ Clean Building
 
 Clickable 6 was cleaning the build directory before each build by default.
 If you want to keep that behaviour for your project, add to your
-``clickable.json``:
+project config:
 
 .. code-block:: javascript
 
@@ -74,6 +74,17 @@ Libraries are now cleaned and built by the same commands as the app itself. Run
 ``clickable build --libs`` to build libraries, ``clickable clean --libs`` to clean them 
 and ``clickable test --libs`` for running unit tests.
 
+Project Configuration File
+--------------------------
+
+The ``clickable.json`` has a successor: ``clickable.yaml``. The schema did not change,
+just the format. YAML allows to write better human-readable and cleaner config files.
+
+If you just want to keep your config file as is, you can do so, because YAML is a
+superset of JSON. It is recommended to rename the file to ``clickable.yaml``. But even
+if you keep the file name ``clickable.json``, Clickable will find it after looking for a
+``clickable.yaml``.
+
 Builders
 --------
 
@@ -121,7 +132,7 @@ Clickable 7.
 Architecture
 ^^^^^^^^^^^^
 
-Instead of setting ``arch`` in your ``clickable.json`` you should specify the
+Instead of setting ``arch`` in your project config you should specify the
 architecture you want to build for via command line.
 Example: ``clickable build --arch arm64``
 

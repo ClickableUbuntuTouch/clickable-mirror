@@ -3,11 +3,11 @@
 Environment Variables
 =====================
 
-Environment variables will override values in the clickable.json and can be
+Environment variables will override values in the project config and can be
 overridden by command line arguments.
 
 In contrast to the environment variables described here that configure
-Clickable, there are :ref:`environment variables <clickable-json-placeholders>` set by
+Clickable, there are :ref:`environment variables <project-config-placeholders>` set by
 Clickable to be used during build.
 
 ``CLICKABLE_ARCH``
@@ -18,57 +18,57 @@ Restricts build commands (``build``, ``build-libs``, ``desktop``) to the specifi
 ``CLICKABLE_QT_VERSION``
 ------------------------
 
-Overrides the clickable.json's :ref:`qt_version <clickable-json-qt_version>`.
+Overrides the project config's :ref:`qt_version <project-config-qt_version>`.
 
 ``CLICKABLE_FRAMEWORK``
 -----------------------
 
-Overrides the clickable.json's :ref:`builder <clickable-json-framework>`.
+Overrides the project config's :ref:`builder <project-config-framework>`.
 
 ``CLICKABLE_BUILDER``
 ---------------------
 
-Overrides the clickable.json's :ref:`builder <clickable-json-builder>`.
+Overrides the project config's :ref:`builder <project-config-builder>`.
 
 ``CLICKABLE_BUILD_DIR``
 -----------------------
 
-Overrides the clickable.json's :ref:`dir <clickable-json-build_dir>`.
+Overrides the project config's :ref:`dir <project-config-build_dir>`.
 
 ``CLICKABLE_DEFAULT``
 ---------------------
 
-Overrides the clickable.json's :ref:`default <clickable-json-default>`.
+Overrides the project config's :ref:`default <project-config-default>`.
 
 ``CLICKABLE_MAKE_JOBS``
 -----------------------
 
-Overrides the clickable.json's :ref:`make_jobs <clickable-json-make-jobs>`.
+Overrides the project config's :ref:`make_jobs <project-config-make-jobs>`.
 
 ``GOPATH``
 ----------
 
-Overrides the clickable.json's :ref:`gopath <clickable-json-gopath>`.
+Overrides the project config's :ref:`gopath <project-config-gopath>`.
 
 ``CARGO_HOME``
 --------------
 
-Overrides the clickable.json's :ref:`cargo_home <clickable-json-cargo_home>`.
+Overrides the project config's :ref:`cargo_home <project-config-cargo_home>`.
 
 ``CLICKABLE_DOCKER_IMAGE``
 --------------------------
 
-Overrides the clickable.json's :ref:`docker_image <clickable-json-docker-image>`.
+Overrides the project config's :ref:`docker_image <project-config-docker-image>`.
 
 ``CLICKABLE_BUILD_ARGS``
 ------------------------
 
-Overrides the clickable.json's :ref:`build_args <clickable-json-build-args>`.
+Overrides the project config's :ref:`build_args <project-config-build-args>`.
 
 ``CLICKABLE_MAKE_ARGS``
 ------------------------
 
-Overrides the clickable.json's :ref:`make_args <clickable-json-make-args>`.
+Overrides the project config's :ref:`make_args <project-config-make-args>`.
 
 ``OPENSTORE_API_KEY``
 ---------------------
@@ -108,7 +108,7 @@ Same as :ref:`--no-nvidia <nvidia>`.
 ``CLICKABLE_ALWAYS_CLEAN``
 --------------------------
 
-Overrides the clickable.json's :ref:`always_clean <clickable-json-always-clean>`.
+Overrides the project config's :ref:`always_clean <project-config-always-clean>`.
 
 ``CLICKABLE_NON_INTERACTIVE``
 -----------------------------
@@ -123,7 +123,7 @@ Same as ``--debug``
 ``CLICKABLE_TEST``
 ------------------
 
-Overrides the clickable.json's :ref:`test <clickable-json-test>`.
+Overrides the project config's :ref:`test <project-config-test>`.
 
 ``CLICKABLE_DARK_MODE``
 -----------------------
@@ -137,4 +137,4 @@ Adds custom env vars to the build container. E.g. set
 ``CLICKABLE_ENV_BUILD_TESTS=ON`` to have ``BUILD_TESTS=ON`` set in the build
 container.
 
-Overrides env vars in :ref:`test <clickable-json-env_vars>`.
+Overrides env vars in :ref:`test <project-config-env_vars>`.
