@@ -358,6 +358,17 @@ class ProjectConfig():
         self.set_build_arch()
         self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.build_arch]
 
+    def get_image_framework(self):
+        if self.config['framework'] in Constants.framework_image_mapping:
+            return Constants.framework_image_mapping[self.config['framework']]
+
+        framework_base = Constants.framework_base_default
+        for base in Constants.framework_base:
+            if self.config['framework'].find(base) != -1:
+                framework_base = base
+
+        return Constants.framework_image_fallback[framework_base]
+
     def setup_image(self):
         if self.needs_clickable_image():
             self.check_nvidia_mode()
@@ -370,15 +381,13 @@ class ProjectConfig():
             if self.is_ide_command():
                 container_spec += "-ide"
 
-            image_framework = Constants.framework_image_mapping.get(
-                self.config['framework'], Constants.framework_fallback)
-
+            image_framework = self.get_image_framework()
             container_mapping_host = Constants.container_mapping[Constants.host_arch]
             container = container_mapping_host.get((image_framework, container_spec), None)
 
             if not container:
                 raise ClickableException(
-                    f'There is currently no docker image for {image_framework}/{container_spec}'
+                    f'There is currently no docker image for {image_framework}-{container_spec}'
                 )
 
             self.config['docker_image'] = container
