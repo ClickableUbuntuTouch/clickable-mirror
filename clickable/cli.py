@@ -41,9 +41,15 @@ class Cli():
         parser.add_argument(
             '--config',
             '-c',
-            help='Use specified config file instead of looking for one of [{}] '
+            help='Use specified project config file instead of looking for one of [{}] '
                  'in the current directory'.format(
                      ", ".join(Constants.project_config_path_options)),
+            default=None
+        )
+        parser.add_argument(
+            '--clickable-config',
+            help='Use specified Clickable config file instead of looking for "{}"'
+                 .format(Constants.clickable_config_path),
             default=None
         )
         parser.add_argument(

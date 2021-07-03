@@ -31,6 +31,9 @@ class Clickable():
     def run(self):
         if HAS_ARGCOMPLETE:
             argcomplete.autocomplete(self.cli.parser)
+        else:
+            logger.debug('argcomplete is not installed')
+
         args = self.cli.parse_args(sys.argv[1:])
 
         self.verbose = 'verbose' in args and args.verbose

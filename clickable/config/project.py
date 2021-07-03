@@ -2,6 +2,7 @@ import os
 import platform
 import re
 import multiprocessing
+from pathlib import PurePath
 from collections import OrderedDict
 
 import yaml
@@ -13,17 +14,20 @@ from clickable.exceptions import ClickableException
 from .libconfig import LibConfig, LibInitConfig
 from .file_helpers import InstallFiles, ProjectFiles
 from .constants import Constants
+from .global_config import GlobalConfig
+from .environment import EnvironmentConfig
 
 from ..utils import (
     merge_make_jobs_into_args,
     get_make_jobs_from_args,
     flexible_string_to_list,
     env,
-    validate_project_config_format,
+    validate_config_format,
     make_absolute,
     make_env_var_conform,
     is_path_sane,
     let_user_confirm,
+    load_config_schema,
 )
 from ..logger import logger
 
@@ -105,6 +109,7 @@ class ProjectConfig():
     container_list = []
     install_files = []
     lib_configs = []
+    global_config = None
 
     def __init__(self, args=None, cwd=None, commands=None, always_clean=False):
         if not commands:
@@ -180,17 +185,20 @@ class ProjectConfig():
         }
 
     def parse_configs(self, args, commands, always_clean):
+        self.load_global_config(args.clickable_config if args else None)
         config_path = args.config if args else None
         config_dict = self.load_project_config(config_path)
 
         self.config.update(config_dict)
-        env_config = self.load_env_config()
+        env_config = self.load_env_config(self.global_config.environment)
         self.config.update(env_config)
         self.config['env_vars'].update(self.config['env_env_vars'])
 
         if args:
             arg_config = self.load_arg_config(args)
             self.config.update(arg_config)
+
+        self.merge_cli_config()
 
         self.config['default'] = flexible_string_to_list(self.config['default'], split=True)
 
@@ -207,6 +215,9 @@ class ProjectConfig():
             and self.commands[0] != 'clean'
         ):
             self.commands = ['clean'] + self.commands
+
+    def load_global_config(self, path):
+        self.global_config = GlobalConfig(path)
 
     def setup(self):
         self.cleanup_config()
@@ -251,6 +262,11 @@ class ProjectConfig():
                 self.config['arch'] = Constants.host_arch
                 logger.debug(
                     'Architecture set to "{}" due to container mode'.format(self.config['arch'])
+                )
+            elif self.global_config.device.arch:
+                self.config['arch'] = self.global_config.device.arch
+                logger.debug(
+                    'Architecture set to "{}" from device config'.format(self.config['arch'])
                 )
             else:
                 self.config['arch'] = 'armhf'
@@ -378,17 +394,6 @@ class ProjectConfig():
         else:
             super().__setattr__(name, value)
 
-    def load_config_schema(self):
-        schema_path = os.path.join(os.path.dirname(__file__), 'clickable.schema')
-        with open(schema_path, 'r') as f:
-            try:
-                return yaml.safe_load(f)
-            except ValueError as err:
-                raise ClickableException(
-                    'Failed reading "clickable.schema", it is not valid yaml file'
-                ) from err
-            return None
-
     def load_project_config(self, config_path):
         config = {}
         use_default_config = not config_path
@@ -419,8 +424,9 @@ class ProjectConfig():
                             '"{}" is no longer a valid configuration option'.format(key)
                         )
 
-                schema = self.load_config_schema()
-                validate_project_config_format(config=config_dict, schema=schema)
+                schema = load_config_schema('project')
+                relative_path = PurePath(config_path).relative_to(self.config['root_dir'])
+                validate_config_format(config_dict, schema, 'project', relative_path)
 
                 for key in self.config:
                     value = config_dict.get(key, None)
@@ -434,8 +440,15 @@ class ProjectConfig():
 
         return config
 
-    def load_env_config(self):
-        if self.get_env_var('CLICKABLE_CONTAINER_MODE'):
+    def merge_cli_config(self):
+        if self.global_config.cli.default_chain:
+            self.config['default'] = self.global_config.cli.default_chain
+
+        if self.global_config.cli.scripts:
+            self.config['scripts'].update(self.global_config.cli.scripts)
+
+    def load_env_config(self, config: EnvironmentConfig):
+        if self.get_env_var('CLICKABLE_CONTAINER_MODE') or config.container_mode:
             self.container_mode = True
 
         if self.get_env_var('CLICKABLE_SERIAL_NUMBER'):
@@ -444,14 +457,17 @@ class ProjectConfig():
         if self.get_env_var('CLICKABLE_SSH'):
             self.ssh = self.get_env_var('CLICKABLE_SSH')
 
-        if self.get_env_var('CLICKABLE_NVIDIA'):
+        if self.get_env_var('CLICKABLE_NVIDIA') or config.nvidia == 'on':
             self.use_nvidia = True
 
-        if self.get_env_var('CLICKABLE_NO_NVIDIA'):
+        if self.get_env_var('CLICKABLE_NO_NVIDIA') or config.nvidia == 'off':
             self.avoid_nvidia = True
 
-        if self.get_env_var('CLICKABLE_NON_INTERACTIVE'):
+        if self.get_env_var('CLICKABLE_NON_INTERACTIVE') or config.non_interactive:
             self.interactive = False
+
+        if config.restrict_arch:
+            self.config["restrict_arch_env"] = config.restrict_arch
 
         config = {}
         for var, name in self.ENV_MAP.items():

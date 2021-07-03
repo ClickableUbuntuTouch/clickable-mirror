@@ -10,7 +10,7 @@ class DevicesCommand(Command):
         self.cli_conf.help_msg = 'Lists all ADB devices'
 
     def run(self):
-        devices = self.device.detect_attached()
+        devices = self.device.detect_adb_attached()
 
         if len(devices) == 0:
             logger.warning('No attached devices')

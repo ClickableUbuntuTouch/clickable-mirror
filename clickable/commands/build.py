@@ -70,9 +70,10 @@ class BuildCommand(Command):
         )
 
     def configure(self, args):
-        self.clean_app = args.clean or self.config.always_clean
+        self.clean_app = (args.clean or self.config.always_clean
+                          or self.config.global_config.build.always_clean)
         self.clean_libs = args.clean and args.libs is not None
-        self.skip_review = args.skip_review
+        self.skip_review = args.skip_review or self.config.global_config.build.skip_review
         self.output_path = args.output
         self.debug_build = args.debug
         self.app = args.app or args.libs is None

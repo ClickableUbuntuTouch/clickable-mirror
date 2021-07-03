@@ -45,13 +45,13 @@ class ShellCommand(Command):
         if self.config.ssh:
             subprocess.check_call(shlex.split('ssh phablet@{}'.format(self.config.ssh)))
         else:
-            self.device.check_any_attached()
+            self.device.check_any_adb_attached()
 
             adb_args = ''
             if self.config.device_serial_number:
                 adb_args = '-s {}'.format(self.config.device_serial_number)
             else:
-                self.device.check_multiple_attached()
+                self.device.check_multiple_adb_attached()
 
             output = run_subprocess_check_output(
                 shlex.split('adb {} shell pgrep sshd'.format(adb_args))
