@@ -20,6 +20,7 @@ Using Clickable
     install
     getting-started
     usage
+    config
     debugging
     commands
     project-config
