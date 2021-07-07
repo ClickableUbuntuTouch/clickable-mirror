@@ -2,7 +2,7 @@ clickable (6.24.2) unstable; urgency=medium
 
   * Fixed version checking when there is no internet connection
 
- -- Brian Douglass <bhdouglass@gmail.com>  Wed, 7 Jul 2021 12:37:00 -0500
+ -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 7 Jul 2021 12:37:00 -0500
 
 clickable (6.24.1) unstable; urgency=medium
 
