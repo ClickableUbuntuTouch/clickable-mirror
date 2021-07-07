@@ -260,8 +260,10 @@ class Clickable(object):
                     version = data['version']
                 except requests.exceptions.Timeout as e:
                     logger.warning('Unable to check for updates to clickable, the request timedout')
+                except requests.exceptions.ConnectionError as e:
+                    logger.warning('Unable to check for updates to clickable. Are you connected to the internet?')
                 except Exception as e:
-                    logger.debug('Version check failed:' + str(e.cmd), exc_info=e)
+                    logger.debug('Version check failed:' + str(e), exc_info=e)
                     logger.warning('Unable to check for updates to clickable, an unknown error occurred')
 
                 if version:
