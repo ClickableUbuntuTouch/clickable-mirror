@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -x
-set -e
-
 echo "-----BEGIN PGP PUBLIC KEY BLOCK-----" > pub.gpg
 echo $GPG_PUBLIC | tr " " "\n" >> pub.gpg
 echo "-----END PGP PUBLIC KEY BLOCK-----" >> pub.gpg
