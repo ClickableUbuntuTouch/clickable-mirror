@@ -1,7 +1,7 @@
 import os
 import glob
 import json
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 
 from clickable.exceptions import ClickableException
 from .constants import Constants

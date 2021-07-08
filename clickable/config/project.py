@@ -552,8 +552,8 @@ class ProjectConfig():
         if not self.config[key]:
             return
 
-        for sub in self.placeholders:
-            rep = self.config[self.placeholders[sub]]
+        for sub, placeholder in self.placeholders.items():
+            rep = self.config[placeholder]
             if rep is None:
                 logger.warning("Placeholder '{}' used in '{}' is not set. Skipping..."
                                .format(sub, key))
