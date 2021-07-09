@@ -9,13 +9,13 @@ from .base import Command
 
 
 class CleanCommand(Command):
-    def __init__(self, libs=None):
+    def __init__(self, libs=None, app=True):
         super().__init__()
         self.cli_conf.name = 'clean'
         self.cli_conf.help_msg = 'Clean the build directory'
 
-        self.app = True
         self.libs = libs
+        self.app = app
 
     def setup_parser(self, parser):
         parser.add_argument(

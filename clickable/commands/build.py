@@ -120,7 +120,7 @@ class BuildCommand(Command):
             return
 
         if self.clean_libs:
-            clean_cmd = CleanCommand(libs=self.libs)
+            clean_cmd = CleanCommand(libs=self.libs, app=False)
             clean_cmd.init_from_command(self)
             clean_cmd.run()
 
