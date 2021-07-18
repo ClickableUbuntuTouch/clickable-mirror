@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v6.24.2
+------------------
+
+- Fixed version checking when there is no internet connection
+
 Changes in v6.24.1
 ------------------
 
