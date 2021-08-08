@@ -168,6 +168,11 @@ class DesktopCommand(Command):
             if self.valgrind:
                 DebugValgrindSupport().update(docker_config)
 
+        docker_config.add_environment_variables(
+            {
+                "CLICKABLE_DESKTOP_MODE": "1",
+            })
+
         docker_config.add_volume_mappings(self.setup_volume_mappings())
 
         docker_config.add_environment_variables(
