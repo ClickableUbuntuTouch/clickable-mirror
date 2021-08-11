@@ -33,6 +33,8 @@ Run ``clickable desktop --dark-mode`` to set the dark mode preference.
 
 Run ``clickable desktop --lang <language code>`` to test using a different language.
 
+The env var ``CLICKABLE_DESKTOP_MODE`` is set in desktop mode.
+
 .. _nvidia:
 
 ``clickable desktop --nvidia``
