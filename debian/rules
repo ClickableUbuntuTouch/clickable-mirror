@@ -11,7 +11,7 @@ override_dh_install:
 	# Install the manpage
 	mkdir -p $(PKGDIR)/usr/share/man/man1/
 
-	PYTHONPATH=$(PKGDIR)/usr/lib/$(shell ls $(PKGDIR)/usr/lib/)/dist-packages/ \
+	HOME=/tmp PYTHONPATH=$(PKGDIR)/usr/lib/$(shell ls $(PKGDIR)/usr/lib/)/dist-packages/ \
 		help2man $(PKGDIR)/usr/bin/clickable \
 		--no-info \
 		--help-option="--help" \
