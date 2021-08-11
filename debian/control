@@ -11,7 +11,6 @@ Build-Depends: debhelper (>= 9),
                python3-cookiecutter,
                python3-yaml,
                python3-jsonschema,
-               python3-argcomplete,
                python3-setuptools
 Standards-Version: 4.1.4
 Homepage: https://gitlab.com/clickable/clickable
@@ -24,9 +23,9 @@ Depends: adb | android-tools-adb,
          python3-requests,
          python3-yaml,
          python3-jsonschema,
-         python3-argcomplete,
          ${misc:Depends},
          ${python3:Depends}
-Recommends: python3-distutils
+Recommends: python3-distutils,
+            python3-argcomplete
 Suggests: x11-xserver-utils
 Description: Compile, build, and deploy Ubuntu Touch click packages all from the command line.
