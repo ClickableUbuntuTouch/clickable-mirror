@@ -30,8 +30,14 @@ class InstallCommand(Command):
 
     def configure(self, args):
         self.click_path = args.click
-        self.skip_uninstall = (args.skip_uninstall or self.click_path
-                               or self.config.global_config.device.skip_uninstall)
+        self.skip_uninstall = args.skip_uninstall or self.click_path
+
+    def configure_nested(self):
+        self.configure_common()
+
+    def configure_common(self):
+        if self.config.global_config.device.skip_uninstall:
+            self.skip_uninstall = True
 
     def try_find_installed_version(self, package_name):
         try:
