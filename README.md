@@ -64,9 +64,9 @@ To run both of them, simply use the command `make lint`.
 
 ### Run the tests
 
-Install nose and the coverage modules: `pip3 install nose coverage`.
+Install the pytest modules: `pip3 install pytest pytest-cov`.
 
-Run nose to complete the tests: `make test`.
+Run pytest to complete the tests: `make test`.
 
 ### Related Repositories
 

@@ -2,17 +2,23 @@ stages:
   - test
   - publish
 
-integration-test:
+run-test:
   stage: test
   image: clickable/testing
   script:
-    - nosetests integration
+    - ./clickable-dev --help
+
+integration-test:
+  stage: test
+  image: clickable/clickable-ci
+  script:
+    - pytest --cov=clickable ./tests/integration
 
 unit-test:
   stage: test
-  image: clickable/testing
+  image: clickable/clickable-ci
   script:
-    - nosetests unit
+    - pytest --cov=clickable ./tests/unit
 
 build-deb:
   stage: publish

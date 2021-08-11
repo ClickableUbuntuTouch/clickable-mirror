@@ -7,10 +7,10 @@ format:
 	autopep8 --in-place --recursive --aggressive tests
 
 test:
-	nosetests
+	pytest --cov=clickable ./tests
 
 test-unit:
-	nosetests unit
+	pytest --cov=clickable ./tests/unit
 
 test-integration:
-	nosetests integration
+	pytest --cov=clickable ./tests/integration
