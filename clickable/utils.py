@@ -7,6 +7,8 @@ import glob
 import inspect
 from os.path import dirname, basename, isfile, join
 
+import yaml
+
 from clickable.builders.base import Builder
 from clickable.logger import logger
 from clickable.exceptions import FileNotFoundException, ClickableException
@@ -208,22 +210,36 @@ def flexible_string_to_list(variable, split=False):
     return variable
 
 
-def validate_project_config_format(config, schema):
+def load_config_schema(name):
+    file_name = '{}.schema'.format(name)
+    schema_path = os.path.join(os.path.dirname(__file__), 'config', file_name)
+    with open(schema_path, 'r') as f:
+        try:
+            return yaml.safe_load(f)
+        except ValueError as err:
+            raise ClickableException(
+                'Failed reading "{}", it is not valid yaml file'.format(file_name)
+            ) from err
+        return None
+
+
+def validate_config_format(config, schema, name, path):
     if SCHEMA_VALIDATOR_AVAILABLE:
         try:
             validate(instance=config, schema=schema)
         except ValidationError as e:
-            logger.error("The project config configuration file is invalid!")
+            logger.error('The {} config file "{}" contains invalid fields!'.format(
+                name, path))
             error_message = e.message
             # Lets add the key to the invalid value
             if e.path:
                 if len(e.path) > 1 and isinstance(e.path[-1], int):
-                    error_message = "{} (in '{}')".format(error_message, e.path[-2])
+                    error_message = '{} (in "{}")'.format(error_message, e.path[-2])
                 else:
-                    error_message = "{} (in '{}')".format(error_message, e.path[-1])
+                    error_message = '{} (in "{}")'.format(error_message, e.path[-1])
             raise ClickableException(error_message) from e
     else:
-        logger.warning("Dependency 'jsonschema' not found. Could not validate project config.")
+        logger.warning('Dependency "jsonschema" not found. Could not validate config file.')
 
 
 def image_exists(image):

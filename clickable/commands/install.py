@@ -32,6 +32,13 @@ class InstallCommand(Command):
         self.click_path = args.click
         self.skip_uninstall = args.skip_uninstall or self.click_path
 
+    def configure_nested(self):
+        self.configure_common()
+
+    def configure_common(self):
+        if self.config.global_config.device.skip_uninstall:
+            self.skip_uninstall = True
+
     def try_find_installed_version(self, package_name):
         try:
             response = self.device.run_command(
@@ -74,7 +81,7 @@ class InstallCommand(Command):
             run_subprocess_check_call(command, cwd=cwd, shell=True)
 
         else:
-            self.device.check_any_attached()
+            self.device.check_any_adb_attached()
 
             if self.config.device_serial_number:
                 command = 'adb -s {} push {} /home/phablet/'.format(
@@ -82,7 +89,7 @@ class InstallCommand(Command):
                     self.click_path
                 )
             else:
-                self.device.check_multiple_attached()
+                self.device.check_multiple_adb_attached()
                 command = 'adb push {} /home/phablet/'.format(self.click_path)
 
             run_subprocess_check_call(command, cwd=cwd, shell=True)

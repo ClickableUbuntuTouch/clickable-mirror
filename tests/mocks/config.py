@@ -1,8 +1,9 @@
+import os
+
 from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
 from clickable.config.file_helpers import InstallFiles
-
-import os
+from clickable.config.global_config import GlobalConfig
 
 
 class InstallFilesMock(InstallFiles):
@@ -45,15 +46,18 @@ class ConfigMock(ProjectConfig):
     def load_project_config(self, config_path):
         if self.mock_config_json is None:
             return super().load_project_config(config_path)
-        else:
-            config_json = self.mock_config_json
-            return config_json
+
+        config_json = self.mock_config_json
+        return config_json
+
+    def load_global_config(self, path):
+        self.global_config = GlobalConfigMock(path)
 
     def get_env_var(self, key):
         if self.mock_config_env is None:
             return super().get_env_var(key)
-        else:
-            return self.mock_config_env.get(key, None)
+
+        return self.mock_config_env.get(key, None)
 
     def set_builder_interactive(self):
         if not self.config['builder'] and not self.needs_builder():
@@ -66,3 +70,8 @@ class ConfigMock(ProjectConfig):
                 self.config['install_dir'],
                 self.config['builder'],
                 self.config['arch'])
+
+
+class GlobalConfigMock(GlobalConfig):
+    def load(self, path, is_custom):
+        return {}

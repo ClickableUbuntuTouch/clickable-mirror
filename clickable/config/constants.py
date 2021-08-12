@@ -92,5 +92,6 @@ class Constants():
     host_arch = host_arch_mapping.get(platform.machine(), None)
 
     clickable_dir = os.path.expanduser('~/.clickable')
+    clickable_config_path = os.path.join(clickable_dir, 'config.yaml')
     desktop_device_home = os.path.join(clickable_dir, 'home')
     device_home = '/home/phablet'

@@ -21,8 +21,7 @@ class IdeCommand(DesktopCommand):
     def setup_parser(self, parser):
         parser.add_argument(
             'command',
-            metavar='cmd',
-            default='qtcreator',
+            metavar='qtcreator',
             nargs='*',
             help='Command to run IDE inside the container',
         )
@@ -38,12 +37,33 @@ class IdeCommand(DesktopCommand):
         )
 
     def configure(self, args):
-        self.command = ' '.join(args.command)
+        if args.command:
+            self.command = ' '.join(args.command)
+        elif self.config.global_config.ide.default:
+            self.command = self.config.global_config.ide.default
+        else:
+            self.command = 'qtcreator'
+
         self.ide_support = not args.no_support
         self.list_support = args.list_support
 
+        self.merge_image_setup()
+
     def configure_nested(self):
         raise ClickableException("IDE command can't be nested in a chain.")
+
+    def merge_image_setup(self):
+        ide_image_setup_run = self.config.global_config.ide.image_setup.get('run', [])
+        if ide_image_setup_run:
+            image_setup_run = self.config.image_setup.get('run', [])
+            image_setup_run += ide_image_setup_run
+            self.config.image_setup['run'] = image_setup_run
+
+        ide_image_setup_env = self.config.global_config.ide.image_setup.get('env', {})
+        if ide_image_setup_env:
+            image_setup_env = self.config.image_setup.get('env', {})
+            image_setup_env.update(ide_image_setup_env)
+            self.config.image_setup['env'] = image_setup_env
 
     def run(self):
         if self.list_support:

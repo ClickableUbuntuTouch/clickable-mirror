@@ -70,7 +70,7 @@ class BuildCommand(Command):
         )
 
     def configure(self, args):
-        self.clean_app = args.clean or self.config.always_clean
+        self.clean_app = args.clean
         self.clean_libs = args.clean and args.libs is not None
         self.skip_review = args.skip_review
         self.output_path = args.output
@@ -78,21 +78,20 @@ class BuildCommand(Command):
         self.app = args.app or args.libs is None
         self.libs = args.libs
 
-        if self.libs is not None:
-            existing_libs = [lib.name for lib in self.config.lib_configs]
-            for lib in self.libs:
-                if lib not in existing_libs:
-                    raise ClickableException(
-                        'Cannot build unknown library "{}", which is not in your '
-                        'project config'.format(lib)
-                    )
-
-        self.parse_env()
+        self.configure_common()
 
     def configure_nested(self):
-        self.clean_app = self.config.always_clean
+        self.configure_common()
+
+    def configure_common(self):
+        if self.config.global_config.build.skip_review:
+            self.skip_review = True
+
+        if self.config.always_clean or self.config.global_config.build.always_clean:
+            self.clean_app = True
 
         self.parse_env()
+        self.check_libs()
 
     def parse_env(self):
         if env('CLICKABLE_DEBUG_BUILD'):
@@ -107,6 +106,16 @@ class BuildCommand(Command):
             output_env = env('CLICKABLE_OUTPUT')
             if output_env:
                 self.output_path = output_env
+
+    def check_libs(self):
+        if self.libs is not None:
+            existing_libs = [lib.name for lib in self.config.lib_configs]
+            for lib in self.libs:
+                if lib not in existing_libs:
+                    raise ClickableException(
+                        'Cannot build unknown library "{}", which is not in your '
+                        'project config'.format(lib)
+                    )
 
     def run(self):
         if self.libs is not None:
