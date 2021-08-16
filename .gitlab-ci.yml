@@ -1,24 +1,38 @@
+services:
+  - docker:dind
+
+variables:
+  DOCKER_CERT_PATH: /certs/client
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_HOST: "tcp://docker:2376"
+
 stages:
   - test
   - publish
 
-run-test:
-  stage: test
-  image: clickable/testing
-  script:
-    - ./clickable-dev --help
-
 integration-test:
   stage: test
   image: clickable/clickable-ci
+  variables:
+    CLICKABLE_SKIP_DOCKER_SETUP: 1
   script:
-    - pytest --cov=clickable ./tests/integration
+    - export HOME=`pwd`/home
+    - mkdir -p $HOME
+    - pytest ./tests/integration
 
 unit-test:
   stage: test
   image: clickable/clickable-ci
   script:
     - pytest --cov=clickable ./tests/unit
+
+lint:
+  stage: test
+  image: clickable/clickable-ci
+  script:
+    - flake8
+    - pylint clickable
 
 build-deb:
   stage: publish

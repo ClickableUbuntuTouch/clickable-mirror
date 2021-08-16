@@ -67,16 +67,16 @@ class TestIdeQtCreatorCommand(UnitTest):
     def test_recurse_replace(self):
 
         final_command = self.idedelegate.recurse_replace('qmlscene --ok=\"args\"', {})
-        self.assertEquals('qmlscene --ok=\"args\"', final_command)
+        assert 'qmlscene --ok=\"args\"' == final_command
 
         final_command = self.idedelegate.recurse_replace('\"qmlscene --ok=\"args\"\"', {})
-        self.assertEquals('\"qmlscene --ok=\"args\"\"', final_command)
+        assert '\"qmlscene --ok=\"args\"\"' == final_command
 
         cmake_vars = {
             'FAKE': 'qmlscene'
         }
         final_command = self.idedelegate.recurse_replace('${FAKE} --ok=\"args\"', cmake_vars)
-        self.assertEquals('qmlscene --ok=\"args\"', final_command)
+        assert 'qmlscene --ok=\"args\"' == final_command
 
         # test with recursive vars
         cmake_vars = {
@@ -84,7 +84,7 @@ class TestIdeQtCreatorCommand(UnitTest):
             'FAKE_VAR': '${FAKE_SUBVAR}/hello'
         }
         final_command = self.idedelegate.recurse_replace('${FAKE_VAR} --args someargs', cmake_vars)
-        self.assertEquals('share/foo/hello --args someargs', final_command)
+        assert 'share/foo/hello --args someargs' == final_command
 
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_executable', return_value='')
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_exec_args')

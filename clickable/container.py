@@ -13,6 +13,7 @@ from clickable.utils import (
     run_subprocess_check_call,
     run_subprocess_check_output,
     image_exists,
+    env
 )
 from clickable.logger import logger
 from clickable.config.constants import Constants
@@ -148,6 +149,7 @@ class Container():
 
     def needs_docker_setup(self):
         return (
+            not env('CLICKABLE_SKIP_DOCKER_SETUP') and
             sys.platform != 'darwin' and
             (not self.docker_group_exists() or not self.user_part_of_docker_group())
         )
