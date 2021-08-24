@@ -19,6 +19,10 @@ class Cli():
 
         self.parser.add_argument('--version', '-v', nargs=0, action=VersionAction)
 
+        self.no_command_parser = argparse.ArgumentParser(description='clickable')
+        self.add_common_options(self.no_command_parser)
+        self.commands = []
+
     def add_cmd_parser(self, command):
         config = command.cli_conf
 
@@ -36,6 +40,9 @@ class Cli():
         command.setup_parser(parser)
 
         parser.set_defaults(func=command.start)
+
+        self.commands.append(config.name)
+        self.commands.extend(config.aliases)
 
     def add_common_options(self, parser):
         parser.add_argument(
@@ -112,4 +119,9 @@ class Cli():
         )
 
     def parse_args(self, argv):
+        ignore = ['-h', '--help', '-v', '--version']
+
+        if len(argv) >= 1 and argv[0] not in self.commands and argv[0] not in ignore:
+            argv.insert(0, 'default')
+
         return self.parser.parse_args(argv)
