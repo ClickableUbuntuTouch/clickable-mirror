@@ -14,7 +14,7 @@ class TestConfigCommand(TestCase):
     def test_set_conditional_defaults_default(self):
         self.config.container_mode = False
         self.config.set_conditional_defaults()
-        self.assertEqual(self.config.arch, 'armhf')
+        self.assertEqual(self.config.arch, Constants.host_arch)
         self.assertEqual(self.config.make_jobs, str(multiprocessing.cpu_count()))
 
     def test_set_conditional_defaults_make_args(self):
@@ -24,11 +24,11 @@ class TestConfigCommand(TestCase):
         self.assertEqual(self.config.make_jobs, '5')
 
     def test_set_conditional_defaults_container_mode(self):
-        self.config.host_arch = 'amd64'
+        self.config.host_arch = Constants.host_arch
         self.config.container_mode = True
 
         self.config.set_conditional_defaults()
-        self.assertEqual(self.config.arch, 'amd64')
+        self.assertEqual(self.config.arch, Constants.host_arch)
 
     def test_set_conditional_defaults_arch_agnostic(self):
         self.config.builder = Constants.PURE_QML_CMAKE
@@ -39,7 +39,7 @@ class TestConfigCommand(TestCase):
     @mock.patch('clickable.config.project.ProjectConfig.is_desktop_mode', side_effect=true_fn)
     def test_set_conditional_defaults_arch_desktop(self, mock_desktop_mode):
         self.config.set_conditional_defaults()
-        self.assertEqual(self.config.arch, 'amd64')
+        self.assertEqual(self.config.arch, Constants.host_arch)
         mock_desktop_mode.assert_called_once_with()
 
     def test_set_conditional_defaults_restrict_arch(self):

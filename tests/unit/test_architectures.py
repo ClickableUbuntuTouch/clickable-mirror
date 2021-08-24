@@ -1,7 +1,8 @@
 from clickable.cli import Cli
-from .base_test import UnitTest
 from clickable.commands.build import BuildCommand
 from clickable.commands.create import CreateCommand
+from clickable.config.constants import Constants
+from .base_test import UnitTest
 
 
 class TestArchitectures(UnitTest):
@@ -57,7 +58,7 @@ class TestArchitectures(UnitTest):
         elif restrict_arch_env:
             expected_arch = restrict_arch_env
         else:
-            expected_arch = "armhf"
+            expected_arch = Constants.host_arch
 
         if not expect_exception:
             self.assertEqual(expected_arch, self.config.arch)
