@@ -33,6 +33,10 @@ class RustBuilder(Builder):
         cargo_command = 'cargo build {} --target {} --target-dir {}' \
             .format('--release' if not self.debug_build else '',
                     self._cargo_target, self.config.build_dir)
+
+        if self.config.build_args:
+            cargo_command = '{} {}'.format(cargo_command, ' '.join(self.config.build_args))
+
         self.container.run_command(cargo_command)
 
         # There could be more than one executable

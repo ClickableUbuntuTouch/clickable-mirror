@@ -160,9 +160,13 @@ When passing ``--debug`` to Clickable, ``DEBUG_BUILD=1`` is set as an environmen
 build_args
 ----------
 
-Optional, arguments to pass to qmake or cmake. When using ``--debug``,
-``CONFIG+=debug`` is additionally appended for qmake and
-``-DCMAKE_BUILD_TYPE=Debug`` for cmake and cordova builds. Ex: ``CONFIG+=ubuntu``
+Optional, arguments to pass to qmake, cargo or cmake.
+
+When using ``--debug``, ``CONFIG+=debug`` is additionally appended for qmake and
+``-DCMAKE_BUILD_TYPE=Debug`` for cmake and cordova builds. For cargo calls
+``--release`` is added if not running Clickable with ``--debug``.
+
+Ex: ``CONFIG+=ubuntu``
 
 Can be specified as a string or a list of strings.
 
