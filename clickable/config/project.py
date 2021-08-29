@@ -425,7 +425,8 @@ class ProjectConfig():
                         )
 
                 schema = load_config_schema('project')
-                relative_path = PurePath(config_path).relative_to(self.config['root_dir'])
+                absolute_path = make_absolute(config_path)
+                relative_path = PurePath(absolute_path).relative_to(self.config['root_dir'])
                 validate_config_format(config_dict, schema, 'project', relative_path)
 
                 for key in self.config:
