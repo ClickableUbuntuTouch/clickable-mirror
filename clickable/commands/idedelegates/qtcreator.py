@@ -106,7 +106,12 @@ class QtCreatorDelegate(IdeCommandDelegate):
     def init_cmake_project(self, config, docker_config):
 
         executable = config.project_files.find_any_executable()
-        exec_args = " ".join(config.project_files.find_any_exec_args())
+        exec_args_list = config.project_files.find_any_exec_args()
+
+        if exec_args_list:
+            exec_args = " ".join(exec_args_list)
+        else:
+            exec_args = ""
 
         # don't do all that if exec line not found
         if not executable:
