@@ -13,7 +13,8 @@ from clickable.utils import (
     run_subprocess_check_call,
     run_subprocess_check_output,
     image_exists,
-    env
+    env,
+    check_command,
 )
 from clickable.logger import logger
 from clickable.config.constants import Constants
@@ -84,20 +85,21 @@ class Container():
                 logger.warning("Cached container is outdated")
 
     def start_docker(self):
-        started = False
-        error_code = run_subprocess_call(
-            shlex.split('which systemctl'),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        check_command('systemctl')
 
-        if error_code == 0:
-            logger.info('Asking for root to start docker')
-            error_code = run_subprocess_call(shlex.split('sudo systemctl start docker'))
+        logger.info('Asking for root to start docker')
+        run_subprocess_check_output(shlex.split('sudo systemctl start docker'))
 
-            started = (error_code == 0)
+    def is_docker_service_running(self):
+        check_command('systemctl')
 
-        return started
+        try:
+            run_subprocess_check_output(
+                shlex.split('systemctl is-active --quiet docker'),
+                stderr=subprocess.STDOUT)
+            return True
+        except subprocess.CalledProcessError as err:
+            return False
 
     def check_docker(self, retries=3):
         if not self.docker_mode:
@@ -106,18 +108,18 @@ class Container():
                 "This seems to be a bug in Clickable."
             )
 
+        check_command('docker')
+
         if self.needs_docker_setup():
             self.setup_docker()
 
-        try:
-            run_subprocess_check_output(shlex.split('docker ps'), stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as err:
+        if not self.is_docker_service_running():
             retries -= 1
             if retries <= 0:
                 raise ClickableException(
                     "Couldn't check docker. If you just installed Clickable you may "
                     "need to reboot once."
-                ) from err
+                )
 
             self.start_docker()
 
@@ -134,47 +136,57 @@ class Container():
 
         return group_exists
 
-    def user_part_of_docker_group(self):
-        output = run_subprocess_check_output(
-            shlex.split('groups {}'.format(getpass.getuser()))
-        ).strip()
+    def user_in_docker_group_pending(self):
+        return self.user_in_docker_group() and not self.proccess_in_docker_group()
 
-        # Test for exactly docker in the group list
-        return (
-            ' docker ' in output or
-            output.endswith(' docker') or
-            output.startswith('docker ') or
-            output == 'docker'
-        )
+    def proccess_in_docker_group(self):
+        check_command('groups')
+
+        groups = run_subprocess_check_output(shlex.split('groups')).strip().split()
+
+        return 'docker' in groups
+
+    def user_in_docker_group(self):
+        check_command('groups')
+
+        groups = run_subprocess_check_output(
+            shlex.split('groups {}'.format(getpass.getuser()))
+        ).strip().split(':')[1].split()
+
+        return 'docker' in groups
 
     def needs_docker_setup(self):
         return (
             not env('CLICKABLE_SKIP_DOCKER_SETUP') and
             sys.platform != 'darwin' and
-            (not self.docker_group_exists() or not self.user_part_of_docker_group())
+            not self.is_docker_ready()
         )
 
     def setup_docker(self):
         logger.info('Setting up docker')
 
-        self.start_docker()
+        if not self.is_docker_service_running():
+            self.start_docker()
+
+        if self.is_docker_ready():
+            logger.info('Setup has already been completed')
+            return
 
         if not self.docker_group_exists():
             logger.info('Asking for root to create docker group')
             subprocess.check_call(shlex.split('sudo groupadd docker'))
 
-        if self.user_part_of_docker_group():
-            logger.info('Setup has already been completed')
-        else:
+        if not self.user_in_docker_group():
             logger.info('Asking for root to add the current user to the docker group')
             subprocess.check_call(
                 shlex.split('sudo usermod -aG docker {}'.format(getpass.getuser()))
             )
 
-            raise ClickableException('Log out or restart to apply changes')
+        if self.user_in_docker_group_pending():
+            raise ClickableException('Log out or restart to gain docker access')
 
     def is_docker_ready(self):
-        return self.docker_group_exists() and self.user_part_of_docker_group()
+        return self.docker_group_exists() and self.proccess_in_docker_group()
 
     def pull_files(self, files, dst_parent):
         os.makedirs(dst_parent, exist_ok=True)
