@@ -14,14 +14,13 @@ class VersionAction(argparse.Action):
 
 class Cli():
     def __init__(self):
+        self.commands = []
+
         self.parser = argparse.ArgumentParser(description='clickable')
         self.subparsers = self.parser.add_subparsers(title='commands', dest='sub_command')
 
         self.parser.add_argument('--version', '-v', nargs=0, action=VersionAction)
 
-        self.no_command_parser = argparse.ArgumentParser(description='clickable')
-        self.add_common_options(self.no_command_parser)
-        self.commands = []
 
     def add_cmd_parser(self, command):
         config = command.cli_conf
