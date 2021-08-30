@@ -15,7 +15,7 @@ integration-test:
   stage: test
   image: clickable/clickable-ci
   variables:
-    CLICKABLE_SKIP_DOCKER_SETUP: 1
+    CLICKABLE_SKIP_DOCKER_CHECKS: 1
   script:
     - export HOME=`pwd`/home
     - mkdir -p $HOME

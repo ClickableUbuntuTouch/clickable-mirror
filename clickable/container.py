@@ -91,6 +91,9 @@ class Container():
         run_subprocess_check_output(shlex.split('sudo systemctl start docker'))
 
     def is_docker_service_running(self):
+        if env('CLICKABLE_SKIP_DOCKER_CHECKS'):
+            return True
+
         check_command('systemctl')
 
         try:
@@ -157,7 +160,7 @@ class Container():
 
     def needs_docker_setup(self):
         return (
-            not env('CLICKABLE_SKIP_DOCKER_SETUP') and
+            not env('CLICKABLE_SKIP_DOCKER_CHECKS') and
             sys.platform != 'darwin' and
             not self.is_docker_ready()
         )
