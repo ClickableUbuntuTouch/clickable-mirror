@@ -21,7 +21,6 @@ class Cli():
 
         self.parser.add_argument('--version', '-v', nargs=0, action=VersionAction)
 
-
     def add_cmd_parser(self, command):
         config = command.cli_conf
 

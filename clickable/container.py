@@ -9,7 +9,6 @@ import sys
 import json
 
 from clickable.utils import (
-    run_subprocess_call,
     run_subprocess_check_call,
     run_subprocess_check_output,
     image_exists,
@@ -101,7 +100,7 @@ class Container():
                 shlex.split('systemctl is-active --quiet docker'),
                 stderr=subprocess.STDOUT)
             return True
-        except subprocess.CalledProcessError as err:
+        except subprocess.CalledProcessError:
             return False
 
     def check_docker(self, retries=3):
