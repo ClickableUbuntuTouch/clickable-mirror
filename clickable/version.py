@@ -62,11 +62,13 @@ def check_version(quiet=False):
                 version = data['version']
             except requests.exceptions.Timeout:
                 logger.warning('Unable to check for updates to clickable, the request timedout')
-            except Exception as e:  # pylint: disable=broad-except
+            except requests.exceptions.ConnectionError as e:
+                logger.warning(
+                    'Unable to check for updates to clickable. Are you connected to the internet?')
+            except Exception as e:
                 logger.debug('Version check failed:' + str(e), exc_info=e)
                 logger.warning(
-                    'Unable to check for updates to clickable, an unknown error occurred'
-                )
+                    'Unable to check for updates to clickable, an unknown error occurred')
 
             if version:
                 with open(version_check, 'w') as f:
