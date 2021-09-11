@@ -1,6 +1,3 @@
-import os
-import shutil
-
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 
@@ -30,8 +27,6 @@ class RustBuilder(Builder):
 
         if self.debug_build:
             cargo_command = '{} {}'.format(cargo_command, "--debug")
-        if os.path.isdir(self.config.install_dir):
-            shutil.rmtree(self.config.install_dir)
 
 
         if self.config.build_args:
