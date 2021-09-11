@@ -1,7 +1,3 @@
-import os
-import glob
-import shutil
-
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 
@@ -26,24 +22,16 @@ class RustBuilder(Builder):
         return rust_arch_target_mapping[self.config.build_arch]
 
     def build(self):
-        if os.path.isdir(self.config.install_dir):
-            shutil.rmtree(self.config.install_dir)
+        cargo_command = 'cargo install --target {} --target-dir {} --root {} --path {}'.format(
+            self._cargo_target, self.config.build_dir, self.config.install_dir, self.config.src_dir)
 
-        # Build using cargo
-        cargo_command = 'cargo build {} --target {} --target-dir {}' \
-            .format('--release' if not self.debug_build else '',
-                    self._cargo_target, self.config.build_dir)
+        if self.debug_build:
+            cargo_command = '{} {}'.format(cargo_command, "--debug")
+
+        if self.config.verbose:
+            cargo_command = '{} {}'.format(cargo_command, "--verbose")
 
         if self.config.build_args:
             cargo_command = '{} {}'.format(cargo_command, ' '.join(self.config.build_args))
 
-        self.container.run_command(cargo_command)
-
-        # There could be more than one executable
-        executables = glob.glob(os.path.join(
-            self.config.build_dir,
-            self._cargo_target,
-            'debug' if self.debug_build else 'release',
-            "*"))
-        for filename in filter(lambda f: os.path.isfile(f), executables):
-            self.config.install_bin.append(filename)
+        self.container.run_command(cargo_command, use_build_dir=False, cwd=self.config.src_dir)

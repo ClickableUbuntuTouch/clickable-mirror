@@ -186,6 +186,7 @@
             "enum":  [
               "cmake",
               "qmake",
+              "rust",
               "custom"
             ]
           },
