@@ -95,6 +95,9 @@ template. For existing Rust apps adding that field might be necessary as well.
 The Rust builder now configures the target directory to the build directory configured
 with Clickable in order to make the ``clean`` command work correctly for Rust apps.
 
+The Rust builder now runs ``cargo install`` instead of ``cargo build``. It also
+supports ``build_args`` in your project config now.
+
 Pure and Cordova
 ^^^^^^^^^^^^^^^^
 
