@@ -204,7 +204,7 @@ def merge_make_jobs_into_args(make_args, make_jobs):
 def flexible_string_to_list(variable, split=False):
     if isinstance(variable, (str, bytes)):
         if split:
-            return variable.split(' ')
+            return variable.split()
 
         return [variable]
     return variable
@@ -213,7 +213,7 @@ def flexible_string_to_list(variable, split=False):
 def load_config_schema(name):
     file_name = '{}.schema'.format(name)
     schema_path = os.path.join(os.path.dirname(__file__), 'config', file_name)
-    with open(schema_path, 'r') as f:
+    with open(schema_path, 'r', encoding='UTF-8') as f:
         try:
             return yaml.safe_load(f)
         except ValueError as err:

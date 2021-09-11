@@ -215,7 +215,7 @@ class DesktopCommand(Command):
 
     def determine_executable(self, desktop_path):
         execute = None
-        with open(desktop_path, 'r') as desktop_file:
+        with open(desktop_path, 'r', encoding='UTF-8') as desktop_file:
             for line in desktop_file.readlines():
                 if line.startswith('Exec='):
                     execute = line
@@ -240,7 +240,7 @@ class DesktopCommand(Command):
             )
 
         if os.path.exists('/etc/timezone'):
-            with open('/etc/timezone') as host_timezone_file:
+            with open('/etc/timezone', 'r', encoding='UTF-8') as host_timezone_file:
                 return host_timezone_file.readline().strip()
         else:
             logger.debug(

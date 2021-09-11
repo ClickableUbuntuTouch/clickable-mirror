@@ -173,7 +173,7 @@ class GdbCommand(Command):
             "via 'source {0}'.".format(self.export_script)
         )
 
-        with open(self.export_script, 'w') as script_file:
+        with open(self.export_script, 'w', encoding='UTF-8') as script_file:
             for command in self.script:
                 script_file.write(command)
                 script_file.write('\n')

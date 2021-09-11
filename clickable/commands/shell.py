@@ -89,7 +89,7 @@ class ShellCommand(Command):
                     .format(id_pub)
                 )
 
-            with open(id_pub, 'r') as f:
+            with open(id_pub, 'r', encoding='UTF-8') as f:
                 public_key = f.read().strip()
 
             self.device.run_command('[ -d ~/.ssh ] || mkdir ~/.ssh')

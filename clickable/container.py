@@ -47,7 +47,7 @@ class Container():
         if not os.path.exists(self.docker_name_file):
             return
 
-        with open(self.docker_name_file, 'r') as f:
+        with open(self.docker_name_file, 'r', encoding='UTF-8') as f:
             cached_image = None
             cached_base_image = None
 
@@ -130,7 +130,7 @@ class Container():
 
     def docker_group_exists(self):
         group_exists = False
-        with open('/etc/group', 'r') as f:
+        with open('/etc/group', 'r', encoding='UTF-8') as f:
             lines = f.readlines()
             for line in lines:
                 if line.startswith('docker:'):
@@ -241,7 +241,7 @@ class Container():
             os.makedirs(rustup_tmp, exist_ok=True)
 
             # create .package-cache if it doesn't exist
-            with open(cargo_package_cache_lock, "a"):
+            with open(cargo_package_cache_lock, "a", encoding='UTF-8'):
                 pass
 
             mounts['/opt/rust/cargo/registry'] = cargo_registry
@@ -363,11 +363,11 @@ FROM {}
         if not os.path.exists(self.clickable_dir):
             os.makedirs(self.clickable_dir)
 
-        with open(self.docker_file, 'w') as f:
+        with open(self.docker_file, 'w', encoding='UTF-8') as f:
             f.write(dockerfile_content)
 
         self.docker_image = '{}-{}'.format(self.base_docker_image, uuid.uuid4())
-        with open(self.docker_name_file, 'w') as f:
+        with open(self.docker_name_file, 'w', encoding='UTF-8') as f:
             json.dump({
                 'name': self.docker_image,
                 'base_image': self.base_docker_image,
@@ -393,7 +393,7 @@ FROM {}
         if not os.path.exists(self.docker_file):
             return True
 
-        with open(self.docker_file, 'r') as f:
+        with open(self.docker_file, 'r', encoding='UTF-8') as f:
             if dockerfile_content.strip() != f.read().strip():
                 return True
 

@@ -408,7 +408,7 @@ class ProjectConfig():
         if config_path and os.path.isfile(config_path):
             logger.debug("Loading config file {}".format(config_path))
 
-            with open(config_path, 'r') as f:
+            with open(config_path, 'r', encoding='UTF-8') as f:
                 config_dict = {}
                 try:
                     config_dict = yaml.safe_load(f)
