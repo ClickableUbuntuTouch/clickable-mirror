@@ -40,13 +40,13 @@ class LibConfig():
         "INSTALL_DIR": "install_dir",
     })
     accepts_placeholders = ["root_dir", "build_dir", "src_dir", "install_dir",
-                            "build",
+                            "cargo_home", "build",
                             "build_args", "make_args", "postmake", "postbuild",
-                            "prebuild",
+                            "prebuild", "rustup_home",
                             "env_vars", "build_home"]
 
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
-                 'build_home']
+                 'cargo_home', 'build_home', 'rustup_home']
     required = ['builder']
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
@@ -90,6 +90,8 @@ class LibConfig():
             'dependencies_target': [],
             'dependencies_ppa': [],
             'make_jobs': None,
+            'cargo_home': os.path.expanduser('~/.clickable/cargo'),
+            'rustup_home': os.path.expanduser('~/.clickable/rustup'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
