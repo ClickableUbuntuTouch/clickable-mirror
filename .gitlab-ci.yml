@@ -13,6 +13,7 @@ stages:
 
 integration-test:
   stage: test
+  # TODO fix this not working on PRs
   image: clickable/clickable-ci
   variables:
     CLICKABLE_SKIP_DOCKER_CHECKS: 1
@@ -38,7 +39,8 @@ build-deb:
   stage: publish
   image: clickable/build-deb:bionic
   rules:
-    - if: $CI_COMMIT_TAG == null
+    - if: "$CI_COMMIT_BRANCH == 'master' || $CI_COMMIT_BRANCH == 'dev'"
+    # TODO only on master & dev
   artifacts:
     expire_in: 1 week
     paths:
