@@ -297,7 +297,7 @@ class Container():
                 user = "-u {}".format(os.getuid())
 
             mounts = self.render_mounts(
-                self.get_docker_mounts(transparent=[cwd]))
+                self.get_docker_mounts(transparent=[cwd, self.config.root_dir]))
 
             wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} ' \
                               '{network} -i {image} bash -c "{cmd}"'.format(
