@@ -60,7 +60,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
     # guess exec command and args from CMakeLists.txt
     # return None if nothing found
     def cmake_guess_exec_command(self, cmd_var):
-        f = open(os.path.join(self.project_path, 'CMakeLists.txt'), 'r')
+        f = open(os.path.join(self.project_path, 'CMakeLists.txt'), 'r', encoding='UTF-8')
         cmake_file = f.read()
         output_cmd = None
 
@@ -177,7 +177,8 @@ class QtCreatorDelegate(IdeCommandDelegate):
 
         output_path = os.path.join(self.project_path, 'CMakeLists.txt.user.shared')
         # now read template and generate the .shared file to the root project dir
-        with open(self.template_path, "r") as infile2, open(output_path, "w") as outfile:
+        with open(self.template_path, 'r', encoding='UTF-8') as infile2,\
+                open(output_path, 'w', encoding='UTF-8') as outfile:
             for line in infile2:
                 for f_key, f_value in template_replacement.items():
                     if f_key in line:

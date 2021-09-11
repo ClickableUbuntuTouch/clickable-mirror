@@ -39,7 +39,7 @@ class GlobalConfig():
                 )
             return {}
 
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='UTF-8') as f:
             try:
                 return yaml.safe_load(f)
             except ValueError as err:

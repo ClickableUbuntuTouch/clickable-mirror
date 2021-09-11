@@ -52,12 +52,12 @@ class CordovaBuilder(CMakeBuilder):
                 shutil.copy(full_source_path, full_dest_path)
 
         apparmor_file = os.path.join(self.config.install_dir, 'apparmor.json')
-        with open(apparmor_file, 'r') as apparmor_reader:
+        with open(apparmor_file, 'r', encoding='UTF-8') as apparmor_reader:
             apparmor = json.load(apparmor_reader)
             apparmor['policy_version'] = 16.04
 
             if 'webview' not in apparmor['policy_groups']:
                 apparmor['policy_groups'].append('webview')
 
-            with open(apparmor_file, 'w') as apparmor_writer:
+            with open(apparmor_file, 'w', encoding='UTF-8') as apparmor_writer:
                 json.dump(apparmor, apparmor_writer, indent=4)

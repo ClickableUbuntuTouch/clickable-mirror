@@ -27,7 +27,7 @@ def check_version(quiet=False):
         check = True
         version_check = expanduser('~/.clickable/version_check.json')
         if isfile(version_check):
-            with open(version_check, 'r') as f:
+            with open(version_check, 'r', encoding='UTF-8') as f:
                 try:
                     version_check_data = json.load(f)
                 except ValueError:
@@ -62,16 +62,16 @@ def check_version(quiet=False):
                 version = data['version']
             except requests.exceptions.Timeout:
                 logger.warning('Unable to check for updates to clickable, the request timedout')
-            except requests.exceptions.ConnectionError as e:
+            except requests.exceptions.ConnectionError:
                 logger.warning(
                     'Unable to check for updates to clickable. Are you connected to the internet?')
-            except Exception as e:
+            except requests.exceptions.RequestException as e:
                 logger.debug('Version check failed:' + str(e), exc_info=e)
                 logger.warning(
                     'Unable to check for updates to clickable, an unknown error occurred')
 
             if version:
-                with open(version_check, 'w') as f:
+                with open(version_check, 'w', encoding='UTF-8') as f:
                     json.dump({
                         'version': version,
                         'datetime': datetime.now().strftime(DATE_FORMAT),

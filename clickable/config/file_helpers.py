@@ -31,7 +31,7 @@ class ProjectFiles():
         )
 
         if desktop_file:
-            with open(desktop_file, 'r') as f:
+            with open(desktop_file, 'r', encoding='UTF-8') as f:
                 # Not using configparser here since it has issues with %U that many apps have
                 for line in f.readlines():
                     if '=' in line:
@@ -162,12 +162,13 @@ class InstallFiles():
         return '{}_{}_{}.click'.format(self.find_package_name(), self.find_version(), self.arch)
 
     def write_manifest(self, manifest):
-        with open(os.path.join(self.install_dir, "manifest.json"), 'w') as writer:
+        with open(os.path.join(self.install_dir, "manifest.json"),
+                  'w', encoding='UTF-8')as writer:
             json.dump(manifest, writer, indent=4)
 
     def load_manifest(self, manifest_path):
         manifest = {}
-        with open(manifest_path, 'r') as f:
+        with open(manifest_path, 'r', encoding='UTF-8') as f:
             try:
                 manifest = json.load(f)
             except ValueError as err:
@@ -196,7 +197,7 @@ class InstallFiles():
         )
 
         if desktop_file:
-            with open(desktop_file, 'r') as f:
+            with open(desktop_file, 'r', encoding='UTF-8') as f:
                 # Not using configparser here since it has issues with %U that many apps have
                 for line in f.readlines():
                     if '=' in line:
