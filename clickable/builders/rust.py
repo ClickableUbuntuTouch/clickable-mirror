@@ -28,6 +28,8 @@ class RustBuilder(Builder):
         if self.debug_build:
             cargo_command = '{} {}'.format(cargo_command, "--debug")
 
+        if self.config.verbose:
+            cargo_command = '{} {}'.format(cargo_command, "--verbose")
 
         if self.config.build_args:
             cargo_command = '{} {}'.format(cargo_command, ' '.join(self.config.build_args))
