@@ -198,16 +198,16 @@ class BuildCommand(Command):
 
         container.setup()
 
-        if self.config.prebuild:
-            self.run_custom_commands(self.config.prebuild)
+        if config.prebuild:
+            self.run_custom_commands(config.prebuild)
 
         run_builder(config, container, self.debug_build)
 
         if is_app:
             self.install_additional_files()
 
-        if self.config.postbuild:
-            self.run_custom_commands(self.config.postbuild)
+        if config.postbuild:
+            self.run_custom_commands(config.postbuild)
 
     def install_files(self, pattern, dest_dir):
         if not is_sub_dir(dest_dir, self.config.install_dir):
