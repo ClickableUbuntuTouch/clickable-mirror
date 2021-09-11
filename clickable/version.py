@@ -1,6 +1,7 @@
 from os.path import expanduser, isfile
 from datetime import datetime, timedelta
 import json
+import re
 
 from clickable.logger import logger
 
@@ -19,6 +20,25 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 def show_version():
     logger.info('clickable ' + __version__)
     check_version()
+
+
+def split_version_numbers(version_string):
+    return [
+        int(n) for n in re.split(r'\.', version_string)
+    ]
+
+
+def is_newer_than_running(version_numbers):
+    running_version = split_version_numbers(__version__)
+
+    # Compare all numbers until finding an unequal pair
+    for check, running in zip(version_numbers, running_version):
+        if check < running:
+            return False
+        if check > running:
+            return True
+
+    return len(version_numbers) > len(running_version)
 
 
 def check_version(quiet=False):
@@ -79,7 +99,8 @@ def check_version(quiet=False):
                     }, f)
 
         if version:
-            if version != __version__:
+            version_numbers = split_version_numbers(version)
+            if is_newer_than_running(version_numbers):
                 logger.info(
                     'v{} of clickable is available, update to get the latest features '
                     'and improvements!'.format(version)
