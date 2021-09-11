@@ -68,6 +68,12 @@ class BuildCommand(Command):
             help='Build specified libs or all libs if none is specified',
             default=None,
         )
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            help='Build libraries and app (equivalent to --libs --app)',
+            default=False,
+        )
 
     def configure(self, args):
         self.clean_app = args.clean
@@ -75,8 +81,8 @@ class BuildCommand(Command):
         self.skip_review = args.skip_review
         self.output_path = args.output
         self.debug_build = args.debug
-        self.app = args.app or args.libs is None
-        self.libs = args.libs
+        self.app = args.app or args.libs is None or args.all
+        self.libs = [] if args.all else args.libs
 
         self.configure_common()
 
