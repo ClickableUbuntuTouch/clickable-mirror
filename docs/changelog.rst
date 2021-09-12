@@ -32,6 +32,7 @@ New features
 - Library placeholders are available to successive libraries in the sequence (useful for linking libraries against other libraries).
 - Library install directories are added to ``CMAKE_INSTALL_PREFIX`` for successive libraries in the sequence (to enable the usage of ``find_package()``).
 - Set ``CMAKE_INSTALL_PREFIX`` in Qt Creator run configurations.
+- Added Godot template
 
 Breaking Changes
 ^^^^^^^^^^^^^^^^
