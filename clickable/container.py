@@ -97,11 +97,21 @@ class Container():
 
         try:
             run_subprocess_check_output(
+                shlex.split('systemctl is-active --quiet snap.docker.dockerd.service'),
+                stderr=subprocess.STDOUT)
+            return True
+        except subprocess.CalledProcessError:
+            pass
+
+        try:
+            run_subprocess_check_output(
                 shlex.split('systemctl is-active --quiet docker'),
                 stderr=subprocess.STDOUT)
             return True
         except subprocess.CalledProcessError:
-            return False
+            pass
+
+        return False
 
     def check_docker(self, retries=3):
         if not self.docker_mode:
