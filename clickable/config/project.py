@@ -8,7 +8,7 @@ from collections import OrderedDict
 import yaml
 
 from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
-from clickable.version import __version__
+from clickable.version import __version__, is_newer_than_running, split_version_numbers
 from clickable.exceptions import ClickableException
 
 from .libconfig import LibConfig, LibInitConfig
@@ -699,33 +699,16 @@ class ProjectConfig():
                     'version number'.format(self.config['clickable_minimum_required'])
                 )
 
-            # Convert version strings to integer lists
-            clickable_version_numbers = [int(n) for n in re.split(r'\.', __version__)]
-            clickable_required_numbers = [
-                int(n) for n in re.split(r'\.', self.config['clickable_minimum_required'])
-            ]
-            if len(clickable_required_numbers) > len(clickable_version_numbers):
-                logger.warning(
-                    'Clickable version number only consists of {} numbers, but {} '
-                    'numbers specified in "clickable_minimum_required". Superfluous numbers '
-                    'will be ignored.'.format(
-                        len(clickable_version_numbers),
-                        len(clickable_required_numbers)
+            clickable_required_numbers = split_version_numbers(
+                    self.config['clickable_minimum_required'])
+            if is_newer_than_running(clickable_required_numbers):
+                raise ClickableException(
+                    'This project requires Clickable version {} ({} is used). '
+                    'Please update Clickable!'.format(
+                        self.config['clickable_minimum_required'],
+                        __version__
                     )
                 )
-
-            # Compare all numbers until finding an unequal pair
-            for req, ver in zip(clickable_required_numbers, clickable_version_numbers):
-                if req < ver:
-                    break
-                if req > ver:
-                    raise ClickableException(
-                        'This project requires Clickable version {} ({} is used). '
-                        'Please update Clickable!'.format(
-                            self.config['clickable_minimum_required'],
-                            __version__
-                        )
-                    )
 
             if clickable_required_numbers[0] < 7:
                 logger.warning('This project is configured for Clickable version {} according to '

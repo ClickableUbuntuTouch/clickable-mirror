@@ -23,7 +23,8 @@ class RustBuilder(Builder):
 
     def build(self):
         cargo_command = 'cargo install --target {} --target-dir {} --root {} --path {}'.format(
-            self._cargo_target, self.config.build_dir, self.config.install_dir, self.config.src_dir)
+            self._cargo_target, self.config.build_dir, self.config.install_dir,
+            self.config.src_dir)
 
         if self.debug_build:
             cargo_command = '{} {}'.format(cargo_command, "--debug")
