@@ -1,3 +1,29 @@
+clickable (7.0.0) unstable; urgency=medium
+
+  * Configure Clickable globally with a new configuration file.
+  * Integrated bash completion, to set up run clickable setup completion.
+  * Added new chain command to run multiple Clickable commands in a chain.
+  * Added new script command to run scripts defined in the clickable.json config file.
+  * Added new ci command to open a shell in the Clickable CI container.
+  * The create command allows to create apps non-interactively configuring the template with command line parameters.
+  * The gdb command allows to export a GDB init script that can be used by any IDE's remote debugger.
+  * The behavior of the gdb and gdbserver commands can be configured in detail via command line parameters.
+  * The rust builder supports the build_args field in the project config (arguments are forwarded to cargo).
+  * Project configuration now uses yaml format and project config is called clickable.yaml (clickale.json is used as fallback and json format can still be used as it is a subset of yaml)
+  * Build commands can be either specified as a string or a list of strings (prebuild, build, postmake, postbuild).
+  * Added install_root_data config field to list files for installation into the click package root directory.
+  * Improved ignored files field to match with wildcard characters.
+  * Added sanity checks for paths in the config.
+  * Added Desktop Mode env var to allow apps detecting Clickable Desktop Mode
+  * Library placeholders are available to successive libraries in the sequence (useful for linking libraries against other libraries).
+  * Library install directories are added to CMAKE_INSTALL_PREFIX for successive libraries in the sequence (to enable the usage of find_package()).
+  * Overhauled command line interface with proper sub-commands, each providing specific options. See clickable --help and clickable <sub-command> --help.
+  * Set CMAKE_INSTALL_PREFIX in Qt Creator run configurations.
+  * Removed deprecated configuration fields.
+  * For more details and breaking changes, see https://clickable-ut.dev/en/latest/changelog.html
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Sat, 11 Sep 2021 22:58:00 -0500
+
 clickable (6.24.2) unstable; urgency=medium
 
   * Fixed version checking when there is no internet connection
@@ -235,8 +261,8 @@ clickable (6.10.0) unstable; urgency=medium
 
   * Fix containers being rebuilt when switching between desktop mode and building for amd64
   * Enabled compiling rust apps into arm64
-  * Make ``install_data`` paths relative to the install dir
-  * Fixed the ``clickable create`` command when using an older version of git
+  * Make install_data paths relative to the install dir
+  * Fixed the clickable create command when using an older version of git
 
  -- Brian Douglass <bhdouglass@gmail.com>  Fri, 21 Feb 2020 14:05:00 -0500
 
