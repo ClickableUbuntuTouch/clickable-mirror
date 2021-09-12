@@ -11,7 +11,7 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
-__version__ = '6.24.2'
+__version__ = '7.0.0'
 __container_minimum_required__ = 4
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
