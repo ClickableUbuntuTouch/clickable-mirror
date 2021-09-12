@@ -21,7 +21,7 @@ TEMPLATE_MAP = {
     'html': 'HTML',
     'go': 'Go',
     'rust': 'Rust',
-    'godot': 'Godot',
+    'godot': 'Godot (Precompiled)',
 }
 
 LICENSE_MAP = {
