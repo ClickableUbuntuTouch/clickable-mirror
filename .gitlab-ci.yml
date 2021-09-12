@@ -11,8 +11,15 @@ stages:
   - test
   - publish
 
+# More info: https://docs.gitlab.com/ee/user/application_security/sast/index.html
 sast:
   stage: test
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'dev'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    SAST_EXCLUDED_ANALYZERS: brakeman, eslint, flawfinder, gosec, kubesec, nodejs-scan,
+      phpcs-security-audit, pmd-apex, security-code-scan, semgrep, sobelow, spotbugs
 
 include:
   - template: Security/SAST.gitlab-ci.yml
