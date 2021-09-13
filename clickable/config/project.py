@@ -700,7 +700,7 @@ class ProjectConfig():
                 )
 
             clickable_required_numbers = split_version_numbers(
-                    self.config['clickable_minimum_required'])
+                self.config['clickable_minimum_required'])
             if is_newer_than_running(clickable_required_numbers):
                 raise ClickableException(
                     'This project requires Clickable version {} ({} is used). '
