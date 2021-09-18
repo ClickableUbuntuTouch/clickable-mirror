@@ -505,7 +505,9 @@ It's a dictionary of dictionaries similar to the project config itself. Example:
 
 The keywords ``test``, ``install_dir``, ``prebuild``, ``build``, ``postbuild``,
 ``postmake``, ``make_jobs``, ``make_args``, ``env_vars``, ``build_args``, ``docker_image``,
-``dependencies_host``, ``dependencies_target`` and ``dependencies_ppa``,
+``dependencies_host``, ``dependencies_target``, ``dependencies_ppa``, ``test`` and
+``image_setup``.
+
 can be used for a library the same way as described above for the app.
 
 In addition to the :ref:`placeholders <project-config-placeholders>` described above,
@@ -525,7 +527,7 @@ A single library can be build by specifying its name as
 
 builder
 ^^^^^^^
-Required, but only ``cmake``, ``qmake`` and ``custom`` are allowed.
+Required, but only ``cmake``, ``qmake``, ``rust`` and ``custom`` are allowed.
 
 src_dir
 ^^^^^^^
