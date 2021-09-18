@@ -238,6 +238,7 @@ class Container():
             gopaths = self.config.gopath.split(':')
             for (index, path) in enumerate(gopaths):
                 mounts['/gopath/path{}'.format(index)] = path
+                os.makedirs(path, exist_ok=True)
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
             cargo_registry = os.path.join(self.config.cargo_home, 'registry')

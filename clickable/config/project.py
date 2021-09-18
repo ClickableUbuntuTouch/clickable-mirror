@@ -167,7 +167,7 @@ class ProjectConfig():
             'app_qml_dir': '${INSTALL_DIR}/lib/${ARCH_TRIPLET}',
             'ignore': [],
             'make_jobs': None,
-            'gopath': None,
+            'gopath': os.path.expanduser('~/.clickable/go'),
             'cargo_home': os.path.expanduser('~/.clickable/cargo'),
             'rustup_home': os.path.expanduser('~/.clickable/rustup'),
             'docker_image': None,
