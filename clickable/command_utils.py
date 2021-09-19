@@ -15,7 +15,7 @@ def get_commands():
 
     for name in command_modules:
         command_submodule = __import__(
-            'clickable.commands.{}'.format(name),
+            f'clickable.commands.{name}',
             globals(),
             locals(),
             [name]

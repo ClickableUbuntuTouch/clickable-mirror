@@ -113,7 +113,8 @@ def find(
                 found.append(os.path.join(root, name))
 
     if not found:
-        raise FileNotFoundException('Could not find {}'.format(', '.join(names)))
+        joined_names = ', '.join(names)
+        raise FileNotFoundException(f'Could not find {joined_names}')
 
     # Favor the manifest in the install dir first, then fall back to the build dir and
     # finally the source dir
@@ -135,7 +136,7 @@ def find(
 
 def is_command(command):
     error_code = run_subprocess_call(
-        shlex.split('which {}'.format(command)),
+        shlex.split(f'which {command}'),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
@@ -146,8 +147,8 @@ def is_command(command):
 def check_command(command):
     if not is_command(command):
         raise ClickableException(
-            'The command "{}" does not exist on this system, please install it for '
-            'clickable to work properly"'.format(command)
+            f'The command "{command}" does not exist on this system, please install it for '
+            'clickable to work properly"'
         )
 
 
@@ -169,7 +170,7 @@ def get_builders():
 
     for name in builder_modules:
         builder_submodule = __import__(
-            'clickable.builders.{}'.format(name), globals(), locals(), [name]
+            f'clickable.builders.{name}', globals(), locals(), [name]
         )
         for _, cls in inspect.getmembers(builder_submodule):
             if inspect.isclass(cls) and issubclass(cls, Builder) and cls.name:
@@ -193,10 +194,10 @@ def get_make_jobs_from_args(make_args):
 
 
 def merge_make_jobs_into_args(make_args, make_jobs):
-    make_jobs_arg = '-j{}'.format(make_jobs)
+    make_jobs_arg = f'-j{make_jobs}'
 
     if make_args:
-        return '{} {}'.format(make_args, make_jobs_arg)
+        return f'{make_args} {make_jobs_arg}'
 
     return make_jobs_arg
 
@@ -211,14 +212,14 @@ def flexible_string_to_list(variable, split=False):
 
 
 def load_config_schema(name):
-    file_name = '{}.schema'.format(name)
+    file_name = f'{name}.schema'
     schema_path = os.path.join(os.path.dirname(__file__), 'config', file_name)
     with open(schema_path, 'r', encoding='UTF-8') as f:
         try:
             return yaml.safe_load(f)
         except ValueError as err:
             raise ClickableException(
-                'Failed reading "{}", it is not valid yaml file'.format(file_name)
+                f'Failed reading "{file_name}", it is not valid yaml file'
             ) from err
         return None
 
@@ -228,22 +229,21 @@ def validate_config_format(config, schema, name, path):
         try:
             validate(instance=config, schema=schema)
         except ValidationError as e:
-            logger.error('The {} config file "{}" contains invalid fields!'.format(
-                name, path))
+            logger.error('The %s config file "%s" contains invalid fields!', name, path)
             error_message = e.message
             # Lets add the key to the invalid value
             if e.path:
                 if len(e.path) > 1 and isinstance(e.path[-1], int):
-                    error_message = '{} (in "{}")'.format(error_message, e.path[-2])
+                    error_message = f'{error_message} (in "{e.path[-2]}")'
                 else:
-                    error_message = '{} (in "{}")'.format(error_message, e.path[-1])
+                    error_message = f'{error_message} (in "{e.path[-1]}")'
             raise ClickableException(error_message) from e
     else:
         logger.warning('Dependency "jsonschema" not found. Could not validate config file.')
 
 
 def image_exists(image):
-    command = 'docker image inspect {}'.format(image)
+    command = f'docker image inspect {image}'
     return run_subprocess_call(
         command,
         stderr=subprocess.DEVNULL,
@@ -294,7 +294,7 @@ def is_sub_dir(path, parent):
 
 def let_user_confirm(message, default=True):
     options = 'Y/n' if default else 'y/N'
-    question = '{} [{}]: '.format(message, options)
+    question = f'{message} [{options}]: '
 
     choice = input(Colors.INFO + question + Colors.CLEAR).strip().lower()
 

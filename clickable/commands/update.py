@@ -9,7 +9,7 @@ from .base import Command
 
 def update_image(image):
     if image_exists(image):
-        command = 'docker pull {}'.format(image)
+        command = f'docker pull {image}'
         run_subprocess_check_call(command)
 
 

@@ -32,10 +32,8 @@ class Device():
                 device = line.split(' ')[0]
                 for part in line.split(' '):
                     if part.startswith('model:'):
-                        device = '{} - {}'.format(
-                            device,
-                            part.replace('model:', '').replace('_', ' ').strip()
-                        )
+                        model = part.replace('model:', '').replace('_', ' ').strip()
+                        device = f'{device} - {model}'
 
                 devices.append(device)
 
@@ -57,23 +55,23 @@ class Device():
     def get_adb_args(self):
         self.check_any_adb_attached()
         if self.config.serial_number:
-            return '-s {}'.format(self.config.serial_number)
+            return f'-s {self.config.serial_number}'
 
         self.check_multiple_adb_attached()
         return ''
 
     def forward_port_adb(self, port, adb_args):
-        command = 'adb {0} forward tcp:{1} tcp:{1}'.format(adb_args, port)
+        command = f'adb {adb_args} forward tcp:{port} tcp:{port}'.format(adb_args, port)
         run_subprocess_check_call(command)
 
     def push_file(self, src, dst):
         if self.config.ipv4:
             dir_path = os.path.dirname(dst)
-            self.run_command('mkdir -p {}'.format(dir_path))
-            command = 'scp {} phablet@{}:{}'.format(src, self.config.ipv4, dst)
+            self.run_command(f'mkdir -p {dir_path}')
+            command = f'scp {src} phablet@{self.config.ipv4}:{dst}'
         else:
             adb_args = self.get_adb_args()
-            command = 'adb {} push {} {}'.format(adb_args, src, dst)
+            command = f'adb {adb_args} push {src} {dst}'
 
         run_subprocess_check_call(command, shell=True)
 
@@ -81,13 +79,12 @@ class Device():
         ssh_args = ""
 
         if forward_port:
-            ssh_args = "{0} -L {1}:localhost:{1}".format(ssh_args, forward_port)
+            ssh_args = f"{ssh_args} -L {forward_port}:localhost:{forward_port}"
 
         if isinstance(command, list):
             command = " && ".join(command)
 
-        return 'echo "{}" | ssh {} phablet@{}'.format(
-            command, ssh_args, self.config.ipv4)
+        return f'echo "{command}" | ssh {ssh_args} phablet@{self.config.ipv4}'
 
     def get_adb_command(self, command, forward_port=None):
         adb_args = self.get_adb_args()
@@ -98,7 +95,7 @@ class Device():
         if isinstance(command, list):
             command = ";".join(command)
 
-        return 'adb {} shell "{}"'.format(adb_args, command)
+        return f'adb {adb_args} shell "{command}"'
 
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if self.container_mode:
@@ -110,7 +107,7 @@ class Device():
 
         wrapped_command = ''
         if self.config.ipv4:
-            logger.debug("Accessing {} via SSH".format(self.config.ipv4))
+            logger.debug("Accessing %s via SSH", self.config.ipv4)
             wrapped_command = self.get_ssh_command(command, forward_port)
         else:
             logger.debug("Accessing device via ADB")

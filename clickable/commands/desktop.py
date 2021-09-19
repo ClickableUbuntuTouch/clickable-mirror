@@ -112,7 +112,7 @@ class DesktopCommand(Command):
             )
 
         if self.desktop_locale != "C" and "." not in self.desktop_locale:
-            self.desktop_locale = "{}.UTF-8".format(self.desktop_locale)
+            self.desktop_locale = f"{self.desktop_locale}.UTF-8"
 
     def run(self):
         self.prepare_run()
@@ -206,9 +206,7 @@ class DesktopCommand(Command):
         desktop_path = os.path.join(self.config.install_dir, desktop_path)
         if not os.path.exists(desktop_path):
             raise ClickableException(
-                'Could not determine executable. Desktop file does not exist: "{}"'.format(
-                    desktop_path
-                )
+                f'Could not determine executable. Desktop file does not exist: "{desktop_path}"'
             )
 
         return desktop_path
@@ -222,9 +220,7 @@ class DesktopCommand(Command):
                     break
 
         if not execute:
-            raise ClickableException('No "Exec" line found in the desktop file {}'.format(
-                desktop_path
-            ))
+            raise ClickableException(f'No "Exec" line found in the desktop file {desktop_path}')
 
         return execute[len('Exec='):].strip()
 
@@ -304,7 +300,7 @@ class DesktopCommand(Command):
 
     def get_docker_lib_path_env(self, working_directory):
         return ':'.join([
-            os.path.join(working_directory, 'lib/{}'.format(self.config.arch_triplet)),
+            os.path.join(working_directory, f'lib/{self.config.arch_triplet}'),
             os.path.join(working_directory, 'lib'),
             '/usr/local/nvidia/lib',
             '/usr/local/nvidia/lib64',
@@ -313,7 +309,7 @@ class DesktopCommand(Command):
     def get_docker_path_env(self, working_directory):
         return ':'.join([
             os.path.join(working_directory, 'bin'),
-            os.path.join(working_directory, 'lib/{}/bin'.format(self.config.arch_triplet)),
+            os.path.join(working_directory, f'lib/{self.config.arch_triplet}/bin'),
             working_directory,
             '/usr/local/nvidia/bin',
             '/bin',
@@ -325,7 +321,7 @@ class DesktopCommand(Command):
 
         device_home = Constants.desktop_device_home
         makedirs(device_home)
-        logger.info("Mounting device home to {}".format(device_home))
+        logger.info("Mounting device home to %s", device_home)
 
         vol_map = {
             self.config.cwd: self.config.cwd,

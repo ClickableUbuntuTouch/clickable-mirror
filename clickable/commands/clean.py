@@ -40,8 +40,8 @@ class CleanCommand(Command):
             for lib in self.libs:
                 if lib not in existing_libs:
                     raise ClickableException(
-                        'Cannot clean unknown library "{}", which is not in your '
-                        'project config'.format(lib)
+                        f'Cannot clean unknown library "{lib}", which is not in your '
+                        'project config'
                     )
 
     def run(self):
@@ -59,7 +59,7 @@ class CleanCommand(Command):
 
         for lib in self.config.lib_configs:
             if lib.name in filter_libs or not filter_libs:
-                logger.info("Cleaning {} build directory".format(lib.name))
+                logger.info("Cleaning %s build directory", lib.name)
                 clean(lib.build_dir)
 
     def clean_app(self):
@@ -70,7 +70,7 @@ class CleanCommand(Command):
 def clean(path):
     if os.path.exists(path):
         try:
-            logger.info("Cleaning directory {}.".format(path))
+            logger.info("Cleaning directory %s", path)
             shutil.rmtree(path)
         except Exception:  # pylint: disable=broad-except
             cls, value, _ = sys.exc_info()
@@ -78,4 +78,4 @@ def clean(path):
             if cls == OSError and 'No such file or directory' in str(value):
                 pass  # Nothing to do here, the directory didn't exist
             else:
-                logger.warning('Failed to clean the directory: {}: {}'.format(cls, value))
+                logger.warning('Failed to clean the directory: %s: %s', cls, value)

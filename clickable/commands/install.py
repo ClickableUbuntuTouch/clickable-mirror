@@ -42,7 +42,7 @@ class InstallCommand(Command):
     def try_find_installed_version(self, package_name):
         try:
             response = self.device.run_command(
-                'readlink /opt/click.ubuntu.com/{}/current'.format(package_name),
+                f'readlink /opt/click.ubuntu.com/{package_name}/current',
                 get_output=True
             )
             return response.splitlines()[-1]
@@ -56,7 +56,7 @@ class InstallCommand(Command):
         if version:
             logger.info("Uninstalling the app first.")
             self.device.run_command(
-                'pkcon remove \\"{};{};all;local:click\\"'.format(package_name, version)
+                f'pkcon remove \\"{package_name};{version};all;local:click\\"'
             )
 
     def run(self):
@@ -77,20 +77,18 @@ class InstallCommand(Command):
             cwd = self.config.build_dir
 
         if self.config.ssh:
-            command = 'scp {} phablet@{}:/home/phablet/'.format(self.click_path, self.config.ssh)
+            command = f'scp {self.click_path} phablet@{self.config.ssh}:/home/phablet/'
             run_subprocess_check_call(command, cwd=cwd, shell=True)
 
         else:
             self.device.check_any_adb_attached()
 
             if self.config.device_serial_number:
-                command = 'adb -s {} push {} /home/phablet/'.format(
-                    self.config.device_serial_number,
-                    self.click_path
-                )
+                command = f'adb -s {self.config.device_serial_number} push {self.click_path} ' \
+                          '/home/phablet/'
             else:
                 self.device.check_multiple_adb_attached()
-                command = 'adb push {} /home/phablet/'.format(self.click_path)
+                command = f'adb push {self.click_path} /home/phablet/'
 
             run_subprocess_check_call(command, cwd=cwd, shell=True)
 
@@ -101,8 +99,8 @@ class InstallCommand(Command):
 
         logger.info("Installing the app.")
         self.device.run_command(
-            'pkcon install-local --allow-untrusted /home/phablet/{}'.format(click),
+            f'pkcon install-local --allow-untrusted /home/phablet/{click}',
             cwd=cwd
         )
         logger.info("Cleaning up.")
-        self.device.run_command('rm /home/phablet/{}'.format(click), cwd=cwd)
+        self.device.run_command(f'rm /home/phablet/{click}', cwd=cwd)

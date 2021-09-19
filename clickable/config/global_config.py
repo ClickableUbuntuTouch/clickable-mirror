@@ -34,8 +34,7 @@ class GlobalConfig():
         if not os.path.exists(path):
             if is_custom:
                 raise ClickableException(
-                    'Specified Clickable config file "{}" does not exist.'
-                    .format(path)
+                    f'Specified Clickable config file "{path}" does not exist.'
                 )
             return {}
 
@@ -44,6 +43,5 @@ class GlobalConfig():
                 return yaml.safe_load(f)
             except ValueError as err:
                 raise ClickableException(
-                    'Failed reading Clickable config from "{}". It is not valid yaml file.'
-                    .format(path)
+                    f'Failed reading Clickable config from "{path}". It is not valid yaml file.'
                 ) from err

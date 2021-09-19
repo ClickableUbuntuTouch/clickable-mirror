@@ -84,11 +84,11 @@ class GdbCommand(Command):
         self.configure_nested()
 
     def configure_nested(self):
-        self.debug_symbols = "/usr/lib/debug/lib/{}".format(self.config.arch_triplet)
+        self.debug_symbols = f"/usr/lib/debug/lib/{self.config.arch_triplet}"
 
     def is_elf_file(self, path):
         try:
-            run_subprocess_check_call("readelf {} -l > /dev/null 2>&1".format(path), shell=True)
+            run_subprocess_check_call(f"readelf {path} -l > /dev/null 2>&1", shell=True)
             return True
         except Exception:  # pylint: disable=broad-except
             return False
@@ -117,9 +117,7 @@ class GdbCommand(Command):
                 return path
 
             raise ClickableException(
-                'App executable "{}" is not an ELF file suitable for GDB debugging.'.format(
-                    path
-                )
+                f'App executable "{path}" is not an ELF file suitable for GDB debugging.'
             )
 
         if binary == "qmlscene":
@@ -128,49 +126,49 @@ class GdbCommand(Command):
             )
 
         raise ClickableException(
-            'App binary "{}" found in desktop file could not be found in the '
+            f'App binary "{binary}" found in desktop file could not be found in the '
             'app install directory. Please specify the path as '
-            '"clickable gdb path/to/binary"'.format(binary)
+            '"clickable gdb path/to/binary"'
         )
 
     def create_script(self):
         self.script = []
 
         arch = gdb_arch_target_mapping[self.config.arch]
-        self.script.append('set architecture {}'.format(arch))
+        self.script.append(f'set architecture {arch}')
 
-        self.script.append('file {}'.format(self.binary))
+        self.script.append(f'file {self.binary}')
 
         if self.configure_app:
             src_dirs = [lib.src_dir for lib in self.config.lib_configs]
             src_dirs.append(self.config.src_dir)
             src_dirs = ':'.join(src_dirs)
-            self.script.append('set directories {}'.format(src_dirs))
+            self.script.append(f'set directories {src_dirs}')
 
             libs = self.config.app_lib_dir
-            self.script.append('set solib-search-path {}'.format(libs))
+            self.script.append(f'set solib-search-path {libs}')
 
         if self.add_sysroot:
             sysroot = self.debug_symbols
 
             if self.export_debug_symbols:
-                sysroot = '{}/{}'.format(self.export_debug_symbols, sysroot)
+                sysroot = f'{self.export_debug_symbols}/{sysroot}'
 
             sysroot = os.path.abspath(sysroot)
-            self.script.append('set sysroot {}'.format(sysroot))
+            self.script.append(f'set sysroot {sysroot}')
 
-        self.script.append('target remote localhost:{}'.format(self.port))
+        self.script.append(f'target remote localhost:{self.port}')
 
     def write_debug_symbols(self):
-        logger.info("Writing debug symbols to {}".format(self.export_debug_symbols))
+        logger.info("Writing debug symbols to %s", self.export_debug_symbols)
 
-        dst = '{}/{}'.format(self.export_debug_symbols, os.path.dirname(self.debug_symbols))
+        dst = os.path.join(self.export_debug_symbols, os.path.dirname(self.debug_symbols))
         self.container.pull_files([self.debug_symbols], dst)
 
     def write_script(self):
         logger.info(
-            "Writing GDB init script to {0}. Run it from a multiarch GDB shell "
-            "via 'source {0}'.".format(self.export_script)
+            "Writing GDB init script to %s. Run it from a multiarch GDB shell "
+            "via 'source %s'.", self.export_script, self.export_script
         )
 
         with open(self.export_script, 'w', encoding='UTF-8') as script_file:
@@ -179,11 +177,12 @@ class GdbCommand(Command):
                 script_file.write('\n')
 
     def start_gdb(self):
-        args = ["-ex '{}'".format(cmd) for cmd in self.script]
+        args = [f"-ex '{cmd}'" for cmd in self.script]
         args += self.forward
-        command = 'gdb-multiarch {}'.format(' '.join(args))
+        joined_args = ' '.join(args)
+        command = f'gdb-multiarch {joined_args}'
 
-        logger.info('Starting GDB for "{}".'.format(self.binary))
+        logger.info('Starting GDB for "%s".', self.binary)
         self.container.run_command(
             command,
             localhost=True,

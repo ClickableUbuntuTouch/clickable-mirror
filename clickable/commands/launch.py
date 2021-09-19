@@ -51,7 +51,7 @@ class LaunchCommand(Command):
             # Enclose first character in square brackets to prevent
             # spurious error when running `pkill -f` over `adb`
             kill = '[' + self.kill[:1] + ']' + self.kill[1:]
-            self.device.run_command('pkill -f \\"{}\\"'.format(kill))
+            self.device.run_command(f'pkill -f \\"{kill}\\"')
         except Exception:  # pylint: disable=broad-except
             logger.warning("Could not kill app. Maybe the device is not accessible '\
                     'or the app wasn't running.")
@@ -67,9 +67,9 @@ class LaunchCommand(Command):
             self.package = self.config.install_files.find_full_package_name()
             cwd = self.config.build_dir
 
-        launch = 'ubuntu-app-launch {}'.format(self.package)
+        launch = f'ubuntu-app-launch {self.package}'
         if self.config.launch:
             launch = self.config.launch
 
         logger.info("Launching app.")
-        self.device.run_command('sleep 1s && {}'.format(launch), cwd=cwd)
+        self.device.run_command(f'sleep 1s && {launch}', cwd=cwd)

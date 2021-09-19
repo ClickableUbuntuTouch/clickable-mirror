@@ -102,8 +102,8 @@ def check_version(quiet=False):
             version_numbers = split_version_numbers(version)
             if is_newer_than_running(version_numbers):
                 logger.info(
-                    'v{} of clickable is available, update to get the latest features '
-                    'and improvements!'.format(version)
+                    'v%s of clickable is available, update to get the latest features '
+                    'and improvements!', version
                 )
             else:
                 if not quiet:

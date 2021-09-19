@@ -49,14 +49,14 @@ class ChainCommand(Command):
         raise ClickableException("Chain command can't be nested in a chain.")
 
     def run(self):
-        logger.info('Going to run all of "{}"'.format('", "'.join(self.run_commands)))
+        logger.info('Going to run all of "%s"', '", "'.join(self.run_commands))
 
         for run in self.run_commands:
             if run not in self.commands:
                 raise ClickableException(
-                    'Command {} is unknown to Clickable'.format(run))
+                    f'Command {run} is unknown to Clickable')
 
-            logger.info('Running command "{}"'.format(run))
+            logger.info('Running command "%s"', run)
 
             command = self.commands[run]
             command.init_from_command(self)

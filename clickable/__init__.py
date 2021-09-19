@@ -65,10 +65,8 @@ def main():
     except subprocess.CalledProcessError as e:
         logger.debug('Command exited with an error:' + str(e.cmd), exc_info=e)
         logger.critical(
-            'Command exited with non-zero exit status {}, see above for details. '
-            'This is most likely not a problem with Clickable.'.format(
-                e.returncode,
-            )
+            'Command exited with non-zero exit status %s, see above for details. '
+            'This is most likely not a problem with Clickable.', e.returncode
         )
 
         sys.exit(2)

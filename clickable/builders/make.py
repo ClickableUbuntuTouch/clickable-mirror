@@ -15,10 +15,11 @@ class MakeBuilder(Builder):
     def make(self):
         command = 'make'
         if self.config.make_args:
-            command = '{} {}'.format(command, ' '.join(self.config.make_args))
+            joined_make_args = ' '.join(self.config.make_args)
+            command = f'{command} {joined_make_args}'
 
         if self.config.verbose:
-            command = '{} {}'.format(command, 'VERBOSE=1')
+            command = f'{command} VERBOSE=1'
 
         self.container.run_command(command)
 

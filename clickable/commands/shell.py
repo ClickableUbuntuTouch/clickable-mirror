@@ -20,18 +20,17 @@ class ShellCommand(Command):
         self.aliases = ['ssh']
 
     def toggle_ssh(self, on=False):
+        toggle = 'true' if on else 'false'
         command = 'sudo -u phablet bash -c \'/usr/bin/gdbus call -y -d ' \
                   'com.canonical.PropertyService -o /com/canonical/PropertyService ' \
-                  '-m com.canonical.PropertyService.SetProperty ssh {}\''.format(
-                      'true' if on else 'false'
-                  )
+                  f'-m com.canonical.PropertyService.SetProperty ssh {toggle}\''
 
         adb_args = ''
         if self.config.device_serial_number:
-            adb_args = '-s {}'.format(self.config.device_serial_number)
+            adb_args = f'-s {self.config.device_serial_number}'
 
         run_subprocess_call(
-            shlex.split('adb {} shell "{}"'.format(adb_args, command)),
+            shlex.split(f'adb {adb_args} shell "{command}"'),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -43,18 +42,18 @@ class ShellCommand(Command):
         '''
 
         if self.config.ssh:
-            subprocess.check_call(shlex.split('ssh phablet@{}'.format(self.config.ssh)))
+            subprocess.check_call(shlex.split(f'ssh phablet@{self.config.ssh}'))
         else:
             self.device.check_any_adb_attached()
 
             adb_args = ''
             if self.config.device_serial_number:
-                adb_args = '-s {}'.format(self.config.device_serial_number)
+                adb_args = f'-s {self.config.device_serial_number}'
             else:
                 self.device.check_multiple_adb_attached()
 
             output = run_subprocess_check_output(
-                shlex.split('adb {} shell pgrep sshd'.format(adb_args))
+                shlex.split(f'adb {adb_args} shell pgrep sshd')
             ).split()
             if not output:
                 self.toggle_ssh(on=True)
@@ -63,7 +62,7 @@ class ShellCommand(Command):
             port = 0
             for p in range(2222, 2299):
                 error_code = run_subprocess_call(
-                    shlex.split('adb {} forward tcp:{} tcp:22'.format(adb_args, p)),
+                    shlex.split(f'adb {adb_args} forward tcp:{p} tcp:22'),
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
                 )
@@ -77,16 +76,16 @@ class ShellCommand(Command):
             # Purge the device host key so that SSH doesn't print a scary warning about it
             # (it changes every time the device is reflashed and this is expected)
             known_hosts = os.path.expanduser('~/.ssh/known_hosts')
-            subprocess.check_call(shlex.split('touch {}'.format(known_hosts)))
+            subprocess.check_call(shlex.split(f'touch {known_hosts}'))
             subprocess.check_call(
-                shlex.split('ssh-keygen -f {} -R [localhost]:{}'.format(known_hosts, port))
+                shlex.split(f'ssh-keygen -f {known_hosts} -R [localhost]:{port}')
             )
 
             id_pub = os.path.expanduser('~/.ssh/id_rsa.pub')
             if not os.path.isfile(id_pub):
                 raise ClickableException(
-                    'Could not find a ssh public key at "{}", please generate one and try again'
-                    .format(id_pub)
+                    f'Could not find a ssh public key at "{id_pub}", '
+                    'please generate one and try again'
                 )
 
             with open(id_pub, 'r', encoding='UTF-8') as f:
@@ -96,19 +95,19 @@ class ShellCommand(Command):
             self.device.run_command('touch  ~/.ssh/authorized_keys')
 
             output = run_subprocess_check_output(
-                'adb {} shell "grep \\"{}\\" ~/.ssh/authorized_keys"'.format(adb_args, public_key),
+                f'adb {adb_args} shell "grep \\"{public_key}\\" ~/.ssh/authorized_keys"',
                 shell=True
             ).strip()
             if not output or 'No such file or directory' in output:
                 logger.info('Inserting ssh public key on the connected device')
-                self.device.run_command('echo \"{}\" >>~/.ssh/authorized_keys'.format(public_key))
+                self.device.run_command(f'echo \"{public_key}\" >>~/.ssh/authorized_keys')
                 self.device.run_command('chmod 700 ~/.ssh')
                 self.device.run_command('chmod 600 ~/.ssh/authorized_keys')
 
             subprocess.check_call(
                 shlex.split(
                     'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no '
-                    '-p {} phablet@localhost'.format(port)
+                    f'-p {port} phablet@localhost'
                 )
             )
             self.toggle_ssh(on=False)

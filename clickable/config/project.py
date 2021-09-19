@@ -120,7 +120,7 @@ class ProjectConfig():
 
         if not Constants.host_arch:
             raise ClickableException(
-                "No support for host architecture {}".format(platform.machine())
+                f"No support for host architecture {platform.machine()}"
             )
         self.cwd = cwd if cwd else os.getcwd()
         self.project_files = ProjectFiles(self.cwd)
@@ -230,7 +230,7 @@ class ProjectConfig():
         self.set_env_vars()
 
         for key, value in self.config.items():
-            logger.debug('App config value {}: {}'.format(key, value))
+            logger.debug('App config value %s: %s', key, value)
 
     def set_conditional_defaults(self):
         if self.config["docker_image"]:
@@ -242,37 +242,37 @@ class ProjectConfig():
             if self.is_arch_agnostic():
                 self.config["arch"] = "all"
                 logger.debug(
-                    'Architecture set to "all" because builder "{}" is architecture '
-                    'agnostic'.format(self.config['builder'])
+                    'Architecture set to "all" because builder "%s" is architecture '
+                    'agnostic', self.config['builder']
                 )
             elif self.is_desktop_mode():
                 self.config["arch"] = Constants.host_arch
                 logger.debug(
-                    'Architecture set to "{}" because of desktop mode.'.format(self.config["arch"])
+                    'Architecture set to "%s" because of desktop mode.', self.config["arch"]
                 )
             elif self.config["restrict_arch"]:
                 self.config["arch"] = self.config["restrict_arch"]
             elif self.config["restrict_arch_env"]:
                 self.config["arch"] = self.config["restrict_arch_env"]
                 logger.debug(
-                    'Architecture set to "{}" due to environment restriction'
-                    .format(self.config["arch"])
+                    'Architecture set to "%s" due to environment restriction',
+                    self.config["arch"]
                 )
             elif self.container_mode:
                 self.config['arch'] = Constants.host_arch
                 logger.debug(
-                    'Architecture set to "{}" due to container mode'.format(self.config['arch'])
+                    'Architecture set to "%s" due to container mode', self.config['arch']
                 )
             elif self.global_config.device.arch:
                 self.config['arch'] = self.global_config.device.arch
                 logger.debug(
-                    'Architecture set to "{}" from device config'.format(self.config['arch'])
+                    'Architecture set to "%s" from device config', self.config['arch']
                 )
             else:
                 self.config['arch'] = Constants.host_arch
                 logger.debug(
-                    'Architecture set to host arch "{}" because no architecture was '
-                    'specified'.format(self.config['arch'])
+                    'Architecture set to host arch "%s" because no architecture was '
+                    'specified', self.config['arch']
                 )
 
         if self.config['arch'] == 'all':
@@ -282,14 +282,14 @@ class ProjectConfig():
 
         if self.config['arch'] not in Constants.arch_triplet_mapping:
             raise ClickableException(
-                'There is currently no support for architecture  "{}"'.format(self.config['arch'])
+                f'There is currently no support for architecture  "{self.config["arch"]}"'
             )
         self.config['arch_triplet'] = Constants.arch_triplet_mapping[self.config['arch']]
 
         if Constants.host_arch not in Constants.container_mapping:
             raise ClickableException(
                 'Clickable currently does not have docker images for your host '
-                'architecture "{}"'.format(Constants.host_arch)
+                f'architecture "{Constants.host_arch}"'
             )
 
         if not self.config['kill']:
@@ -341,7 +341,7 @@ class ProjectConfig():
             framework = Constants.default_qt_framework_mapping.get(qt, None)
 
             if not framework:
-                raise ClickableException('Qt version "{}" is not known to Clickable'.format(qt))
+                raise ClickableException(f'Qt version "{qt}" is not known to Clickable')
 
             self.config['framework'] = framework
 
@@ -353,12 +353,12 @@ class ProjectConfig():
 
             if self.use_nvidia and not self.build_arch.endswith('-nvidia'):
                 if self.is_ide_command():
-                    self.build_arch = "{}-nvidia-ide".format(self.build_arch)
+                    self.build_arch = f"{self.build_arch}-nvidia-ide"
                 else:
-                    self.build_arch = "{}-nvidia".format(self.build_arch)
+                    self.build_arch = f"{self.build_arch}-nvidia"
 
             if self.is_ide_command() and not self.use_nvidia:
-                self.build_arch = "{}-ide".format(self.build_arch)
+                self.build_arch = f"{self.build_arch}-ide"
 
             image_framework = Constants.framework_image_mapping.get(
                 self.config['framework'], Constants.framework_fallback)
@@ -366,10 +366,7 @@ class ProjectConfig():
             container_mapping_host = Constants.container_mapping[Constants.host_arch]
             if (image_framework, self.build_arch) not in container_mapping_host:
                 raise ClickableException(
-                    'There is currently no docker image for {}/{}'.format(
-                        image_framework,
-                        self.build_arch
-                    )
+                    f'There is currently no docker image for {image_framework}/{self.build_arch}'
                 )
             self.config['docker_image'] = container_mapping_host[
                 (image_framework, self.build_arch)
@@ -406,7 +403,7 @@ class ProjectConfig():
                     break
 
         if config_path and os.path.isfile(config_path):
-            logger.debug("Loading config file {}".format(config_path))
+            logger.debug("Loading config file %s", config_path)
 
             with open(config_path, 'r', encoding='UTF-8') as f:
                 config_dict = {}
@@ -414,14 +411,12 @@ class ProjectConfig():
                     config_dict = yaml.safe_load(f)
                 except ValueError as err:
                     raise ClickableException(
-                        'Project config {} is not a valid yaml file'.format(
-                            config_path)
-                    ) from err
+                        f'Project config {config_path} is not a valid yaml file') from err
 
                 for key in self.removed_keywords:
                     if key in config_dict:
                         raise ClickableException(
-                            '"{}" is no longer a valid configuration option'.format(key)
+                            f'"{key}" is no longer a valid configuration option'
                         )
 
                 schema = load_config_schema('project')
@@ -436,7 +431,7 @@ class ProjectConfig():
                         config[key] = value
         elif not use_default_config:
             raise ClickableException(
-                'Specified config file "{}" does not exist.'.format(config_path)
+                f'Specified config file "{config_path}" does not exist.'
             )
 
         return config
@@ -524,7 +519,7 @@ class ProjectConfig():
         env_dict["HOME"] = self.config["build_home"]
 
         for key, val in env_dict.items():
-            docker_env_vars.append('-e {}="{}"'.format(key, val))
+            docker_env_vars.append(f'-e {key}="{val}"')
 
         return " ".join(docker_env_vars)
 
@@ -572,8 +567,8 @@ class ProjectConfig():
         for sub, placeholder in self.placeholders.items():
             rep = self.config[placeholder]
             if rep is None:
-                logger.warning("Placeholder '{}' used in '{}' is not set. Skipping..."
-                               .format(sub, key))
+                logger.warning("Placeholder '%s' used in '%s' is not set. Skipping...",
+                               sub, key)
             else:
                 self.substitute("${" + sub + "}", rep, key, change_keys)
 
@@ -642,7 +637,7 @@ class ProjectConfig():
             self.lib_configs.append(lib)
 
             for lp in self.libs_placeholders:
-                key = '{}_LIB_{}'.format(lib.name, lp)
+                key = f'{lib.name}_LIB_{lp}'
                 placeholder = make_env_var_conform(key)
                 placeholders[placeholder] = key
                 injected_config[key] = lib.config[lp]
@@ -690,67 +685,57 @@ class ProjectConfig():
 
     def check_clickable_version(self):
         migration_link = 'https://clickable-ut.dev/en/dev/migration.html'
+        minimum_required = self.config['clickable_minimum_required']
 
         if self.config['clickable_minimum_required']:
             # Check if specified version string is valid
             if not re.fullmatch(r"\d+(\.\d+)*", self.config['clickable_minimum_required']):
                 raise ClickableException(
-                    '"{}" specified as "clickable_minimum_required" is not a valid '
-                    'version number'.format(self.config['clickable_minimum_required'])
+                    f'"{minimum_required}" specified as "clickable_minimum_required" is not a '
+                    'valid version number'
                 )
 
             clickable_required_numbers = split_version_numbers(
-                self.config['clickable_minimum_required'])
+                minimum_required)
             if is_newer_than_running(clickable_required_numbers):
                 raise ClickableException(
-                    'This project requires Clickable version {} ({} is used). '
-                    'Please update Clickable!'.format(
-                        self.config['clickable_minimum_required'],
-                        __version__
-                    )
-                )
+                    f'This project requires Clickable version {minimum_required} '
+                    f'({__version__} is used). Please update Clickable!')
 
             if clickable_required_numbers[0] < 7:
-                logger.warning('This project is configured for Clickable version {} according to '
-                               'the "clickable_minimum_required" field. See {} for details about '
-                               'migration to Clickable 7.'.format(clickable_required_numbers[0],
-                                                                  migration_link))
+                logger.warning('This project is configured for Clickable version %s according to '
+                               'the "clickable_minimum_required" field. See %s for details about '
+                               'migration to Clickable 7.', clickable_required_numbers[0],
+                               migration_link)
         else:
             logger.warning('This project does not have a required Clickable version configured '
-                           '("clickable_minimum_required"). See {} for details about migration to '
-                           'Clickable 7 if you run into issues.'.format(migration_link))
+                           '("clickable_minimum_required"). See %s for details about migration to '
+                           'Clickable 7 if you run into issues.', migration_link)
 
     def check_arch_restrictions(self):
         if self.is_arch_agnostic():
             if self.config["arch"] != "all":
                 raise ClickableException(
-                    'The "{}" builder needs architecture "all", but "{}" was specified'.format(
-                        self.config['builder'],
-                        self.config['arch'],
-                    )
-                )
+                    f'The "{self.config["builder"]}" builder needs architecture "all", but '
+                    f'"{self.config["arch"]}" was specified')
             if (self.config["restrict_arch"] and
                     self.config["restrict_arch"] != "all"):
                 raise ClickableException(
-                    'The "{}" builder needs architecture "all", but "restrict_arch" was set '
-                    'to "{}"'.format(
-                        self.config['builder'],
-                        self.config['restrict_arch'],
-                    )
-                )
+                    f'The "{self.config["builder"]}" builder needs architecture "all", but '
+                    f'"restrict_arch" was set to "{self.config["restrict_arch"]}"')
         else:
             if self.is_desktop_mode():
                 if self.config["arch"] != Constants.host_arch:
                     raise ClickableException(
-                        'Desktop mode needs host architecture "{}", but "{}" was '
-                        'specified'.format(Constants.host_arch, self.config["arch"])
+                        f'Desktop mode needs host architecture "{Constants.host_arch}", but '
+                        f'"{self.config["arch"]}" was specified'
                     )
 
         if (self.config['restrict_arch'] and
                 self.config['restrict_arch'] != self.config['arch']):
             raise ClickableException(
-                'Cannot build app for architecture "{}" as it is restricted to "{}" '
-                'in the project config.'.format(self.config["arch"], self.config['restrict_arch'])
+                f'Cannot build app for architecture "{self.config["arch"]}" as it is restricted '
+                f'to "{self.config["restrict_arch"]}" in the project config.'
             )
 
         if (self.config['restrict_arch_env'] and
@@ -758,8 +743,8 @@ class ProjectConfig():
                 self.config['arch'] != 'all' and
                 self.is_build_cmd()):
             raise ClickableException(
-                'Cannot build app for architecture "{}" as the environment is restricted '
-                'to "{}".'.format(self.config["arch"], self.config['restrict_arch_env'])
+                f'Cannot build app for architecture "{self.config["arch"]}" as the environment is '
+                f'restricted to "{self.config["restrict_arch_env"]}".'
             )
 
         if self.config['arch'] == 'all':
@@ -767,15 +752,14 @@ class ProjectConfig():
             for key in install_keys:
                 if self.config[key]:
                     logger.warning(
-                        "'{}' ({}) marked for install, even though architecture is 'all'.".format(
-                            "', '".join(self.config[key]),
-                            key
-                        )
+                        "'%s' (%s) marked for install, even though architecture is 'all'.",
+                        "', '".join(self.config[key]),
+                        key
                     )
             if self.config['install_qml']:
                 logger.warning(
-                    "Be aware that QML modules are going to be installed to {}, which is not "
-                    "part of 'QML2_IMPORT_PATH' at runtime.".format(self.config['app_qml_dir'])
+                    "Be aware that QML modules are going to be installed to %s, which is not "
+                    "part of 'QML2_IMPORT_PATH' at runtime.", self.config['app_qml_dir']
                 )
 
     def check_paths(self):
@@ -819,11 +803,9 @@ class ProjectConfig():
             )
 
         if self.config['builder'] and self.config['builder'] not in Constants.builders:
+            builders = ', '.join(Constants.builders)
             raise ClickableException(
-                '"{}" is not a valid builder ({})'.format(
-                    self.config['builder'],
-                    ', '.join(Constants.builders)
-                )
+                f'"{self.config["builder"]}" is not a valid builder ({builders})'
             )
 
     def check_docker_configs(self):
@@ -848,8 +830,8 @@ class ProjectConfig():
         for path in self.path_keys:
             if self.config[path] and not is_path_sane(self.config[path]):
                 raise ClickableException(
-                    'The "{}" config contains special characters (e.g. spaces):\n{}'
-                    .format(path, self.config[path])
+                    f'The "{path}" config contains special characters (e.g. spaces):\n'
+                    f'{self.config[path]}'
                 )
 
     def check_config_errors(self):
@@ -890,4 +872,4 @@ class ProjectConfig():
 
         self.config['builder'] = builder
 
-        logger.info('Auto detected builder to be "{}"'.format(builder))
+        logger.info('Auto detected builder to be "%s"', builder)

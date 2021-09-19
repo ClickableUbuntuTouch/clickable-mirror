@@ -30,15 +30,12 @@ class QtCreatorDelegate(IdeCommandDelegate):
                 os.path.exists(os.path.join(self.project_path, 'clickable.yaml')) or
                 os.path.exists(os.path.join(self.project_path, 'clickable.json'))):
             p = self.project_path
-        return path.replace('qtcreator', 'qtcreator -settingspath {} {}'.format(
-            self.clickable_dir,
-            p
-        ))
+        return path.replace('qtcreator', f'qtcreator -settingspath {self.clickable_dir} {p}')
 
     def before_run(self, config, docker_config):
         # if first qtcreator launch, install common settings
         if not os.path.isdir(self.target_settings_path):
-            logger.info('copy initial qtcreator settings to {}'.format(self.clickable_dir))
+            logger.info('copy initial qtcreator settings to %s', self.clickable_dir)
             tar = tarfile.open(self.init_settings_path)
             tar.extractall(self.clickable_dir)
             tar.close()
@@ -134,12 +131,12 @@ class QtCreatorDelegate(IdeCommandDelegate):
 
                 executable = exe
                 exec_args = exe_arg
-                logger.debug('found that executable is {} with args: {}'.format(exe, exe_arg))
+                logger.debug('found that executable is %s with args: %s', exe, exe_arg)
             else:
                 # was not able to guess executable
                 logger.warning(
-                    "Could not determine executable command '{}', please adjust your run settings"
-                    .format(executable)
+                    "Could not determine executable command '%s', please adjust your run settings",
+                    executable
                 )
 
         # work around for qtcreator bug when first run of a project to avoid qtcreator hang
@@ -148,20 +145,16 @@ class QtCreatorDelegate(IdeCommandDelegate):
             os.makedirs(config.build_dir)
 
         env_vars = docker_config.environment
-        clickable_env_path = '{}:{}'.format(env_vars["PATH"], env_vars["CLICK_PATH"])
-        clickable_ld_library_path = '{}:{}'.format(
-            env_vars["LD_LIBRARY_PATH"],
-            env_vars["CLICK_LD_LIBRARY_PATH"]
-        )
-        clickable_qml2_import_path = '{}:{}:{}'.format(
-            env_vars["QML2_IMPORT_PATH"],
-            env_vars["CLICK_QML2_IMPORT_PATH"],
-            os.path.join(config.install_dir, 'lib')
-        )
+        clickable_env_path = f'{env_vars["PATH"]}:{env_vars["CLICK_PATH"]}'
+        clickable_ld_library_path = f'{env_vars["LD_LIBRARY_PATH"]}:' \
+                                    f'{env_vars["CLICK_LD_LIBRARY_PATH"]}'
+        lib_install_dir = os.path.join(config.install_dir, 'lib')
+        clickable_qml2_import_path = f'{env_vars["QML2_IMPORT_PATH"]}:' \
+                                     f'{env_vars["CLICK_QML2_IMPORT_PATH"]}:{lib_install_dir}'
         build_args = ''
         if config.build_args:
             build_args = ' '.join(self.config.build_args)
-        clickable_build_args = '{} -DCMAKE_INSTALL_PREFIX:PATH=/.'.format(build_args)
+        clickable_build_args = f'{build_args} -DCMAKE_INSTALL_PREFIX:PATH=/.'
 
         template_replacement = {
             "CLICKABLE_LD_LIBRARY_PATH": clickable_ld_library_path,
@@ -185,4 +178,4 @@ class QtCreatorDelegate(IdeCommandDelegate):
                         line = line.replace(f_key, f_value)
                 outfile.write(line)
 
-        logger.info('generated default build/run template to {}'.format(output_path))
+        logger.info('generated default build/run template to %s', output_path)

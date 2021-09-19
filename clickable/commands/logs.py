@@ -18,11 +18,10 @@ class LogsCommand(Command):
             logger.debug('Skipping logs, running in container mode')
             return
 
-        log = '~/.cache/upstart/application-click-{}.log'.format(
-            self.config.install_files.find_full_package_name(),
-        )
+        package_name = self.config.install_files.find_full_package_name()
+        log = f'~/.cache/upstart/application-click-{package_name}.log'
 
         if self.config.log:
             log = self.config.log
 
-        self.device.run_command('tail -f {}'.format(log))
+        self.device.run_command(f'tail -f {log}')
