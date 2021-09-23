@@ -119,8 +119,8 @@ class BuildCommand(Command):
             for lib in self.libs:
                 if lib not in existing_libs:
                     raise ClickableException(
-                        'Cannot build unknown library "{}", which is not in your '
-                        'project config'.format(lib)
+                        f'Cannot build unknown library "{lib}", which is not in your '
+                        'project config'
                     )
 
     def run(self):
@@ -143,7 +143,7 @@ class BuildCommand(Command):
 
         for lib in self.config.lib_configs:
             if lib.name in filter_libs or not filter_libs:
-                logger.info("Building {}".format(lib.name))
+                logger.info("Building %s", lib.name)
 
                 lib.container_mode = self.config.container_mode
                 lib.docker_image = self.config.docker_image
@@ -176,14 +176,14 @@ class BuildCommand(Command):
             makedirs(config.build_dir)
         except Exception:  # pylint: disable=broad-except
             logger.warning(
-                'Failed to create the build directory: {}'.format(str(sys.exc_info()[0]))
+                'Failed to create the build directory: %s', str(sys.exc_info()[0])
             )
 
         try:
             makedirs(config.build_home)
         except Exception:  # pylint: disable=broad-except
             logger.warning(
-                'Failed to create the build home directory: {}'.format(str(sys.exc_info()[0]))
+                'Failed to create the build home directory: %s', str(sys.exc_info()[0])
             )
 
         if os.path.isdir(config.install_dir):
@@ -193,7 +193,7 @@ class BuildCommand(Command):
             makedirs(config.install_dir)
         except Exception:  # pylint: disable=broad-except
             logger.warning(
-                'Failed to create the build home directory: {}'.format(str(sys.exc_info()[0]))
+                'Failed to create the build home directory: %s', str(sys.exc_info()[0])
             )
 
         container.setup()
@@ -220,17 +220,18 @@ class BuildCommand(Command):
                 "install_* patterns must not contain any '\"' quotation character."
             )
 
-        command = 'ls -d "{}"'.format(pattern)
+        command = f'ls -d "{pattern}"'
         files = self.container.run_command(command, get_output=True).split()
 
-        logger.info("Installing {}".format(", ".join(files)))
+        logger.info("Installing %s", ", ".join(files))
         self.container.pull_files(files, dest_dir)
 
     def install_qml_files(self, pattern, dest_dir):
         if '*' in pattern:
             self.install_files(pattern, dest_dir)
         else:
-            command = 'cat {}'.format(os.path.join(pattern, 'qmldir'))
+            qmldir_file = os.path.join(pattern, 'qmldir')
+            command = f'cat {qmldir_file}'
             qmldir = self.container.run_command(command, get_output=True)
             module = None
             for line in qmldir.split('\n'):
@@ -270,11 +271,9 @@ class BuildCommand(Command):
 
         if arch != self.config.arch:
             raise ClickableException(
-                'Clickable is building for architecture "{}", but "{}" is specified in '
-                'the manifest. You can set the architecture field to @CLICK_ARCH@ to '
-                'let Clickable set the architecture field automatically.'.format(
-                    self.config.arch, arch
-                )
+                f'Clickable is building for architecture "{self.config.arch}", but "{arch}" is '
+                'specified in the manifest. You can set the architecture field to @CLICK_ARCH@ to '
+                'let Clickable set the architecture field automatically.'
             )
 
         return False
@@ -287,8 +286,8 @@ class BuildCommand(Command):
             return True
 
         if framework != self.config.framework:
-            logger.warning('Framework in manifest is "{}", Clickable expected "{}".'.format(
-                framework, self.config.framework))
+            logger.warning('Framework in manifest is "%s", Clickable expected "%s".',
+                           framework, self.config.framework)
 
         return False
 
@@ -308,7 +307,7 @@ class BuildCommand(Command):
     def click_build(self):
         self.manipulate_manifest()
 
-        command = 'click build {} --no-validate'.format(self.config.install_dir)
+        command = f'click build {self.config.install_dir} --no-validate'
         self.container.run_command(command)
 
         click = self.config.install_files.get_click_filename()
@@ -323,7 +322,7 @@ class BuildCommand(Command):
             shutil.copyfile(self.click_path, output_file)
             self.click_path = output_file
 
-        logger.debug('Click outputted to {}'.format(self.click_path))
+        logger.debug('Click outputted to %s', self.click_path)
 
     def run_custom_commands(self, commands):
         if commands:

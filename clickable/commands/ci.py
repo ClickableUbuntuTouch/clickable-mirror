@@ -40,7 +40,7 @@ class CiCommand(Command):
     def configure(self, args):
         self.root_user = not args.user
         self.version = args.clickable_version
-        self.image = "clickable/ci-16.04-{}:{}".format(self.config.build_arch, self.version)
+        self.image = f"clickable/ci-16.04-{self.config.build_arch}:{self.version}"
 
         if args.command:
             self.command = ' '.join(args.command)

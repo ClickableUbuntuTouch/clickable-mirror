@@ -69,7 +69,7 @@ class TestCleanCommand(UnitTest):
 
         mock_exists.assert_called_with(ANY)
         mock_rmtree.assert_called_with(ANY)
-        mock_logger_warning.assert_called_with(ANY)
+        mock_logger_warning.assert_called()
 
     @mock.patch('shutil.rmtree', side_effect=temp_exception)
     @mock.patch('os.path.exists', side_effect=true_fn)

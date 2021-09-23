@@ -18,21 +18,22 @@ class RustBuilder(Builder):
     def _cargo_target(self):
         if self.config.build_arch not in rust_arch_target_mapping:
             raise ClickableException(
-                'Arch {} unsupported by rust template'.format(self.config.build_arch))
+                f'Arch {self.config.build_arch} unsupported by rust template')
         return rust_arch_target_mapping[self.config.build_arch]
 
     def build(self):
-        cargo_command = 'cargo install --target {} --target-dir {} --root {} --path {}'.format(
-            self._cargo_target, self.config.build_dir, self.config.install_dir,
-            self.config.src_dir)
+        cargo_command = f'cargo install --target {self._cargo_target} --target-dir ' \
+                        f'{self.config.build_dir} --root {self.config.install_dir} ' \
+                        f'--path {self.config.src_dir}'
 
         if self.debug_build:
-            cargo_command = '{} {}'.format(cargo_command, "--debug")
+            cargo_command = f'{cargo_command} --debug'
 
         if self.config.verbose:
-            cargo_command = '{} {}'.format(cargo_command, "--verbose")
+            cargo_command = f'{cargo_command} --verbose'
 
         if self.config.build_args:
-            cargo_command = '{} {}'.format(cargo_command, ' '.join(self.config.build_args))
+            joined_build_args = ' '.join(self.config.build_args)
+            cargo_command = f'{cargo_command} {joined_build_args}'
 
         self.container.run_command(cargo_command, use_build_dir=False, cwd=self.config.src_dir)

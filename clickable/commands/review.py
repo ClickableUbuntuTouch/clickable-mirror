@@ -52,9 +52,9 @@ class ReviewCommand(Command):
         cwd = os.path.dirname(os.path.realpath(click_path))
 
         try:
-            logger.info("Running review on {}".format(click_path))
+            logger.info("Running review on %s", click_path)
             self.container.run_command(
-                'click-review {}'.format(click_path),
+                f'click-review {click_path}',
                 use_build_dir=False,
                 cwd=cwd
             )

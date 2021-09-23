@@ -39,8 +39,8 @@ class TestCommand(Command):
             for lib in self.libs:
                 if lib not in existing_libs:
                     raise ClickableException(
-                        'Cannot clean unknown library "{}", which is not in your '
-                        'project config'.format(lib)
+                        f'Cannot clean unknown library "{lib}", which is not in your '
+                        'project config'
                     )
 
     def run(self):
@@ -58,7 +58,7 @@ class TestCommand(Command):
 
         for lib in self.config.lib_configs:
             if lib.name in filter_libs or not filter_libs:
-                logger.info("Running tests on {}".format(lib.name))
+                logger.info("Running tests on %s", lib.name)
 
                 self.test_single_lib(lib)
 
@@ -80,5 +80,5 @@ def test(container, config):
     if not os.path.exists(config.build_dir):
         raise ClickableException("Build dir does not exist. Run build command before testing.")
 
-    command = 'xvfb-startup {}'.format(config.test)
+    command = f'xvfb-startup {config.test}'
     container.run_command(command, use_build_dir=True)

@@ -80,16 +80,14 @@ class GdbserverCommand(Command):
         signal.signal(signal.SIGINT, signal_handler)
 
     def get_app_dir(self):
-        return "/opt/click.ubuntu.com/{}/current".format(
-            self.config.install_files.find_package_name(),
-        )
+        package_name = self.config.install_files.find_package_name()
+        return f"/opt/click.ubuntu.com/{package_name}/current"
 
     def get_app_id(self):
-        return "{}_{}_{}".format(
-            self.config.install_files.find_package_name(),
-            self.config.install_files.find_app_name(),
-            self.config.install_files.find_version(),
-        )
+        package_name = self.config.install_files.find_package_name()
+        app_name = self.config.install_files.find_app_name()
+        version = self.config.install_files.find_version()
+        return f"{package_name}_{app_name}_{version}"
 
     def get_app_exec(self):
         desktop = self.config.install_files.get_desktop(self.config.install_dir)
@@ -100,8 +98,8 @@ class GdbserverCommand(Command):
         environ = self.get_app_env()
         app_exec = self.get_app_exec().split()
 
-        commands = ["cd {}".format(app_dir),
-                    "PATH={} which {}".format(environ["PATH"], app_exec[0])]
+        commands = [f"cd {app_dir}",
+                    f"PATH={environ['PATH']} which {app_exec[0]}"]
         output = self.device.run_command(commands, get_output=True).strip()
         path = output.splitlines()[-1]
 
@@ -117,17 +115,17 @@ class GdbserverCommand(Command):
         app_id = self.get_app_id()
 
         environ = {
-            "APP_DESKTOP_FILE_PATH": "/opt/click.ubuntu.com/.click/users/phablet/{}/{}.desktop".format(package_name, app_name),  # noqa=E501
-            "APP_DIR": "/opt/click.ubuntu.com/.click/users/phablet/{}".format(package_name),
+            "APP_DESKTOP_FILE_PATH": f"/opt/click.ubuntu.com/.click/users/phablet/{package_name}/{app_name}.desktop",  # noqa=E501
+            "APP_DIR": f"/opt/click.ubuntu.com/.click/users/phablet/{package_name}",
             "APP_EXEC": self.get_app_exec(),
             "APP_ID": app_id,
-            "__GL_SHADER_DISK_CACHE_PATH": "/home/phablet/.cache/{}".format(package_name),
-            "TMPDIR": "/run/user/32011/confined/{}".format(package_name),
+            "__GL_SHADER_DISK_CACHE_PATH": f"/home/phablet/.cache/{package_name}",
+            "TMPDIR": f"/run/user/32011/confined/{package_name}",
             "UPSTART_INSTANCE": app_id,
-            "XDG_DATA_DIRS": "/opt/click.ubuntu.com/.click/users/phablet/{}:/usr/share/ubuntu-touch:/usr/share/ubuntu-touch:/usr/local/share/:/usr/share/:/custom/usr/share/".format(package_name),  # noqa=E501
-            "LD_LIBRARY_PATH": "/opt/click.ubuntu.com/.click/users/phablet/{0}/lib/{1}:/opt/click.ubuntu.com/.click/users/phablet/{0}/lib".format(package_name, self.config.arch_triplet),  # noqa=E501
-            "PATH": "/opt/click.ubuntu.com/.click/users/phablet/{0}/lib/{1}/bin:/opt/click.ubuntu.com/.click/users/phablet/{0}:/home/phablet/bin:/home/phablet/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin".format(package_name, self.config.arch_triplet),  # noqa=E501
-            "QML2_IMPORT_PATH": "/usr/lib/{0}/qt5/imports:/opt/click.ubuntu.com/.click/users/phablet/{1}/lib/{0}".format(self.config.arch_triplet, package_name),  # noqa=E501
+            "XDG_DATA_DIRS": f"/opt/click.ubuntu.com/.click/users/phablet/{package_name}:/usr/share/ubuntu-touch:/usr/share/ubuntu-touch:/usr/local/share/:/usr/share/:/custom/usr/share/",  # noqa=E501
+            "LD_LIBRARY_PATH": f"/opt/click.ubuntu.com/.click/users/phablet/{package_name}/lib/{self.config.arch_triplet}:/opt/click.ubuntu.com/.click/users/phablet/{package_name}/lib",  # noqa=E501
+            "PATH": f"/opt/click.ubuntu.com/.click/users/phablet/{package_name}/lib/{self.config.arch_triplet}/bin:/opt/click.ubuntu.com/.click/users/phablet/{package_name}:/home/phablet/bin:/home/phablet/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",  # noqa=E501
+            "QML2_IMPORT_PATH": f"/usr/lib/{self.config.arch_triplet}/qt5/imports:/opt/click.ubuntu.com/.click/users/phablet/{package_name}/lib/{self.config.arch_triplet}",  # noqa=E501
             "UBUNTU_APP_LAUNCH_ARCH": self.config.arch_triplet,
             "APP_XMIR_ENABLE": "0",
             "DESKTOP_SESSION": "ubuntu-touch",
@@ -165,7 +163,7 @@ class GdbserverCommand(Command):
     def get_cached_desktop_path(self):
         return os.path.join(
             "/home/phablet/.cache/ubuntu-app-launch/desktop",
-            "{}.desktop".format(self.get_app_id())
+            f"{self.get_app_id()}.desktop"
         )
 
     def kill_gdbserver(self):
@@ -175,16 +173,16 @@ class GdbserverCommand(Command):
         )
 
         for line in processes.splitlines():
-            if "gdbserver localhost:{}".format(self.port) in line:
+            if f"gdbserver localhost:{self.port}" in line:
                 logger.debug("Killing running gdbserver on device")
                 pid = line.split()[1]
-                self.device.run_command("kill -9 {}".format(pid))
+                self.device.run_command(f"kill -9 {pid}")
 
     def check_cached_desktop_file(self):
         path = self.get_cached_desktop_path()
         try:
             self.device.run_command(
-                "ls {} > /dev/null 2>&1".format(path),
+                f"ls {path} > /dev/null 2>&1",
                 get_output=True
             ).strip()
         except Exception as err:
@@ -225,13 +223,12 @@ class GdbserverCommand(Command):
             environ = self.get_app_env()
 
         if self.add_desktop_file_hint:
-            desktop_file_hint = '--desktop_file_hint={}'.format(desktop_file)
+            desktop_file_hint = f'--desktop_file_hint={desktop_file}'
 
-        set_env = " ".join(["{}='{}'".format(key, value) for key, value in environ.items()])
+        set_env = " ".join([f"{key}='{value}'" for key, value in environ.items()])
         commands = [
-            'cd {}'.format(app_dir),
-            '{} gdbserver localhost:{} {} {}'.format(
-                set_env, self.port, app_exec, desktop_file_hint),
+            f'cd {app_dir}',
+            f'{set_env} gdbserver localhost:{self.port} {app_exec} {desktop_file_hint}',
         ]
 
         self.set_signal_handler()

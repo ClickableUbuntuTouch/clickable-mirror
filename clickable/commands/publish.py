@@ -79,12 +79,11 @@ class PublishCommand(Command):
         }
         params = {'apikey': self.api_key}
 
-        logger.info('Uploading version {} of {} for {}/{} to the OpenStore'.format(
-            self.config.install_files.find_version(),
-            package_name,
-            channel,
-            self.config.arch,
-        ))
+        logger.info('Uploading version %s of %s for %s/%s to the OpenStore',
+                    self.config.install_files.find_version(),
+                    package_name,
+                    channel,
+                    self.config.arch)
         response = requests.post(url, files=files, data=data, params=params)
         if response.status_code == 200:
             logger.info('Upload successful')
@@ -92,19 +91,15 @@ class PublishCommand(Command):
             title = urllib.parse.quote(self.config.install_files.find_package_title())
             raise ClickableException(
                 'App needs to be created in the OpenStore before you can publish it. '
-                'Visit {}/submit?appId={}&name={}'.format(
-                    OPENSTORE_API,
-                    package_name,
-                    title,
-                )
+                f'Visit {OPENSTORE_API}/submit?appId={package_name}&name={title}'
             )
         else:
             try:
                 message = response.json()['message']
             except Exception:  # pylint: disable=broad-except
                 message = 'Unspecified Error'
-                logger.debug("Publish failed with: {}".format(response.text))
+                logger.debug("Publish failed with: %s", response.text)
 
             raise ClickableException(
-                'Failed to upload click: {} ({})'.format(message, response.status_code)
+                f'Failed to upload click: {message} ({response.status_code})'
             )

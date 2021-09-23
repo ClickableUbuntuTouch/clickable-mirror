@@ -153,13 +153,15 @@ class InstallFiles():
         return app
 
     def find_full_package_name(self):
-        return '{}_{}_{}'.format(
-            self.find_package_name(),
-            self.find_app_name(),
-            self.find_version())
+        package_name = self.find_package_name()
+        app_name = self.find_app_name()
+        version = self.find_version()
+        return f'{package_name}_{app_name}_{version}'
 
     def get_click_filename(self):
-        return '{}_{}_{}.click'.format(self.find_package_name(), self.find_version(), self.arch)
+        package_name = self.find_package_name()
+        version = self.find_version()
+        return f'{package_name}_{version}_{self.arch}.click'
 
     def write_manifest(self, manifest):
         with open(os.path.join(self.install_dir, "manifest.json"),
@@ -182,7 +184,7 @@ class InstallFiles():
         return self.load_manifest(os.path.join(self.install_dir, "manifest.json"))
 
     def try_find_locale(self):
-        return ':'.join(glob.glob("{}/**/locale".format(self.install_dir), recursive=True))
+        return ':'.join(glob.glob(f"{self.install_dir}/**/locale", recursive=True))
 
     def get_desktop(self, cwd, temp_dir=None, build_dir=None):
         desktop = {}

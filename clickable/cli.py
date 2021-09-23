@@ -25,8 +25,8 @@ class Cli():
         config = command.cli_conf
 
         if not config.name:
-            raise ClickableException("Command class {} has no command name.".format(
-                type(command).__name__))
+            raise ClickableException(
+                f"Command class {type(command).__name__} has no command name.")
 
         parser = self.subparsers.add_parser(
             config.name,
@@ -43,18 +43,19 @@ class Cli():
         self.commands.extend(config.aliases)
 
     def add_common_options(self, parser):
+        path_options = ", ".join(Constants.project_config_path_options)
+
         parser.add_argument(
             '--config',
             '-c',
-            help='Use specified project config file instead of looking for one of [{}] '
-                 'in the current directory'.format(
-                     ", ".join(Constants.project_config_path_options)),
+            help='Use specified project config file instead of looking for one of '
+                 f'[{path_options}] in the current directory',
             default=None
         )
         parser.add_argument(
             '--clickable-config',
-            help='Use specified Clickable config file instead of looking for "{}"'
-                 .format(Constants.clickable_config_path),
+            help='Use specified Clickable config file instead of looking for '
+                 f'"{Constants.clickable_config_path}"',
             default=None
         )
         parser.add_argument(

@@ -121,7 +121,7 @@ class LibConfig():
         self.check_config_errors()
 
         for key, value in self.config.items():
-            logger.debug('Lib {} config value {}: {}'.format(config.name, key, value))
+            logger.debug('Lib %s config value %s: %s', config.name, key, value)
 
     def __getattr__(self, name):
         return self.config[name]
@@ -139,7 +139,7 @@ class LibConfig():
         env_dict["HOME"] = self.config["build_home"]
 
         for key, val in env_dict.items():
-            docker_env_vars.append('-e {}="{}"'.format(key, val))
+            docker_env_vars.append(f'-e {key}="{val}"')
 
         return " ".join(docker_env_vars)
 
@@ -196,9 +196,7 @@ class LibConfig():
     def check_config_errors(self):
         if not self.config['builder']:
             raise ClickableException(
-                'The project config is missing a "builder" in library "{}".'.format(
-                    self.config["name"]
-                )
+                f'The project config is missing a "builder" in library "{self.config["name"]}".'
             )
 
         if self.config['builder'] == Constants.CUSTOM and not self.config['build']:
@@ -219,7 +217,7 @@ class LibConfig():
         self.host_arch = Constants.host_arch_mapping.get(host, None)
 
         if not self.host_arch:
-            raise ClickableException("No support for host architecture {}".format(host))
+            raise ClickableException(f"No support for host architecture {host}")
 
     def needs_clickable_image(self):
         return not self.container_mode and not self.is_custom_docker_image

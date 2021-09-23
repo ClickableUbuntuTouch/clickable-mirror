@@ -29,19 +29,19 @@ class Container():
         self.base_docker_image = self.docker_image
 
         if self.config.needs_clickable_image():
-            self.clickable_dir = '.clickable/{}'.format(self.config.build_arch)
+            self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
-                self.clickable_dir = '{}/{}'.format(self.clickable_dir, name)
+                self.clickable_dir = f'{self.clickable_dir}/{name}'
 
-            self.docker_name_file = '{}/image.json'.format(self.clickable_dir)
-            self.docker_file = '{}/Dockerfile'.format(self.clickable_dir)
+            self.docker_name_file = f'{self.clickable_dir}/image.json'
+            self.docker_file = f'{self.clickable_dir}/Dockerfile'
 
             if self.needs_customized_container():
                 self.restore_cached_image()
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
-            logger.info("Caching cargo related files in {} and {}".format(
-                self.config.cargo_home, self.config.rustup_home))
+            logger.info("Caching cargo related files in %s and %s",
+                        self.config.cargo_home, self.config.rustup_home)
 
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):
@@ -71,8 +71,8 @@ class Container():
 
             self.check_docker()
 
-            command_base = 'docker images -q {}'.format(self.base_docker_image)
-            command_cached = 'docker history -q {}'.format(cached_image)
+            command_base = f'docker images -q {self.base_docker_image}'
+            command_cached = f'docker history -q {cached_image}'
 
             hash_base = run_subprocess_check_output(command_base).strip()
             history_cached = run_subprocess_check_output(command_cached).strip()
@@ -162,7 +162,7 @@ class Container():
         check_command('groups')
 
         groups = run_subprocess_check_output(
-            shlex.split('groups {}'.format(getpass.getuser()))
+            shlex.split(f'groups {getpass.getuser()}')
         ).strip().split(':')[1].split()
 
         return 'docker' in groups
@@ -191,7 +191,7 @@ class Container():
         if not self.user_in_docker_group():
             logger.info('Asking for root to add the current user to the docker group')
             subprocess.check_call(
-                shlex.split('sudo usermod -aG docker {}'.format(getpass.getuser()))
+                shlex.split(f'sudo usermod -aG docker {getpass.getuser()}')
             )
 
         if self.user_in_docker_group_pending():
@@ -217,16 +217,14 @@ class Container():
         else:  # Docker
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[self.config.root_dir]))
-            command_create = 'docker create {} {}'.format(
-                mounts, self.docker_image)
+            command_create = f'docker create {mounts} {self.docker_image}'
             container = run_subprocess_check_output(command_create).strip()
 
             for f in files:
-                command_copy = 'docker cp {}:{} {}'.format(
-                    container, f, dst_parent)
+                command_copy = f'docker cp {container}:{f} {dst_parent}'
                 run_subprocess_check_call(command_copy)
 
-            command_remove = 'docker rm {}'.format(container)
+            command_remove = f'docker rm {container}'
             run_subprocess_check_call(command_remove,
                                       stdout=subprocess.DEVNULL)
 
@@ -237,7 +235,7 @@ class Container():
         if self.config.builder == Constants.GO and self.config.gopath:
             gopaths = self.config.gopath.split(':')
             for (index, path) in enumerate(gopaths):
-                mounts['/gopath/path{}'.format(index)] = path
+                mounts[f'/gopath/path{index}'] = path
                 os.makedirs(path, exist_ok=True)
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
@@ -268,7 +266,7 @@ class Container():
 
     def render_mounts(self, mounts):
         return " ".join([
-            "-v {}:{}:Z".format(host, container)
+            f"-v {host}:{container}:Z"
             for container, host in mounts.items()
         ])
 
@@ -284,44 +282,40 @@ class Container():
         cwd = cwd if cwd else os.path.abspath(self.config.root_dir)
 
         if self.config.container_mode:
-            wrapped_command = 'bash -c "{}"'.format(command)
+            wrapped_command = f'bash -c "{command}"'
         else:  # Docker
             self.check_docker()
 
             if self.config.first_docker_info:
-                logger.debug('Using docker container "{}"'.format(self.docker_image))
+                logger.debug('Using docker container "%s"', self.docker_image)
                 self.config.first_docker_info = False
 
             go_config = ''
             if self.config.builder == Constants.GO and self.config.gopath:
                 gopaths = self.config.gopath.split(':')
                 docker_gopaths = [
-                    '/gopath/path{}'.format(index)
+                    f'/gopath/path{index}'
                     for index in range(len(gopaths))
                 ]
-                go_config = '-e GOPATH={}'.format(':'.join(docker_gopaths), )
+                joined_go_paths = ':'.join(docker_gopaths)
+                go_config = f'-e GOPATH={joined_go_paths}'
 
             env_vars = self.config.prepare_docker_env_vars()
 
             user = ""
             if not root_user:
-                user = "-u {}".format(os.getuid())
+                user = f"-u {os.getuid()}"
 
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[cwd, self.config.root_dir]))
 
-            wrapped_command = 'docker run {mounts} {env} {go} {user} -w {cwd} --rm {tty} ' \
-                              '{network} -i {image} bash -c "{cmd}"'.format(
-                                  mounts=mounts,
-                                  env=env_vars,
-                                  go=go_config,
-                                  cwd=self.config.build_dir if use_build_dir else cwd,
-                                  user=user,
-                                  image=self.docker_image,
-                                  cmd=command,
-                                  tty="-t" if tty else "",
-                                  network='--network="host"' if localhost else "",
-                              )
+            command_cwd = self.config.build_dir if use_build_dir else cwd
+            command_tty = "-t" if tty else ""
+            network = '--network="host"' if localhost else ""
+
+            wrapped_command = f'docker run {mounts} {env_vars} {go_config} {user} ' \
+                              f'-w {command_cwd} --rm {command_tty} {network} ' \
+                              f'-i {self.docker_image} bash -c "{command}"'
 
         kwargs = {}
         if use_build_dir:
@@ -339,13 +333,13 @@ class Container():
             if ':' in dep:
                 dependencies.append(dep)
             else:
-                dependencies.append('{}:{}'.format(dep, self.config.arch))
+                dependencies.append(f'{dep}:{self.config.arch}')
         return dependencies
 
     def get_ppa_adding_commands(self):
         if self.config.dependencies_ppa:
             return [
-                'add-apt-repository -y {}'.format(ppa)
+                f'add-apt-repository -y {ppa}'
                 for ppa in self.config.dependencies_ppa
             ]
 
@@ -353,22 +347,21 @@ class Container():
 
     def construct_dockerfile_content(self, commands, env_vars):
         env_strings = [
-            'ENV {}="{}"'.format(key, var) for key, var in env_vars.items()
+            f'ENV {key}="{var}"' for key, var in env_vars.items()
         ]
 
         run_strings = [
-            'RUN {}'.format(cmd) for cmd in commands
+            f'RUN {cmd}' for cmd in commands
         ]
 
-        return '''
-FROM {}
-{}
-{}
-        '''.format(
-            self.base_docker_image,
-            '\n'.join(env_strings),
-            '\n'.join(run_strings)
-        ).strip()
+        env_lines = '\n'.join(env_strings)
+        run_lines = '\n'.join(run_strings)
+
+        return f'''
+FROM {self.base_docker_image}
+{env_lines}
+{run_lines}
+        '''.strip()
 
     def create_custom_container(self, dockerfile_content):
         if not os.path.exists(self.clickable_dir):
@@ -377,7 +370,7 @@ FROM {}
         with open(self.docker_file, 'w', encoding='UTF-8') as f:
             f.write(dockerfile_content)
 
-        self.docker_image = '{}-{}'.format(self.base_docker_image, uuid.uuid4())
+        self.docker_image = f'{self.base_docker_image}-{uuid.uuid4()}'
         with open(self.docker_name_file, 'w', encoding='UTF-8') as f:
             json.dump({
                 'name': self.docker_image,
@@ -387,7 +380,7 @@ FROM {}
         logger.debug('Generating new docker image')
         try:
             subprocess.check_call(
-                shlex.split('docker build -t {} .'.format(self.docker_image)),
+                shlex.split(f'docker build -t {self.docker_image} .'),
                 cwd=self.clickable_dir
             )
         except subprocess.CalledProcessError:
@@ -408,13 +401,12 @@ FROM {}
             if dockerfile_content.strip() != f.read().strip():
                 return True
 
-        command = 'docker images -q {}'.format(self.docker_image)
+        command = f'docker images -q {self.docker_image}'
         exists = run_subprocess_check_output(command).strip()
         return not exists
 
     def get_apt_install_cmd(self, dependencies):
-        return 'apt-get install -y --force-yes --no-install-recommends {}'.format(
-            ' '.join(dependencies))
+        return f'apt-get install -y --force-yes --no-install-recommends {dependencies}'
 
     def setup_customized_image(self):
         logger.debug('Checking dependencies and container setup')
@@ -432,9 +424,9 @@ FROM {}
                 'echo set debconf/frontend Noninteractive | debconf-communicate && '
                 'echo set debconf/priority critical | debconf-communicate'
             )
+            dependencies_cmd = self.get_apt_install_cmd(dependencies)
             commands.append(
-                'apt-get update && {} && apt-get clean'.format(
-                    self.get_apt_install_cmd(dependencies)))
+                f'apt-get update && {dependencies_cmd} && apt-get clean')
 
         if self.config.image_setup:
             commands.extend(self.config.image_setup.get('run', []))
@@ -460,7 +452,7 @@ FROM {}
                 exists = ''
                 try:
                     exists = self.run_command(
-                        'dpkg -s {} | grep Status'.format(dep),
+                        f'dpkg -s {dep} | grep Status',
                         get_output=True,
                         use_build_dir=False
                     )
@@ -499,11 +491,8 @@ FROM {}
         version = 0
         try:
             format_string = '{{ index .Config.Labels "image_version"}}'
-            command = "docker inspect --format '{}' {}".format(
-                format_string,
-                self.docker_image
-            )
-            logger.debug('Checking docker image version via: {}'.format(command))
+            command = f"docker inspect --format '{format_string}' {self.docker_image}"
+            logger.debug('Checking docker image version via: %s', command)
 
             version_string = run_subprocess_check_output(command)
             version = int(version_string)
@@ -512,9 +501,9 @@ FROM {}
 
         if version < self.minimum_version:
             raise ClickableException(
-                'This version of Clickable requires Clickable docker image {} in version '
-                '{} or higher (found version {}). Please run "clickable update" to update '
-                'your local images.'.format(self.docker_image, self.minimum_version, version)
+                f'This version of Clickable requires Clickable docker image {self.docker_image} '
+                f'in version {self.minimum_version} or higher (found version {version}). '
+                'Please run "clickable update" to update your local images.'
             )
 
     def setup(self):
