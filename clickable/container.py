@@ -406,7 +406,8 @@ FROM {self.base_docker_image}
         return not exists
 
     def get_apt_install_cmd(self, dependencies):
-        return f'apt-get install -y --force-yes --no-install-recommends {dependencies}'
+        joined_deps = ' '.join(dependencies)
+        return f'apt-get install -y --force-yes --no-install-recommends {joined_deps}'
 
     def setup_customized_image(self):
         logger.debug('Checking dependencies and container setup')
