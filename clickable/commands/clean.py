@@ -1,6 +1,5 @@
 import os
 import shutil
-import sys
 
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
@@ -69,13 +68,5 @@ class CleanCommand(Command):
 
 def clean(path):
     if os.path.exists(path):
-        try:
-            logger.info("Cleaning directory %s", path)
-            shutil.rmtree(path)
-        except Exception:  # pylint: disable=broad-except
-            cls, value, _ = sys.exc_info()
-            # TODO see if there is a proper way to do this
-            if cls == OSError and 'No such file or directory' in str(value):
-                pass  # Nothing to do here, the directory didn't exist
-            else:
-                logger.warning('Failed to clean the directory: %s: %s', cls, value)
+        logger.info("Cleaning directory %s", path)
+        shutil.rmtree(path)
