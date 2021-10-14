@@ -42,7 +42,7 @@ class DesktopCommand(Command):
         self.dark_mode = False
         self.desktop_locale = 'C'
 
-        self.builder = BuildCommand()
+        self.builder = BuildCommand(skip_review=True, skip_click=True)
 
     def setup_parser(self, parser):
         self.builder.setup_parser(parser)

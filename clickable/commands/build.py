@@ -20,7 +20,7 @@ from .clean import CleanCommand
 class BuildCommand(Command):
     click_path = ''
 
-    def __init__(self):
+    def __init__(self, skip_review=False, skip_click=False):
         super().__init__()
         self.cli_conf.name = 'build'
         self.cli_conf.help_msg = 'Build the app and/or libraries'
@@ -28,7 +28,8 @@ class BuildCommand(Command):
         self.clean_app = False
         self.clean_libs = False
         self.output_path = None
-        self.skip_review = False
+        self.skip_review = skip_review or skip_click
+        self.skip_click = skip_click
         self.debug_build = False
         self.app = True
         self.libs = None
@@ -78,7 +79,8 @@ class BuildCommand(Command):
     def configure(self, args):
         self.clean_app = args.clean
         self.clean_libs = args.clean and args.libs is not None
-        self.skip_review = args.skip_review
+        if args.skip_review:
+            self.skip_review = True
         self.output_path = args.output
         self.debug_build = args.debug
         self.app = args.app or args.libs is None or args.all
@@ -164,7 +166,9 @@ class BuildCommand(Command):
 
         logger.info("Building app")
         self.build(self.config, self.container)
-        self.click_build()
+
+        if not self.skip_click:
+            self.click_build()
 
         if not self.skip_review:
             review = ReviewCommand()
