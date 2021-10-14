@@ -49,7 +49,7 @@ class Cli():
             '--config',
             '-c',
             help='Use specified project config file instead of looking for one of '
-                 f'[{path_options}] in the current directory',
+                 f'[{path_options}] in the current and all parent directories',
             default=None
         )
         parser.add_argument(

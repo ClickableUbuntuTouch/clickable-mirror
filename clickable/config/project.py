@@ -395,12 +395,23 @@ class ProjectConfig():
         config = {}
         use_default_config = not config_path
         if use_default_config:
-            for option in Constants.project_config_path_options:
-                candidate = os.path.join(self.cwd, option)
+            directory = self.cwd
 
-                if os.path.exists(candidate):
-                    config_path = candidate
+            while True:
+                for option in Constants.project_config_path_options:
+                    candidate = os.path.join(directory, option)
+
+                    if os.path.exists(candidate):
+                        config_path = candidate
+                        self.config['root_dir'] = directory
+                        os.chdir(directory)
+                        self.cwd = directory
+                        break
+
+                parent = os.path.dirname(directory)
+                if parent == directory:
                     break
+                directory = parent
 
         if config_path and os.path.isfile(config_path):
             logger.debug("Loading config file %s", config_path)
@@ -855,7 +866,7 @@ class ProjectConfig():
             raise ClickableException('Not builder configured. Is this a Clickable project?')
 
         builder = None
-        directory = os.listdir(os.getcwd())
+        directory = os.listdir(self.cwd)
 
         if 'config.xml' in directory:
             builder = Constants.CORDOVA
