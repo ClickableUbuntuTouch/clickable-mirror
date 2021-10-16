@@ -14,6 +14,7 @@ New features
 
 - Configure Clickable globally with a new :ref:`configuration file <config.yaml>`.
 - Integrated bash completion, to set up run ``clickable setup completion``.
+- Run Clickable from sub-directories, not only project root.
 - Added new ``chain`` command to run multiple Clickable commands in a chain.
 - Added new ``script`` command to run scripts defined in the clickable.json config file.
 - Added new ``ci`` command to open a shell in the Clickable CI container.

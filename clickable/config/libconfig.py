@@ -24,10 +24,10 @@ class LibInitConfig:
         self.verbose = None
         self.libs_placeholders = None
         self.lib_configs = None
+        self.cwd = None
 
 
 class LibConfig():
-    cwd = os.getcwd()
     config = {}
 
     static_placeholders = OrderedDict({
@@ -69,6 +69,7 @@ class LibConfig():
         self.placeholders.update(self.static_placeholders)
         self.placeholders.update(config.libs_placeholders)
         self.lib_configs = config.lib_configs
+        self.cwd = config.cwd if config.cwd else os.getcwd()
 
         self.set_host_arch()
         self.container_list = list(Constants.container_mapping[self.host_arch].values())
