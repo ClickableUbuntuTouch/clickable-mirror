@@ -5,17 +5,13 @@ Project Config Format
 
 Example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    {
-        "builder": "cmake",
-        "scripts": {
-            "fetch": "git submodule update --init"
-        },
-        "dependencies_target": [
-            "libpoppler-qt5-dev"
-        ]
-    }
+    builder: cmake
+    scripts:
+    - fetch: git submodule update --init
+    dependencies_target:
+    - libpoppler-qt5-dev
 
 .. _project-config-placeholders:
 
@@ -64,12 +60,9 @@ Ex: ``${ROOT}`` can be used in ``src_dir``, but not vice-versa.
 
 Example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    {
-        "builder": "cmake",
-        "build_dir": "${ROOT}/build/${ARCH_TRIPLET}/myApp"
-    }
+    build_dir: ${ROOT}/build/${ARCH_TRIPLET}/myApp
 
 clickable_minimum_required
 --------------------------
@@ -150,11 +143,10 @@ env_vars
 
 Optional, environment variables to be set in the build container. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "env_vars": {
-        "TARGET_SYSTEM": "UbuntuTouch"
-    }
+    env_vars:
+      TARGET_SYSTEM: UbuntuTouch
 
 When passing ``--debug`` to Clickable, ``DEBUG_BUILD=1`` is set as an environment variable, additionally.
 
@@ -223,11 +215,10 @@ install_lib
 Optional, additional libraries that should be installed with the app and be in ``LD_LIBRARY_PATH`` at runtime.
 The destination directory is ``${CLICK_LD_LIBRARY_PATH}``. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "install_lib": [
-        "/usr/lib/${ARCH_TRIPLET}/libasound.so*"
-    ]
+    install_lib:
+    - /usr/lib/${ARCH_TRIPLET}/libasound.so*
 
 Relative paths are prepended with the project root dir.
 
@@ -240,11 +231,10 @@ install_qml
 Optional, additional QML files or directories that should be installed with the app and be in
 ``QML2_IMPORT_PATH`` at runtime. The destination directory is ``${CLICK_QML2_IMPORT_PATH}``. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "install_qml": [
-        "/usr/lib/${ARCH_TRIPLET}/qt5/qml/Qt/labs/calendar"
-    ]
+    install_qml:
+    - /usr/lib/${ARCH_TRIPLET}/qt5/qml/Qt/labs/calendar
 
 
 Relative paths are prepended with the project root dir.
@@ -261,11 +251,10 @@ install_bin
 Optional, additional executables that should be installed with the app and be in ``PATH`` at runtime.
 The destination directory is ``${CLICK_PATH}``. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "install_bin": [
-        "/usr/bin/htop"
-    ]
+    install_bin:
+    - /usr/bin/htop
 
 Relative paths are prepended with the project root dir.
 
@@ -278,12 +267,11 @@ install_root_data
 Optional, additional files or directories that should be installed with the app and be in the app
 root dir. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "install_root_data": [
-        "packaging/manifest.json",
-        "packaging/myapp.desktop"
-    ],
+    install_root_data:
+    - packaging/manifest.json
+    - packaging/myapp.desktop
 
 Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
 Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
@@ -294,12 +282,11 @@ install_data
 Optional, additional files or directories that should be installed with the app.
 Needs to be specified as a dictionary with absolute source paths as keys and destinations as value. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "install_data": {
-        "icons/logo.svg": "assets/logo.svg",
-        "packaging/myapp.desktop": "${INSTALL_DIR}"
-    },
+    install_data:
+    - icons/logo.svg: assets/logo.svg
+    - packaging/myapp.desktop: ${INSTALL_DIR}
 
 Relative source paths are prepended with the project root dir and destination paths with
 the install dir.
@@ -319,14 +306,13 @@ scripts
 
 Optional, an object detailing custom commands to run. For example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "scripts": {
-        "fetch": "git submodule update --init",
-        "echo": "echo ${ARCH_TRIPLET}"
-    }
+    scripts:
+      fetch: git submodule update --init
+      echo-target: echo ${ARCH_TRIPLET}
 
-That enables the use of ``clickable script fetch`` and ``clickable script echo``.
+That enables the use of ``clickable script fetch`` and ``clickable script echo-target``.
 
 .. _project-config-default:
 
@@ -381,11 +367,10 @@ dependencies_ppa
 
 Optional, a list of PPAs, that will be enabled in the build container. Ex:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "dependencies_ppa": [
-        "ppa:bhdouglass/clickable"
-    ]
+    dependencies_ppa:
+    - ppa:bhdouglass/clickable
 
 Can be specified as a string or a list of strings.
 
@@ -396,17 +381,14 @@ image_setup
 Optional, dictionary containing setup configuration for the docker image used.
 The image is based on the default image provided by Clickable. Example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "image_setup": {
-        "env": {
-            "PATH": "/opt/someprogram/bin:$PATH"
-        },
-        "run": [
-            "curl -fsSL https://deb.nodesource.com/setup_current.x | bash -",
-            "apt-get install -y nodejs"
-        ]
-    }
+    image_setup:
+      env:
+        PATH: /opt/someprogram/bin:$PATH
+      run:
+      - curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
+      - apt-get install -y nodejs
 
 rust_channel
 ------------
@@ -442,14 +424,13 @@ ignore
 Optional, a list of files to ignore when building with ``pure`` builder
 Example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "ignore": [
-        ".clickable",
-        ".git",
-        ".gitignore",
-        ".gitmodules"
-    ]
+    ignore:
+    - .clickable
+    - .git
+    - .gitignore
+    - .gitmodules
 
 Can be specified as a string or a list of strings.
 
@@ -495,20 +476,16 @@ libraries
 Optional, dependencies to be build by running ``clickable build-libs``.
 It's a dictionary of dictionaries similar to the project config itself. Example:
 
-.. code-block:: javascript
+.. code-block:: yaml
 
-    "libraries": {
-        "opencv": {
-            "builder": "cmake",
-            "make_jobs": "1",
-            "build_args": [
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-DBUILD_LIST=core,imgproc,highgui,imgcodecs",
-                "-DBUILD_SHARED_LIBS=OFF"
-            ]
-            "prebuild": "git submodule update --init --recursive"
-        }
-    }
+    libraries:
+      opencv:
+        builder: cmake
+        make_jobs: 2
+        build_args:
+        -DBUILD_LIST=core,imgproc,highgui,imgcodecs
+        -DBUILD_SHARED_LIBS=OFF
+        prebuild: git submodule update --init --recursive
 
 The keywords ``test``, ``install_dir``, ``prebuild``, ``build``, ``postbuild``,
 ``postmake``, ``make_jobs``, ``make_args``, ``env_vars``, ``build_args``, ``docker_image``,
