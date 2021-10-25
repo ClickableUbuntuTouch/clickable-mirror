@@ -63,9 +63,6 @@ class TestCommand(Command):
                 self.test_single_lib(lib)
 
     def test_single_lib(self, lib):
-        lib.container_mode = self.config.container_mode
-        lib.docker_image = self.config.docker_image
-        lib.build_arch = self.config.build_arch
         lib.container = Container(lib, lib.name)
         lib.container.setup()
 
