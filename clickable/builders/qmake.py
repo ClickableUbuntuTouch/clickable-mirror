@@ -11,13 +11,12 @@ class QMakeBuilder(MakeBuilder):
 
     def build(self):
         if (
-            self.config.arch == Constants.host_arch or
-            self.config.qt_version == "5.9" or
-            self.config.arch == "all"
+            self.config.is_foreign_target()
+            and self.config.qt_version != "5.9"
         ):
-            command = 'qmake'
-        else:
             command = f'/usr/lib/{self.config.arch_triplet}/qt5/bin/qmake'
+        else:
+            command = 'qmake'
 
         if self.config.build_args:
             joined_build_args = ' '.join(self.config.build_args)

@@ -21,6 +21,7 @@ New features
 - The ``create`` command allows to create apps non-interactively configuring the template with command line parameters.
 - The ``gdb`` command allows to export a GDB init script that can be used by any IDE's remote debugger.
 - The behavior of the ``gdb`` and ``gdbserver`` commands can be configured in detail via command line parameters.
+- The ``rust`` builder supports the ``rust_channel`` field to configure the desired tool chain (e.g. ``1.56.0`` or ``nightly``).
 - The ``rust`` builder supports the ``build_args`` field in the project config (arguments are forwarded to cargo).
 - The ``rust`` builder supports ``--verbose`` flag (forwarded to cargo)
 - The ``rust`` builder supports Clickable libraries
@@ -56,7 +57,8 @@ Bug Fixes
 ^^^^^^^^^
 
 - The ``rust`` builder does not fail any more if the source dir (containing the Cargo.toml) is a sub-directory of the project dir.
-- The rustup cache is mounted along with the cargo cache to fix permission issues on accessing it.
+- The ``rust`` builder does not try to update the tool chain on building any more (which would fail)
+- The rustup cache is made writable in the container to fix permission issues on accessing it.
 - Fixed app icons not displaying in Qt Creator.
 - Fixed run configuration name in Qt Creator.
 - Fixed crash for QtCreator when no exec args have been found

@@ -40,8 +40,8 @@ class Container():
                 self.restore_cached_image()
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
-            logger.info("Caching cargo related files in %s and %s",
-                        self.config.cargo_home, self.config.rustup_home)
+            logger.info("Caching cargo related files in %s",
+                        self.config.cargo_home)
 
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):
@@ -243,11 +243,9 @@ class Container():
             cargo_git = os.path.join(self.config.cargo_home, 'git')
             cargo_package_cache_lock = os.path.join(self.config.cargo_home,
                                                     '.package-cache')
-            rustup_tmp = os.path.join(self.config.rustup_home, 'tmp')
 
             os.makedirs(cargo_registry, exist_ok=True)
             os.makedirs(cargo_git, exist_ok=True)
-            os.makedirs(rustup_tmp, exist_ok=True)
 
             # create .package-cache if it doesn't exist
             with open(cargo_package_cache_lock, "a", encoding='UTF-8'):
@@ -256,7 +254,6 @@ class Container():
             mounts['/opt/rust/cargo/registry'] = cargo_registry
             mounts['/opt/rust/cargo/git'] = cargo_git
             mounts['/opt/rust/cargo/.package-cache'] = cargo_package_cache_lock
-            mounts['/opt/rust/rustup/tmp'] = rustup_tmp
 
         if transparent:
             for path in transparent:
@@ -410,7 +407,7 @@ FROM {self.base_docker_image}
         return f'apt-get install -y --force-yes --no-install-recommends {joined_deps}'
 
     def setup_customized_image(self):
-        logger.debug('Checking dependencies and container setup')
+        logger.debug('Checking dependencies and image setup')
 
         self.check_docker()
 
@@ -428,6 +425,12 @@ FROM {self.base_docker_image}
             dependencies_cmd = self.get_apt_install_cmd(dependencies)
             commands.append(
                 f'apt-get update && {dependencies_cmd} && apt-get clean')
+
+        if self.config.rust_channel:
+            commands.append(f'rustup default {self.config.rust_channel}')
+
+            if self.config.is_foreign_target():
+                commands.append(f'rustup target add {self.config.arch_rust}')
 
         if self.config.image_setup:
             commands.extend(self.config.image_setup.get('run', []))
@@ -480,7 +483,8 @@ FROM {self.base_docker_image}
         return self.config.dependencies_host \
             or self.config.dependencies_target \
             or self.config.dependencies_ppa \
-            or self.config.image_setup
+            or self.config.image_setup \
+            or self.config.rust_channel
 
     def check_base_image_version(self):
         if not self.minimum_version:

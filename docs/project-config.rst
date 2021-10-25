@@ -36,6 +36,7 @@ SDK_FRAMEWORK           Target framework (``ubuntu-sdk-16.04.5`` by default)
 QT_VERSION              Qt version within target framework (``5.12`` by default)
 ARCH                    Target architecture (``armhf``, ``arm64``, ``amd64`` or ``all``)
 ARCH_TRIPLET            Target architecture triplet (``arm-linux-gnueabihf``, ``aarch64-linux-gnu``, ``x86_64-linux-gnu`` or ``all``)
+ARCH_RUST               Rust target (``armv7-unknown-linux-gnueabihf``, ``aarch64-unknown-linux-gnu`` or ``x86_64-unknown-linux-gnu``)
 NUM_PROCS               Number of build jobs recommended (``make_jobs``) and used by the CMake and QMake builders
 ROOT                    Value of ``root_dir``
 BUILD_DIR               Value of ``build_dir``
@@ -402,10 +403,16 @@ The image is based on the default image provided by Clickable. Example:
             "PATH": "/opt/someprogram/bin:$PATH"
         },
         "run": [
-            "rustup default nightly",
-            "rustup install 1.39.0"
+            "curl -fsSL https://deb.nodesource.com/setup_current.x | bash -",
+            "apt-get install -y nodejs"
         ]
     }
+
+rust_channel
+------------
+Optional, rust channel that should installed in the image and used by the rust
+builder.
+Ex: ``nightly`` or ``1.56.0``
 
 run
 ^^^

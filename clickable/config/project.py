@@ -56,6 +56,7 @@ class ProjectConfig():
         "QT_VERSION": "qt_version",
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
+        "ARCH_RUST": "arch_rust",
         "NUM_PROCS": "make_jobs",
         "ROOT": "root_dir",
         "BUILD_DIR": "build_dir",
@@ -70,7 +71,7 @@ class ProjectConfig():
                             "app_lib_dir", "app_bin_dir", "app_qml_dir",
                             "gopath", "cargo_home", "scripts", "build",
                             "build_args", "make_args", "postmake", "postbuild",
-                            "prebuild", "rustup_home",
+                            "prebuild",
                             "install_lib", "install_qml", "install_bin", "install_root_data",
                             "install_data", "env_vars", "build_home"]
 
@@ -80,7 +81,7 @@ class ProjectConfig():
     # Paths to be made absolute, iterates and recurses lists and dicts
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
-                 'app_qml_dir', 'build_home', 'rustup_home',
+                 'app_qml_dir', 'build_home',
                  'install_qml', 'install_bin', 'install_lib', 'install_root_data']
     # Same as for path_keys, except that for dicts the keys are made
     # absolute, not the values
@@ -140,6 +141,7 @@ class ProjectConfig():
             'restrict_arch_env': None,
             'restrict_arch': None,
             'arch_triplet': None,
+            'arch_rust': None,
             'builder': None,
             'postmake': None,
             'prebuild': None,
@@ -169,7 +171,6 @@ class ProjectConfig():
             'make_jobs': None,
             'gopath': os.path.expanduser('~/.clickable/go'),
             'cargo_home': os.path.expanduser('~/.clickable/cargo'),
-            'rustup_home': os.path.expanduser('~/.clickable/rustup'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
@@ -180,6 +181,7 @@ class ProjectConfig():
             'install_dir': '${BUILD_DIR}/install',
             'image_setup': {},
             'qt_version': Constants.default_qt,
+            'rust_channel': None,
             'framework': None,
             'always_clean': False,
         }
@@ -345,9 +347,10 @@ class ProjectConfig():
 
             self.config['framework'] = framework
 
-    def setup_image(self):
         self.set_build_arch()
+        self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.build_arch]
 
+    def setup_image(self):
         if self.needs_clickable_image():
             self.check_nvidia_mode()
 
@@ -643,6 +646,9 @@ class ProjectConfig():
             lib_init.verbose = self.verbose
             lib_init.libs_placeholders = placeholders
             lib_init.lib_configs = self.lib_configs
+            lib_init.container_mode = self.container_mode
+            lib_init.docker_image = self.docker_image
+            lib_init.build_arch = self.build_arch
 
             lib = LibConfig(lib_init)
             self.lib_configs.append(lib)
@@ -825,6 +831,8 @@ class ProjectConfig():
                 logger.warning("Dependencies are ignored when using a custom docker image!")
             if self.image_setup:
                 logger.warning("Docker image setup is ignored when using a custom docker image!")
+            if self.rust_channel:
+                logger.warning("Rust channel is ignored when using a custom docker image!")
 
     def check_desktop_configs(self):
         if self.is_desktop_mode():
@@ -852,6 +860,9 @@ class ProjectConfig():
         self.check_docker_configs()
         self.check_desktop_configs()
         self.check_path_sanity()
+
+    def is_foreign_target(self):
+        return self.build_arch != Constants.host_arch
 
     def set_builder_interactive(self):
         if self.config['builder'] or not self.needs_builder():
