@@ -84,6 +84,12 @@ class Constants():
         'all': 'all'
     }
 
+    rust_arch_target_mapping = {
+        'amd64': 'x86_64-unknown-linux-gnu',
+        'armhf': 'armv7-unknown-linux-gnueabihf',
+        'arm64': 'aarch64-unknown-linux-gnu',
+    }
+
     host_arch_mapping = {
         'x86_64': 'amd64',
         'aarch64': 'arm64',

@@ -37,6 +37,7 @@
     "template": {"type": "string"},
     "framework": {"type": "string"},
     "qt_version": {"type": "string"},
+    "rust_channel": {"type": "string"},
     "prebuild": {
       "type": ["string","array"],
       "items": {"type": "string"}
@@ -110,7 +111,6 @@
     },
     "gopath": {"type": "string"},
     "cargo_home": {"type": "string"},
-    "rustup_home": {"type": "string"},
     "build_args": {
       "type": ["string","array"],
       "items": {"type": "string"}
@@ -148,22 +148,23 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-        "prebuild": {
-          "type": ["string","array"],
-          "items": {"type": "string"}
-        },
-        "build": {
-          "type": ["string","array"],
-          "items": {"type": "string"}
-        },
-        "postbuild": {
-          "type": ["string","array"],
-          "items": {"type": "string"}
-        },
-        "postmake": {
-          "type": ["string","array"],
-          "items": {"type": "string"}
-        },
+          "rust_channel": {"type": "string"},
+          "prebuild": {
+            "type": ["string","array"],
+            "items": {"type": "string"}
+          },
+          "build": {
+            "type": ["string","array"],
+            "items": {"type": "string"}
+          },
+          "postbuild": {
+            "type": ["string","array"],
+            "items": {"type": "string"}
+          },
+          "postmake": {
+            "type": ["string","array"],
+            "items": {"type": "string"}
+          },
           "build_args": {
             "type": ["string","array"],
             "items": {"type": "string"}

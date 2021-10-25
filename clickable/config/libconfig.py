@@ -25,6 +25,9 @@ class LibInitConfig:
         self.libs_placeholders = None
         self.lib_configs = None
         self.cwd = None
+        self.container_mode = None
+        self.docker_image = None
+        self.build_arch = None
 
 
 class LibConfig():
@@ -33,6 +36,7 @@ class LibConfig():
     static_placeholders = OrderedDict({
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
+        "ARCH_RUST": "arch_rust",
         "NAME": "name",
         "ROOT": "root_dir",
         "BUILD_DIR": "build_dir",
@@ -42,11 +46,11 @@ class LibConfig():
     accepts_placeholders = ["root_dir", "build_dir", "src_dir", "install_dir",
                             "cargo_home", "build",
                             "build_args", "make_args", "postmake", "postbuild",
-                            "prebuild", "rustup_home",
+                            "prebuild",
                             "env_vars", "build_home"]
 
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
-                 'cargo_home', 'build_home', 'rustup_home']
+                 'cargo_home', 'build_home']
     required = ['builder']
     # If specified as a string split at spaces
     flexible_split_list = ['dependencies_host', 'dependencies_target',
@@ -57,6 +61,7 @@ class LibConfig():
 
     first_docker_info = True
     container_mode = False
+    build_arch = None
     use_nvidia = False
     gopath = None
     verbose = False
@@ -65,6 +70,9 @@ class LibConfig():
     def __init__(self, config):
         self.qt_version = config.qt_version
         self.verbose = config.verbose
+        self.container_mode = config.container_mode
+        self.build_arch = config.build_arch
+
         self.placeholders = {}
         self.placeholders.update(self.static_placeholders)
         self.placeholders.update(config.libs_placeholders)
@@ -78,6 +86,7 @@ class LibConfig():
             'name': config.name,
             'arch': config.arch,
             'arch_triplet': None,
+            'arch_rust': Constants.rust_arch_target_mapping[self.build_arch],
             'builder': None,
             'postmake': None,
             'prebuild': None,
@@ -92,7 +101,6 @@ class LibConfig():
             'dependencies_ppa': [],
             'make_jobs': None,
             'cargo_home': os.path.expanduser('~/.clickable/cargo'),
-            'rustup_home': os.path.expanduser('~/.clickable/rustup'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
@@ -100,17 +108,21 @@ class LibConfig():
             'install_dir': '${BUILD_DIR}/install',
             'image_setup': {},
             'test': 'ctest',
+            'rust_channel': None,
         }
 
         self.config.update(config.config_dict)
+
         if self.config["docker_image"]:
             self.is_custom_docker_image = True
         else:
             self.is_custom_docker_image = False
+            self.config["docker_image"] = config.docker_image
 
         self.cleanup_config()
 
         self.config['arch_triplet'] = Constants.arch_triplet_mapping[self.config['arch']]
+        self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.config['arch']]
 
         for key in self.path_keys:
             if key not in self.accepts_placeholders and self.config[key]:
@@ -225,3 +237,6 @@ class LibConfig():
 
     def needs_docker(self):
         return not self.container_mode
+
+    def is_foreign_target(self):
+        return self.build_arch != Constants.host_arch

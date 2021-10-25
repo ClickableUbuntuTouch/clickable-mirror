@@ -147,9 +147,6 @@ class BuildCommand(Command):
             if lib.name in filter_libs or not filter_libs:
                 logger.info("Building %s", lib.name)
 
-                lib.container_mode = self.config.container_mode
-                lib.docker_image = self.config.docker_image
-                lib.build_arch = self.config.build_arch
                 container = Container(lib, lib.name)
 
                 # This is a workaround for lib env vars being overwritten by
