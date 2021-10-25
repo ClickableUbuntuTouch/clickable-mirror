@@ -1,5 +1,6 @@
 from clickable.exceptions import ClickableException
 from clickable.container import Container
+from clickable.logger import logger
 
 from .base import Command
 from .update import update_image
@@ -24,6 +25,11 @@ class CiCommand(Command):
             help='Run as user (not as root)',
         )
         parser.add_argument(
+            '--dev',
+            action='store_true',
+            help='Run the nightly dev channel of Clickable',
+        )
+        parser.add_argument(
             '--clickable-version',
             default='latest',
             help='Clickable version of CI image (defaults to latest, \
@@ -40,10 +46,14 @@ class CiCommand(Command):
     def configure(self, args):
         self.root_user = not args.user
         self.version = args.clickable_version
-        self.image = f"clickable/ci-16.04-{self.config.build_arch}:{self.version}"
+        name = "ci-dev-16.04" if args.dev else "ci-16.04"
+        self.image = f"clickable/{name}-{self.config.build_arch}:{self.version}"
 
         if args.command:
             self.command = ' '.join(args.command)
+
+        if self.config.is_custom_docker_image:
+            logger.warning("Ignoring custom docker image and using CI image instead.")
 
         self.config.docker_image = self.image
         self.config.is_custom_docker_image = True
@@ -53,6 +63,8 @@ class CiCommand(Command):
         raise ClickableException("CI command can't be nested in a chain.")
 
     def run(self):
+        logger.info("Running in container %s", self.image)
+
         if self.version == "latest":
             update_image(self.image)
 

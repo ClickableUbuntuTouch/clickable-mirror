@@ -285,8 +285,7 @@ Needs to be specified as a dictionary with absolute source paths as keys and des
 .. code-block:: yaml
 
     install_data:
-    - icons/logo.svg: assets/logo.svg
-    - packaging/myapp.desktop: ${INSTALL_DIR}
+    - icons/logo.svg: assets
 
 Relative source paths are prepended with the project root dir and destination paths with
 the install dir.
@@ -482,9 +481,10 @@ It's a dictionary of dictionaries similar to the project config itself. Example:
       opencv:
         builder: cmake
         make_jobs: 2
-        build_args:
-        -DBUILD_LIST=core,imgproc,highgui,imgcodecs
-        -DBUILD_SHARED_LIBS=OFF
+        build_args: [
+          -DBUILD_LIST=core,imgproc,highgui,imgcodecs,
+          -DBUILD_SHARED_LIBS=OFF
+        ]
         prebuild: git submodule update --init --recursive
 
 The keywords ``test``, ``install_dir``, ``prebuild``, ``build``, ``postbuild``,
