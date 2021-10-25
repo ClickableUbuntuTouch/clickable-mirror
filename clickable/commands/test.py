@@ -1,8 +1,10 @@
-import os
-
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 from clickable.container import Container
+
+from clickable.utils import (
+    get_builder,
+)
 
 from .base import Command
 
@@ -48,11 +50,12 @@ class TestCommand(Command):
             self.test_libs()
         if self.app:
             logger.info("Running app tests")
-            test(self.container, self.config)
+            run_test(self.container, self.config)
 
     def test_libs(self):
         if not self.config.lib_configs:
             logger.warning('No libraries defined.')
+            return
 
         filter_libs = self.libs
 
@@ -73,12 +76,9 @@ class TestCommand(Command):
         # project env vars, especially affecting Container Mode.
         lib.set_env_vars()
 
-        test(lib.container, lib)
+        run_test(lib.container, lib, is_app=False)
 
 
-def test(container, config):
-    if not os.path.exists(config.build_dir):
-        raise ClickableException("Build dir does not exist. Run build command before testing.")
-
-    command = f'xvfb-startup {config.test}'
-    container.run_command(command, use_build_dir=True)
+def run_test(container, config, is_app=True):
+    builder = get_builder(config, container)
+    builder.test(is_app)

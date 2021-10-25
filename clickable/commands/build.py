@@ -3,7 +3,7 @@ import sys
 import shutil
 
 from clickable.utils import (
-    get_builders,
+    get_builder,
     makedirs,
     is_sub_dir,
     env,
@@ -332,6 +332,5 @@ class BuildCommand(Command):
 
 
 def run_builder(config, container, debug_build):
-    builder_classes = get_builders()
-    builder = builder_classes[config.builder](config, container, debug_build)
+    builder = get_builder(config, container, debug_build)
     builder.build()

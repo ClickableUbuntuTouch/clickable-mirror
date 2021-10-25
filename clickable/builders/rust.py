@@ -7,17 +7,9 @@ class RustBuilder(Builder):
     name = Constants.RUST
 
     def build(self):
-        channel = self.config.rust_channel
-        if not channel:
-            channel = '$CLICKABLE_RUST_CHANNEL'
-
-        command = [
-            'cargo',
-            f'+{channel}',
-            'install',
+        command = self.construct_cargo_command("install")
+        command += [
             '--locked',
-            '--target', self.config.arch_rust,
-            '--target-dir', self.config.build_dir,
             '--root', self.config.install_dir,
             '--path', self.config.src_dir,
         ]
@@ -33,3 +25,25 @@ class RustBuilder(Builder):
 
         self.container.run_command(' '.join(command),
                                    use_build_dir=False, cwd=self.config.src_dir)
+
+    def test(self, is_app=True):
+        test = self.config.test
+        if not test:
+            test = ' '.join(self.construct_cargo_command("test"))
+
+        command = f'xvfb-startup {test}'
+        self.container.run_command(command,
+                                   use_build_dir=False, cwd=self.config.src_dir)
+
+    def construct_cargo_command(self, command):
+        channel = self.config.rust_channel
+        if not channel:
+            channel = '$CLICKABLE_RUST_CHANNEL'
+
+        return [
+            'cargo',
+            f'+{channel}',
+            command,
+            '--target', self.config.arch_rust,
+            '--target-dir', self.config.build_dir,
+        ]
