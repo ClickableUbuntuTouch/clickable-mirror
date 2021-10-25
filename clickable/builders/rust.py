@@ -15,6 +15,7 @@ class RustBuilder(Builder):
             'cargo',
             f'+{channel}',
             'install',
+            '--locked',
             '--target', self.config.arch_rust,
             '--target-dir', self.config.build_dir,
             '--root', self.config.install_dir,
