@@ -28,7 +28,7 @@ class ScriptCommand(Command):
         command = self.config.scripts.get(self.script_name, None)
 
         if command:
-            run_subprocess_check_call(command)
+            run_subprocess_check_call(command, shell=True)
         else:
             raise ClickableException(
                 f'{self.script_name} is not a script defined in the project config.'
