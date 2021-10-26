@@ -685,6 +685,14 @@ class ProjectConfig():
     def is_build_cmd(self):
         return self.is_app_build_cmd() or 'build-libs' in self.commands
 
+    def is_project_independent_cmd(self):
+        return bool(set(['no_lock', 'writable_image', 'screenshots', 'create', 'setup'
+                    'shell', 'devices', 'update']).intersection(self.commands))
+
+    def is_device_cmd(self):
+        return bool(set(['install', 'launch', 'log', 'logs', 'no_lock', 'writable_image',
+                    'screenshots', 'shell', 'devices', 'gdbserver']).intersection(self.commands))
+
     def needs_builder(self):
         return self.is_build_cmd()
 
@@ -853,6 +861,13 @@ class ProjectConfig():
                     f'{self.config[path]}'
                 )
 
+    def check_device_commands(self):
+        if (self.is_device_cmd()
+                and not self.is_project_independent_cmd()
+                and self.config['arch'] == 'amd64'):
+            logger.warning('For interaction with a target device you might want to specify the '
+                           'device architecture via --arch.')
+
     def check_config_errors(self):
         self.check_clickable_version()
         self.check_arch_restrictions()
@@ -860,6 +875,7 @@ class ProjectConfig():
         self.check_docker_configs()
         self.check_desktop_configs()
         self.check_path_sanity()
+        self.check_device_commands()
 
     def is_foreign_target(self):
         return self.build_arch != Constants.host_arch
