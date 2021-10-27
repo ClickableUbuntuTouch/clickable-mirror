@@ -1,4 +1,5 @@
 from clickable.exceptions import ClickableException
+from clickable.container import Container
 
 from .base import Command
 
@@ -12,12 +13,17 @@ class RunCommand(Command):
 
         self.root_user = True
         self.command = 'bash'
+        self.lib = None
 
     def setup_parser(self, parser):
         parser.add_argument(
             '--user',
             action='store_true',
             help='Run as user (not as root)',
+        )
+        parser.add_argument(
+            '--lib',
+            help='Use library docker image',
         )
         parser.add_argument(
             'command',
@@ -28,6 +34,7 @@ class RunCommand(Command):
 
     def configure(self, args):
         self.root_user = not args.user
+        self.lib = args.lib
 
         if args.command:
             self.command = ' '.join(args.command)
@@ -36,8 +43,21 @@ class RunCommand(Command):
         raise ClickableException("Run command can't be nested in a chain.")
 
     def run(self):
-        self.container.setup()
-        self.container.run_command(
+        container = None
+
+        if self.lib:
+            for lib in self.config.lib_configs:
+                if lib.name == self.lib:
+                    container = Container(lib, lib.name)
+
+            if not container:
+                raise ClickableException(f'Library "{self.lib}" is not in your '
+                                         'project config.')
+        else:
+            container = self.container
+
+        container.setup()
+        container.run_command(
             self.command,
             use_build_dir=False,
             tty=True,
