@@ -53,8 +53,8 @@ class LaunchCommand(Command):
             kill = '[' + self.kill[:1] + ']' + self.kill[1:]
             self.device.run_command(f'pkill -f \\"{kill}\\"')
         except Exception:  # pylint: disable=broad-except
-            logger.warning("Could not kill app. Maybe the device is not accessible '\
-                    'or the app wasn't running.")
+            logger.warning("Could not kill app. Maybe the device is not accessible "
+                           "or the app wasn't running.")
 
     def run(self):
         if self.skip_kill or not self.kill:
