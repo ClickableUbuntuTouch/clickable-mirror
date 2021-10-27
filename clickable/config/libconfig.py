@@ -107,7 +107,7 @@ class LibConfig():
             'make_args': [],
             'install_dir': '${BUILD_DIR}/install',
             'image_setup': {},
-            'test': 'ctest',
+            'test': None,
             'rust_channel': None,
         }
 

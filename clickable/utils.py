@@ -160,6 +160,11 @@ def env(name):
     return value
 
 
+def get_builder(config, container, debug_build=False):
+    builder_classes = get_builders()
+    return builder_classes[config.builder](config, container, debug_build)
+
+
 def get_builders():
     builder_classes = {}
     builder_dir = join(dirname(__file__), 'builders')

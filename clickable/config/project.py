@@ -177,7 +177,7 @@ class ProjectConfig():
             'env_env_vars': {},
             'make_args': [],
             'libraries': {},
-            'test': 'qmltestrunner',
+            'test': None,
             'install_dir': '${BUILD_DIR}/install',
             'image_setup': {},
             'qt_version': Constants.default_qt,
