@@ -98,6 +98,21 @@ with Clickable in order to make the ``clean`` command work correctly for Rust ap
 The Rust builder now runs ``cargo install`` instead of ``cargo build``. It also
 supports ``build_args`` in your project config now.
 
+Go
+^^
+
+In Clickable 6 the Go builder would install files all files from the project folder
+unless they were listed in ``ignore``.
+In order to be more flexible and better aligned with the other builds, this behaviour
+was removed from the builder. Installing necessary files and folders has been added as
+``install_root_data`` field in the Go app template. For existing Go apps adding that
+field might be necessary as well.
+
+The Go builder now configures the package directory to the build directory configured
+with Clickable in order to make the ``clean`` command work correctly for Go apps.
+
+The Go builder no longer renames the produced binary based on the manifest.
+
 Pure and Cordova
 ^^^^^^^^^^^^^^^^
 

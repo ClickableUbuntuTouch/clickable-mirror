@@ -48,7 +48,8 @@ Breaking Changes
 - Scripts can only be executed through the ``script`` command.
 - The ``rust`` builder has been aligned to the other builders and does not try to install manifest and desktop file automatically anymore.
 - The ``rust`` builder runs ``cargo install`` instead of ``cargo build``
-- The ``rust`` builder configures the cargo target directory to match the build dir, fixing cleaning via the ``clean`` command.
+- The ``go`` builder has been aligned to the other builders and does not try to install all files in the project dir automatically anymore.
+- The ``go`` builder does not rename the produced binary anymore.
 - The ``pure`` and ``cordova`` builders no longer override manifest ``architecture`` and ``framework`` fields, unless they are set to ``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@``.
 - ``prebuild`` and ``postbuild`` are executed within the build container.
 - Removed deprecated configuration fields.
@@ -58,7 +59,9 @@ Bug Fixes
 
 - The ``rust`` builder does not fail any more if the source dir (containing the Cargo.toml) is a sub-directory of the project dir.
 - The ``rust`` builder does not try to update the tool chain on building any more (which would fail)
+- The ``rust`` builder configures the cargo target directory to match the build dir, fixing cleaning via the ``clean`` command.
 - The rustup cache is made writable in the container to fix permission issues on accessing it.
+- The ``go`` builder configures the package dir to match the build dir, fixing cleaning via the ``clean`` command.
 - Fixed app icons not displaying in Qt Creator.
 - Fixed run configuration name in Qt Creator.
 - Fixed crash for QtCreator when no exec args have been found
