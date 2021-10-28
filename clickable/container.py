@@ -475,6 +475,12 @@ FROM {self.base_docker_image}
             else:
                 logger.debug('Dependencies already installed')
 
+        if self.config.rust_channel:
+            self.run_command(f'rustup default {self.config.rust_channel}')
+
+            if self.config.is_foreign_target():
+                self.run_command(f'rustup target add {self.config.arch_rust}')
+
         if self.config.image_setup:
             for command in self.config.image_setup.get('run', []):
                 self.run_command(command, use_build_dir=False)
