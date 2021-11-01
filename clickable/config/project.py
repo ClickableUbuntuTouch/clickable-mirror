@@ -669,7 +669,9 @@ class ProjectConfig():
         for key in self.flexible_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=False)
 
-        self.ignore.extend(['.git', '.bzr', '.clickable'])
+        self.ignore.extend([
+            '.git', '.bzr', '.clickable', '.gitlab-ci.yml', 'build', '.gitignore', '.bzrignore'
+        ])
 
         self.config['default'] = ' '.join(self.config['default'])
 
