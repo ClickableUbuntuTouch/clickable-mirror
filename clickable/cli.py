@@ -84,7 +84,13 @@ class Cli():
         )
         parser.add_argument(
             '--docker-image',
-            help='Use a specific docker image to build with'
+            help='Use a specific docker image to build with',
+        )
+        parser.add_argument(
+            '--skip-image-setup',
+            action='store_true',
+            help='Do not run image setup',
+            default=False,
         )
         parser.add_argument(
             '--nvidia',

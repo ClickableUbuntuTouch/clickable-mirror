@@ -28,7 +28,7 @@ class Container():
         self.docker_image = self.config.docker_image
         self.base_docker_image = self.docker_image
 
-        if self.config.needs_clickable_image():
+        if not self.config.container_mode:
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
@@ -486,11 +486,12 @@ FROM {self.base_docker_image}
                 self.run_command(command, use_build_dir=False)
 
     def needs_customized_container(self):
-        return self.config.dependencies_host \
-            or self.config.dependencies_target \
-            or self.config.dependencies_ppa \
-            or self.config.image_setup \
-            or self.config.rust_channel
+        return not self.config.skip_image_setup and (
+            self.config.dependencies_host
+            or self.config.dependencies_target
+            or self.config.dependencies_ppa
+            or self.config.image_setup
+            or self.config.rust_channel)
 
     def check_base_image_version(self):
         if not self.minimum_version:
@@ -518,13 +519,13 @@ FROM {self.base_docker_image}
             )
 
     def setup(self):
-        if self.config.container_mode:
-            self.setup_container_mode()
-
         if self.config.needs_clickable_image():
             self.check_base_image_version()
 
-            if self.needs_customized_container():
+        if not self.config.skip_image_setup:
+            if self.config.container_mode:
+                self.setup_container_mode()
+            elif self.needs_customized_container():
                 self.setup_customized_image()
 
     def clean_clickable(self):
