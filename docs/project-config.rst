@@ -285,7 +285,7 @@ Needs to be specified as a dictionary with absolute source paths as keys and des
 .. code-block:: yaml
 
     install_data:
-    - icons/logo.svg: assets
+      icons/logo.svg: assets
 
 Relative source paths are prepended with the project root dir and destination paths with
 the install dir.

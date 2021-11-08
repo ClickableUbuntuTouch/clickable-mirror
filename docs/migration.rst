@@ -98,6 +98,13 @@ with Clickable in order to make the ``clean`` command work correctly for Rust ap
 The Rust builder now runs ``cargo install`` instead of ``cargo build``. It also
 supports ``build_args`` in your project config now.
 
+The Rust builder can now be used in libraries, too. The Rust builder explicitly
+specifies the rust channel to avoid unintended rustup calls that would fail due to
+missing permissions in the container.
+
+The channel can now be configured via the field ``rust_channel`` which makes it easy
+to use ``nightly`` or pin the rust version as desired (e.g. ``1.56.1``).
+
 Go
 ^^
 
@@ -136,6 +143,12 @@ side.
 
 Clickable 7 lets you specify a list of commands for ``prebuild``, ``build``,
 ``postmake`` and ``postbuild`` besides the possibility of specifying a single string.
+
+Container Handling
+------------------
+
+Unlike previous versions, Clickable 7 does not skip the image setup for custom docker images. If
+skipping is still desired, the command line flag ``--skip-image-setup`` can be used.
 
 Removal of Deprecated Things
 ----------------------------
