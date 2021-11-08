@@ -73,7 +73,8 @@ class ProjectConfig():
                             "build_args", "make_args", "postmake", "postbuild",
                             "prebuild",
                             "install_lib", "install_qml", "install_bin", "install_root_data",
-                            "install_data", "env_vars", "build_home"]
+                            "install_data", "env_vars", "build_home",
+                            "dependencies_host", "dependencies_target", "dependencies_ppa"]
 
     # Dicts where keys accept placeholders
     accepts_placeholders_keys = ["install_data", "env_vars"]
