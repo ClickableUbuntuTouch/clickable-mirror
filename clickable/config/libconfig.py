@@ -28,6 +28,7 @@ class LibInitConfig:
         self.container_mode = None
         self.docker_image = None
         self.build_arch = None
+        self.skip_image_setup = False
 
 
 class LibConfig():
@@ -78,6 +79,7 @@ class LibConfig():
         self.placeholders.update(config.libs_placeholders)
         self.lib_configs = config.lib_configs
         self.cwd = config.cwd if config.cwd else os.getcwd()
+        self.skip_image_setup = config.skip_image_setup
 
         self.set_host_arch()
         self.container_list = list(Constants.container_mapping[self.host_arch].values())
@@ -216,14 +218,6 @@ class LibConfig():
             raise ClickableException(
                 'When using the "custom" builder you must specify a "build" in one the lib configs'
             )
-
-        if self.is_custom_docker_image:
-            if self.dependencies_host or self.dependencies_target or self.dependencies_ppa:
-                logger.warning(
-                    "Dependencies are ignored when using a custom docker image!")
-            if self.image_setup:
-                logger.warning(
-                    "Docker image setup is ignored when using a custom docker image!")
 
     def set_host_arch(self):
         host = platform.machine()

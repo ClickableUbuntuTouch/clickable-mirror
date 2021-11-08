@@ -111,6 +111,7 @@ class ProjectConfig():
     install_files = []
     lib_configs = []
     global_config = None
+    skip_image_setup = False
 
     def __init__(self, args=None, cwd=None, commands=None, always_clean=False):
         if not commands:
@@ -524,6 +525,9 @@ class ProjectConfig():
         if args.docker_image:
             config['docker_image'] = args.docker_image
 
+        if args.skip_image_setup:
+            self.skip_image_setup = True
+
         return config
 
     def prepare_docker_env_vars(self):
@@ -649,6 +653,7 @@ class ProjectConfig():
             lib_init.container_mode = self.container_mode
             lib_init.docker_image = self.docker_image
             lib_init.build_arch = self.build_arch
+            lib_init.skip_image_setup = self.skip_image_setup
 
             lib = LibConfig(lib_init)
             self.lib_configs.append(lib)
@@ -835,15 +840,6 @@ class ProjectConfig():
                 f'"{self.config["builder"]}" is not a valid builder ({builders})'
             )
 
-    def check_docker_configs(self):
-        if self.is_custom_docker_image:
-            if self.dependencies_host or self.dependencies_target or self.dependencies_ppa:
-                logger.warning("Dependencies are ignored when using a custom docker image!")
-            if self.image_setup:
-                logger.warning("Docker image setup is ignored when using a custom docker image!")
-            if self.rust_channel:
-                logger.warning("Rust channel is ignored when using a custom docker image!")
-
     def check_desktop_configs(self):
         if self.is_desktop_mode():
             if self.use_nvidia and self.avoid_nvidia:
@@ -874,7 +870,6 @@ class ProjectConfig():
         self.check_clickable_version()
         self.check_arch_restrictions()
         self.check_builder_rules()
-        self.check_docker_configs()
         self.check_desktop_configs()
         self.check_path_sanity()
         self.check_device_commands()
