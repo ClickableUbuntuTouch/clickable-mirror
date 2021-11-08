@@ -18,10 +18,12 @@ New features
 - Added new ``chain`` command to run multiple Clickable commands in a chain.
 - Added new ``script`` command to run scripts defined in the clickable.json config file.
 - Added new ``ci`` command to open a shell in the Clickable CI container.
+- The ``run`` command can now be provided with a library name to run within the respective image.
 - The ``create`` command allows to create apps non-interactively configuring the template with command line parameters.
 - The ``gdb`` command allows to export a GDB init script that can be used by any IDE's remote debugger.
 - The behavior of the ``gdb`` and ``gdbserver`` commands can be configured in detail via command line parameters.
-- The ``rust`` builder supports the ``rust_channel`` field to configure the desired tool chain (e.g. ``1.56.0`` or ``nightly``).
+- The ``test`` command now runs ``cargo test`` by default for the ``rust`` builder.
+- The ``rust`` builder supports the ``rust_channel`` field to configure the desired tool chain (e.g. ``1.56.1`` or ``nightly``).
 - The ``rust`` builder supports the ``build_args`` field in the project config (arguments are forwarded to cargo).
 - The ``rust`` builder supports ``--verbose`` flag (forwarded to cargo)
 - The ``rust`` builder supports Clickable libraries
@@ -34,6 +36,7 @@ New features
 - Library placeholders are available to successive libraries in the sequence (useful for linking libraries against other libraries).
 - Library install directories are added to ``CMAKE_INSTALL_PREFIX`` for successive libraries in the sequence (to enable the usage of ``find_package()``).
 - Set ``CMAKE_INSTALL_PREFIX`` in Qt Creator run configurations.
+- ``dependencies_host``, ``dependencies_target`` and ``dependencies_ppa`` now support placeholders
 - Added Godot template
 
 Breaking Changes
@@ -52,6 +55,8 @@ Breaking Changes
 - The ``go`` builder does not rename the produced binary anymore.
 - The ``pure`` and ``cordova`` builders no longer override manifest ``architecture`` and ``framework`` fields, unless they are set to ``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@``.
 - ``prebuild`` and ``postbuild`` are executed within the build container.
+- The image setup (``image_setup``, ``dependencies_*``, ``rust_channel``) is executed for custom docker images, too.
+- The image setup can be skipped with the cli flag ``--skip-image-setup``.
 - Removed deprecated configuration fields.
 
 Bug Fixes
@@ -65,6 +70,7 @@ Bug Fixes
 - Fixed app icons not displaying in Qt Creator.
 - Fixed run configuration name in Qt Creator.
 - Fixed crash for QtCreator when no exec args have been found
+- Fixed ``shell`` command if public SSH key is ``id_ed25519.pub``.
 - General polish and small bug fixes.
 
 Changes in v6.24.2
