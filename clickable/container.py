@@ -519,7 +519,7 @@ FROM {self.base_docker_image}
             )
 
     def setup(self):
-        if self.config.needs_clickable_image():
+        if self.docker_mode:
             self.check_base_image_version()
 
         if not self.config.skip_image_setup:
