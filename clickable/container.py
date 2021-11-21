@@ -28,7 +28,7 @@ class Container():
         self.docker_image = self.config.docker_image
         self.base_docker_image = self.docker_image
 
-        if not self.config.container_mode:
+        if self.docker_mode:
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
