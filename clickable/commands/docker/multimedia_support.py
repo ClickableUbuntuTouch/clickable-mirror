@@ -18,7 +18,7 @@ class MultimediaSupport(DockerSupport):
         docker_config.volumes.update({
             '/dev/shm': '/dev/shm',
             '/etc/machine-id': '/etc/machine-id',
-            '/run/{}/pulse'.format(uid): '/run/user/1000/pulse',
+            '/run/user/{}/pulse'.format(uid): '/run/user/1000/pulse',
             '/var/lib/dbus': '/var/lib/dbus',
             '/home/{}/.pulse'.format(user): '/home/phablet/.pulse',
             '/dev/snd': '/dev/snd',
