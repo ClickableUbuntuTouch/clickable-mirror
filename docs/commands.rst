@@ -3,9 +3,14 @@
 Commands
 ========
 
-From the root directory of your project you have multiple sub-commands available. Run
-``clickable --help`` to list them all. ``clickable <cmd> --help`` explains a single command in
-detail. Some of the most common ones are explained below.
+``clickable`` is the main command. Run it from somewhere within the directory of your project. It can be combined with multiple sub-commands. This documentation does not list all subcommands or parameters. Only some of the most common ones are explained below. Run ``clickable --help`` to list them all. ``clickable <subcommand> --help`` explains a single command in detail.
+
+Important:
+1. Parameters for subcommands need to be placed AFTER the subcommand!
+2. Parameters for one subcommand may not necessarily be available for other subcommands. Check with ``--help`` if not sure.
+
+``clickable``
+-------------
 
 A pure ``clickable`` call is equivalent to ``clickable chain``.
 
@@ -65,7 +70,7 @@ On Ubuntu, install these requirements using ``apt install nvidia-container-toolk
 To be able to install the nvidia-container-toolkit you have to perform the following commands
 (as mentioned on https://www.server-world.info/en/note?os=Ubuntu_20.04&p=nvidia&f=2):
 
-As root: 
+As root:
 
 .. code-block:: bash
 
@@ -203,7 +208,7 @@ Update the docker images for use with clickable.
 ``clickable no-lock``
 ---------------------
 
-Turns off the device's display timeout.
+Turns off the display timeout for a connected device.
 
 ``clickable writable-image``
 ----------------------------
