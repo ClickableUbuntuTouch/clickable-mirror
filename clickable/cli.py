@@ -126,7 +126,13 @@ class Cli():
     def parse_args(self, argv):
         ignore = ['-h', '--help', '-v', '--version']
 
-        if len(argv) >= 1 and argv[0] not in self.commands and argv[0] not in ignore:
+        found = False
+        for arg in argv:
+            if arg in self.commands:
+                found = True
+                break
+
+        if not found and len(argv) >= 1 and argv[0] not in ignore:
             argv.insert(0, 'default')
 
         return self.parser.parse_args(argv)
