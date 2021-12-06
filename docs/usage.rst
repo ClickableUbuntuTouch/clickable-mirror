@@ -24,7 +24,7 @@ Note: The first time you run ``clickable`` in your app directory, behind the
 scenes it will download a new Docker container which is about 1GB in size - so
 plan your time and data transfer environment accordingly. This will only happen
 the first time you build your app for a specific architecture and when you run
-``clickable update``.
+``clickable update-images``.
 
 Running the default sub-commands will:
 

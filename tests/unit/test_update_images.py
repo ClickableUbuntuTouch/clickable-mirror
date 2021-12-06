@@ -1,7 +1,7 @@
 from unittest import mock
 from unittest.mock import ANY
 
-from clickable.commands.update import UpdateCommand
+from clickable.commands.update_images import UpdateCommand
 from ..mocks import empty_fn
 from .base_test import UnitTest
 
@@ -19,7 +19,7 @@ class TestUpdateCommand(UnitTest):
 
     @mock.patch('clickable.container.Container.check_docker', side_effect=empty_fn)
     @mock.patch('clickable.utils.run_subprocess_call', side_effect=zero_fn)
-    @mock.patch('clickable.commands.update.run_subprocess_check_call', side_effect=empty_fn)
+    @mock.patch('clickable.commands.update_images.run_subprocess_check_call', side_effect=empty_fn)
     def test_update(
         self,
         mock_run_subprocess_check_call,
