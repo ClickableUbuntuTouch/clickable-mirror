@@ -308,8 +308,7 @@ class DesktopCommand(Command):
 
     def get_docker_path_env(self, working_directory):
         return ':'.join([
-            os.path.join(working_directory, 'bin'),
-            os.path.join(working_directory, f'lib/{self.config.arch_triplet}/bin'),
+            self.config.app_bin_dir,
             working_directory,
             '/usr/local/nvidia/bin',
             '/bin',

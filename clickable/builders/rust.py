@@ -10,7 +10,7 @@ class RustBuilder(Builder):
         command = self.construct_cargo_command("install")
         command += [
             '--locked',
-            '--root', self.config.install_dir,
+            '--root', self.config.app_lib_dir,  # cargo install appends "/bin"
             '--path', self.config.src_dir,
         ]
 
