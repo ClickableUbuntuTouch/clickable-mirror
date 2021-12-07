@@ -8,9 +8,13 @@ class RustBuilder(Builder):
 
     def build(self):
         command = self.construct_cargo_command("install")
+
+        # cargo install appends "/bin". Choosing the app lib dir for the app and the install dir
+        # for rust libraries
+        install_dir = self.config.config.get("app_lib_dir", self.config.install_dir)
         command += [
             '--locked',
-            '--root', self.config.app_lib_dir,  # cargo install appends "/bin"
+            '--root', install_dir,
             '--path', self.config.src_dir,
         ]
 
