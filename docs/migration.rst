@@ -43,10 +43,10 @@ confirm to enable bash completion ``clickable setup completion``.
 If you use another shell, check `argcomplete docs <https://kislyuk.github.io/argcomplete/>`__
 on whether it is supported and how to enable it.
 
-Sub-Commands
-^^^^^^^^^^^^
+Commands
+^^^^^^^^
 
-Clickable 7 introduces proper sub-commands providing specific parameters and help
+Clickable 7 introduces proper commands providing specific parameters and help
 messages. Example: ``clickable create --help``.
 
 Chaining Commands
@@ -69,6 +69,13 @@ Libraries
 Libraries are now cleaned and built by the same commands as the app itself. Run
 ``clickable build --libs`` to build libraries, ``clickable clean --libs`` to clean them 
 and ``clickable test --libs`` for running unit tests.
+
+Update
+^^^^^^
+
+The ``update`` command has been renamed to ``update-images`` because it was often
+misunderstood as a command to update clickable. In fact, it does only update the
+clickable docker images.
 
 Project Configuration File
 --------------------------

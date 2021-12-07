@@ -25,8 +25,9 @@ New features
 - The ``test`` command now runs ``cargo test`` by default for the ``rust`` builder.
 - The ``rust`` builder supports the ``rust_channel`` field to configure the desired tool chain (e.g. ``1.56.1`` or ``nightly``).
 - The ``rust`` builder supports the ``build_args`` field in the project config (arguments are forwarded to cargo).
-- The ``rust`` builder supports ``--verbose`` flag (forwarded to cargo)
-- The ``rust`` builder supports Clickable libraries
+- The ``rust`` builder supports ``--verbose`` flag (forwarded to cargo).
+- The ``rust`` builder supports Clickable libraries.
+- The ``rust`` builder installs the binaries into ``lib/<ARCH_TRIPLET>/bin`` (does not apply to libraries).
 - Project configuration now uses yaml format and project config is called ``clickable.yaml`` (``clickale.json`` is used as fallback and json format can still be used as it is a subset of yaml)
 - Build commands can be either specified as a string or a list of strings (``prebuild``, ``build``, ``postmake``, ``postbuild``).
 - Added ``install_root_data`` config field to list files for installation into the click package root directory.
@@ -72,6 +73,7 @@ Bug Fixes
 - Fixed crash for QtCreator when no exec args have been found
 - Fixed ``shell`` command if public SSH key is ``id_ed25519.pub``.
 - General polish and small bug fixes.
+- Fix sound in desktop mode.
 
 Changes in v6.24.2
 ------------------
