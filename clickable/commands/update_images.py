@@ -16,8 +16,8 @@ def update_image(image):
 class UpdateCommand(Command):
     def __init__(self):
         Command.__init__(self)
-        self.cli_conf.name = 'update'
-        self.cli_conf.aliases = ['update-images']
+        self.cli_conf.name = 'update-images'
+        self.cli_conf.aliases = []
         self.cli_conf.help_msg = 'Update all Clickable docker images that have '\
             'already been used. This does not update Clickable itself.'
 

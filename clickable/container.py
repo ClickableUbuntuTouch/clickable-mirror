@@ -515,7 +515,7 @@ FROM {self.base_docker_image}
             raise ClickableException(
                 f'This version of Clickable requires Clickable docker image {self.docker_image} '
                 f'in version {self.minimum_version} or higher (found version {version}). '
-                'Please run "clickable update" to update your local images.'
+                'Please run "clickable update-images" to update your local images.'
             )
 
     def setup(self):

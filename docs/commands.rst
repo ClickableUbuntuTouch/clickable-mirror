@@ -195,8 +195,8 @@ Runs an arbitrary command in the clickable container. Changes do not persist.
 This is only meant to inspect the container. Opens a root bash shell if no
 command is specified.
 
-``clickable update``
---------------------
+``clickable update-images``
+---------------------------
 
 Update the docker images for use with clickable.
 

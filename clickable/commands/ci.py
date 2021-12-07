@@ -3,7 +3,7 @@ from clickable.container import Container
 from clickable.logger import logger
 
 from .base import Command
-from .update import update_image
+from .update_images import update_image
 
 
 class CiCommand(Command):
