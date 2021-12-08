@@ -122,8 +122,10 @@ class Container():
 
         check_command('docker')
 
-        if self.needs_docker_setup():
-            self.setup_docker()
+        if not (self.needs_docker_setup() and self.is_systemd_used()):
+            return
+
+        self.setup_docker()
 
         if not self.is_docker_service_running():
             retries -= 1
@@ -137,6 +139,9 @@ class Container():
 
             time.sleep(3)  # Give it a sec to boot up
             self.check_docker(retries)
+
+    def is_systemd_used(self):
+        return subprocess.call('command -v systemctl >> /dev/null', shell=True) == 0
 
     def docker_group_exists(self):
         group_exists = False
@@ -170,7 +175,6 @@ class Container():
     def needs_docker_setup(self):
         return (
             not env('CLICKABLE_SKIP_DOCKER_CHECKS') and
-            sys.platform != 'darwin' and
             not self.is_docker_ready()
         )
 
