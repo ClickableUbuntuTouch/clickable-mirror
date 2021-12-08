@@ -92,7 +92,8 @@ class Constants():
 
     host_arch_mapping = {
         'x86_64': 'amd64',
-        'aarch64': 'arm64',
+        'aarch64': 'arm64',  # Linux reports aarch64
+        'arm64': 'arm64',  # Mac reports arm64
         'armv7l': 'armhf',
     }
     host_arch = host_arch_mapping.get(platform.machine(), None)
