@@ -3,49 +3,197 @@
 Commands
 ========
 
-``clickable`` is the main command. Run it from somewhere within the directory of your project. It can be combined with multiple sub-commands. This documentation does not list all subcommands or parameters. Only some of the most common ones are explained below. Run ``clickable --help`` to list them all. ``clickable <subcommand> --help`` explains a single command in detail.
+The behavior of Clickable is controlled via commands, each with their own set of available
+parameters.
 
-Important:
-1. Parameters for subcommands need to be placed AFTER the subcommand!
-2. Parameters for one subcommand may not necessarily be available for other subcommands. Check with ``--help`` if not sure.
+.. code-block:: bash
 
-``clickable``
--------------
+   clickable <command> [param ...]
 
-A pure ``clickable`` call is equivalent to ``clickable chain``.
+This documentation only lists some selected commands and parameters. Run
+``clickable --help`` to see the list of all available commands and
+``clickable <command> --help`` to get a command-specific help message listing its
+available parameters. 
 
-``clickable chain``
--------------------
+Project-specific commands like ``build`` and ``install`` can be executed from the projec
+root or any of its sub-directories, given there is a project config in the project root.
+
+Running Clickable without a command is a shortcut to the default ``chain`` command (see
+below). This special case allows a few universal parameters like ``--verbose`` and
+``--arch``.
+
+``chain``
+---------
 
 Chains multiple commands that can be specified. The default chain can be configured via the
-:ref:`default <project-config-default>` field. The default chain itself defaults to
+:ref:`default <project-config-default>` field. If not configured, the default is
 ``build install launch``.
 
-A clean build can be enforced by running ``clickable chain --clean``.
+A clean build in a chain can be enforced by running ``clickable chain --clean``.
 
-``clickable desktop``
----------------------
+``desktop``
+-----------
 
-Compile and run the app on the desktop. Accepts the same arguments as the ``build`` command plus
-some desktop mode specific ones.
+Compiles and runs the app on the desktop. Accepts the same arguments as the ``build`` command
+plus some desktop mode specific ones.
 
 Note: ArchLinux user might need to run ``xhost +local:clickable`` before using
 desktop mode.
 
-Run ``clickable desktop --verbose`` to show the executed docker command.
-
 Run ``clickable desktop --dark-mode`` to set the dark mode preference.
 
-Run ``clickable desktop --lang <language code>_<country code>`` (for example, `fr_FR`) to test using a different language.
+Run ``clickable desktop --lang <language code>_<country code>`` (for example, `fr_FR`)
+to test using a different language.
+
+Run ``clickable desktop --gdb`` to start the app via GDB.
 
 The env var ``CLICKABLE_DESKTOP_MODE`` is set in desktop mode.
 
+.. _commands-ide:
+
+``ide``
+-------
+
+Will run an IDE inside the Clickable docker container, QtCreator by default. Atom can be
+started with ``clickable ide atom``.
+
+``ci``
+------
+
+Will open a root bash inside a Clickable CI container that can be used to debug a CI job.
+
+``run``
+-------
+
+Opens a bash inside the Clickable docker container to analyze the build environment.
+This is only meant to inspect the container. Changes do not persist.
+
+``clickable run -- <some command>`` runs an arbitrary command in the Clickable container.
+
+``create``
+----------
+
+Generate a new app from a list of :ref:`app template options <app-templates>`.
+
+``shell``
+---------
+
+Opens a SSH shell on a connected device either via SSH or ADB.
+
+``clean``
+---------
+
+Cleans out the app build dir. Can be applied to libraries by appending ``--libs``.
+
+``build``
+---------
+
+Builds the project using the specified builder, build dir, and build commands.
+Then it takes the built files and compiles them into a click package (you can
+find it in the build dir). Finally runs a review.
+
+Set the manifest architecture field to ``@CLICK_ARCH@`` and the framework field
+to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate values.
+
+Specify where to put the compiled click by ``--output``.
+
+Builds libraries specified in the project config using the ``libs`` parameter.
+
+``review``
+----------
+
+Takes the built click package and runs click-review against it. This allows you
+to review your click without installing click-review on your computer.
+
+The review runs automatically after a ``build`` command.
+
+.. _commands-test:
+
+``test``
+--------
+
+Run your test suite with a virtual screen. By default this runs ``qmltestrunner``,
+but you can specify a custom command by setting the :ref:`test <project-config-test>`
+property in your project config.
+
+``install``
+-----------
+
+Takes a built click package from the build dir and installs it on a connected device.
+
+``launch``
+----------
+
+Launches the app on a connected device.
+
+``clickable launch <app name>`` launches the specified app.
+
+``logs``
+--------
+
+Follows the app log file on a connected device.
+
+``log``
+------------------
+
+Prints the app log file from a connected device.
+
+``publish``
+-----------
+
+Publish your click package to the OpenStore. Check the
+:ref:`Getting started doc <getting-started>` for more info.
+
+``clickable publish "changelog message"`` publishs your click app to the OpenStore
+with a message prepended to the changelog.
+
+``update-images``
+-----------------
+
+Update the docker images used with Clickable.
+
+``no-lock``
+-----------
+
+Turns off the display timeout for a connected device.
+
+``writable-image``
+------------------
+
+Make your Ubuntu Touch device's rootfs writable.
+
+``devices``
+-----------
+
+Lists the serial numbers and model names for attached devices using ADB. Useful when
+multiple devices are attached and you need to know what to use for the ``-s``
+argument.
+
+``script``
+----------
+
+``clickable script <script name>`` runs a custom command specified as a script in the
+project config.
+
+Shared Parameters
+-----------------
+
+Some parameters can be used with multiple commands. This sections explains some of them.
+
+``--arch``
+^^^^^^^^^^
+
+Specifying the target architecture allows Clickable to select to appropriate
+docker image, choose the build dir path and (cross-)compile the app correctly.
+
+Defaults to the host architecture.
+
 .. _nvidia:
 
-``clickable desktop --nvidia``
-------------------------------
+``--nvidia``
+^^^^^^^^^^^^
 
-``clickable`` checks automatically if nvidia-drivers are installed and turns on nvidia
+The ``desktop`` command checks automatically if nvidia-drivers are installed and turns on nvidia
 mode. If ``prime-select`` is installed, it is queried to check whether the nvidia-driver
 is actually in use.
 The ``--nvidia`` flag lets you manually enforce nvidia mode. The ``--no-nvidia``
@@ -84,164 +232,26 @@ As root:
 
    systemctl restart docker
 
-Run clickable with the ``--verbose`` flag to see the executed command for your system.
+Run Clickable with the ``--verbose`` flag to see the executed command for your system.
 
-.. _commands-ide:
-
-``clickable ide <custom_command>``
-----------------------------------
-
-Will run ``custom_command`` inside ide container wrapper.
-e.g. Launch qtcreator: ``clickable ide qtcreator``.
-
-
-``clickable ci <custom_command>``
----------------------------------
-
-Will run ``custom_command`` inside a Clickable CI container.
-
-``clickable create``
---------------------
-
-Generate a new app from a list of :ref:`app template options <app-templates>`.
-
-``clickable create <app template name>``
-
-Generate a new app from an :ref:`app template <app-templates>` by name.
-
-``clickable shell``
--------------------
-
-Opens a shell on the device via ssh. This is similar to the ``phablet-shell`` command.
-
-``clickable clean``
--------------------
-
-Cleans out the app build dir. Can by applied to libraries by appending ``--libs``.
-
-``clickable build``
--------------------
-
-Builds the project using the specified builder, build dir, and build commands.
-Then it takes the built files and compiles them into a click package (you can
-find it in the build dir).
-
-Set the manifest architecture field to ``@CLICK_ARCH@`` and the framework field
-to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate values.
-
-``clickable build --libs``
---------------------------
-
-Builds libraries specified in the project config.
-
-``clickable build --output=/path/to/some/diretory``
----------------------------------------------------
-
-Takes the built files and compiles them into a click package, outputting the
-compiled click to the directory specified by ``--output``.
-
-``clickable review``
---------------------
-
-Takes the built click package and runs click-review against it. This allows you
-to review your click without installing click-review on your computer.
-
-.. _commands-test:
-
-``clickable test``
-------------------
-
-Run your test suite in with a virtual screen. By default this runs qmltestrunner,
-but you can specify a custom command by setting the :ref:`test <project-config-test>`
-property in your project config.
-
-``clickable install``
----------------------
-
-Takes a built click package and installs it on a device.
-
-``clickable install ./path/to/click/app.click``
-
-Installs the specified click package on the device
-
-``clickable launch``
---------------------
-
-Launches the app on a device.
-
-``clickable launch <app name>``
-
-Launches the specified app on a device.
-
-``clickable logs``
-------------------
-
-Follow the apps log file on the device.
-
-``clickable log``
-------------------
-
-Dumps the apps log file on the device.
-
-``clickable publish``
----------------------
-
-Publish your click app to the OpenStore. Check the
-:ref:`Getting started doc <getting-started>` for more info.
-
-``clickable publish "changelog message"``
-
-Publish your click app to the OpenStore with a message to add to the changelog.
-
-``clickable run "some command"``
---------------------------------
-
-Runs an arbitrary command in the clickable container. Changes do not persist.
-This is only meant to inspect the container. Opens a root bash shell if no
-command is specified.
-
-``clickable update-images``
----------------------------
-
-Update the docker images for use with clickable.
-
-``clickable no-lock``
----------------------
-
-Turns off the display timeout for a connected device.
-
-``clickable writable-image``
-----------------------------
-
-Make your Ubuntu Touch device's rootfs writable. This replaces to old
-``phablet-config writable-image`` command.
-
-``clickable devices``
----------------------
-
-Lists the serial numbers and model names for attached devices. Useful when
-multiple devices are attached and you need to know what to use for the ``-s``
-argument.
-
-``clickable script <custom command>``
--------------------------------------
-
-Runs a custom command specified in the "scripts" config
 
 .. _container-mode:
 
-``clickable <any command> --container-mode``
---------------------------------------------
+``--container-mode``
+^^^^^^^^^^^^^^^^^^^^
 
 Runs all builds commands on the current machine and not in a container. This is
-useful from running clickable from within a container.
+useful for running Clickable from within a container, especially in a CI.
 
-``clickable <any command> --verbose``
--------------------------------------
+``--verbose``
+^^^^^^^^^^^^^
 
-Have Clickable print out debug information about whatever command(s) are being run.
+Have Clickable print out debug information and more detailed error messages. Also
+makes tools like ``make`` or ``cargo`` more verbose.
 
-``clickable <any command> --ssh <ip address>``
-----------------------------------------------
+``--ssh``
+^^^^^^^^^
 
-Run a command with a device over ssh rather than the default adb.
+Specify an IP address to run a device-related command over SSH rather than the default
+ADB.
+

@@ -11,53 +11,54 @@ process <install>`
 
 To find out all supported command line arguments run ``clickable --help``.
 
-You can get started with using clickable with an existing Ubuntu Touch app.
-You can use clickable with apps generated from the old Ubuntu Touch SDK IDE
+You can get started with using Clickable with an existing Ubuntu Touch app.
+You can use Clickable with apps generated from the old Ubuntu Touch SDK IDE
 or you can start fresh by running ``clickable create`` which is outlined in more
 detail on the previous :ref:`getting started <getting-started>` page.
 
-To run the default set of sub-commands, simply run ``clickable`` in the root directory
-of your app's code. Clickable will attempt to auto detect which
+To run the default set of commands, simply run ``clickable`` in the root
+directory of your app's code. Clickable will attempt to auto detect which
 :ref:`builder <builders>` is able to build your app.
 
-Note: The first time you run ``clickable`` in your app directory, behind the
-scenes it will download a new Docker container which is about 1GB in size - so
+Note: The first time you run ``clickable`` in your app directory,
+it will download a new Docker container which is about 1GB in size - so
 plan your time and data transfer environment accordingly. This will only happen
 the first time you build your app for a specific architecture and when you run
 ``clickable update-images``.
 
-Running the default sub-commands will:
+Running the default commands will:
 
 1) Build the app
 2) Build the click package (can be found in the build directory)
 3) Uninstall the app from your phone
 4) Install the newly built app on your phone
-5) Kill the running app on the phone
+5) Kill the app on the phone (if already running)
 6) Launch the app on your phone
 
-By default the access is accessed using adb, see below if you want to use ssh)
+By default the device is accessed using ADB, see below if you want to use SSH)
 
 Note: ensure your device is in `developer mode <http://docs.ubports.com/en/latest/userguide/advanceduse/adb.html?highlight=mode#enable-developer-mode>`__
-for the app to be installed when using adb or `enable ssh <http://docs.ubports.com/en/latest/userguide/advanceduse/ssh.html>`__
-when using ssh.
+for the app to be installed when using ADB or `enable ssh <http://docs.ubports.com/en/latest/userguide/advanceduse/ssh.html>`__
+when using SSH.
 
 Configuration
 -------------
 One can specify the path to a :ref:`project config file <project-config>`
 with ``--config``. If not
 specified, Clickable will look for an optional configuration file called
-``clickable.yaml`` and then``clickable.json`` in the current directory.
+``clickable.yaml`` and then ``clickable.json`` in the current and all
+parent directories.
 If there is none, Clickable will
 ask if it should attempt to detect the type of app and choose a fitting
 :ref:`builder <builders>` with default configuration.
 
 .. _ssh:
 
-Connecting to a device over ssh
+Connecting to a device over SSH
 -------------------------------
 
-By default the device is connected to via adb.
-If you want to access a device over ssh you need to either specify the device
+By default the device is connected to via ADB.
+If you want to access a device over SSH you need to either specify the device
 IP address or hostname on the command line (ex: ``clickable logs --ssh 192.168.1.10`` ) or you
 can use the ``CLICKABLE_SSH`` env var. Make sure to `enable ssh <http://docs.ubports.com/en/latest/userguide/advanceduse/ssh.html>`__
 on your device for this to work.
@@ -67,8 +68,8 @@ on your device for this to work.
 Multiple connected devices
 --------------------------
 
-By default clickable assumes that there is only one device connected to your
-computer via adb. If you have multiple devices attached to your computer you
+By default Clickable assumes that there is only one device connected to your
+computer via ADB. If you have multiple devices attached to your computer you
 can specify which device to install/launch/etc on by using the flag
 ``--serial-number`` or ``-s`` for short. You can get the serial number
 by running ``clickable devices``.
