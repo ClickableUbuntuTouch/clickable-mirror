@@ -1,3 +1,5 @@
+import os
+
 from clickable.config.project import ProjectConfig
 from clickable.config.constants import Constants
 from clickable.commands.docker.docker_config import DockerConfig
@@ -11,20 +13,15 @@ class GoSupport(DockerSupport):
         self.config = config
 
     def update(self, docker_config: DockerConfig):
-        builder = self.config.builder
+        if self.config.builder == Constants.GO and self.config.gopath:
+            gopaths = self.config.gopath.split(':')
+            for (index, path) in enumerate(gopaths):
+                os.makedirs(path, exist_ok=True)
 
-        if builder == Constants.GO:
-            go_paths = list(map(
-                lambda gopath:
-                '/gopath/path{}'.format(gopath),
-                self.config.gopath.split(':')
-            ))
-
-            for path in go_paths:
                 docker_config.add_volume_mappings({
-                    path: path
+                    path: f'/gopath/path{index}'
                 })
 
             docker_config.add_environment_variables({
-                'GOPATH': ':'.join(list(go_paths))
+                'GOPATH': self.config.gopath
             })
