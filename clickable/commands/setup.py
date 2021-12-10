@@ -1,6 +1,6 @@
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
-from clickable.utils import run_subprocess_check_call, is_command
+from clickable.utils import run_subprocess_check_call
 
 from .base import Command
 
@@ -46,33 +46,28 @@ class SetupCommand(Command):
         except ClickableException:
             logger.warning('Please log out or restart to apply changes')
 
-    def find_argcomplete_command(self):
-        command = 'register-python-argcomplete'
-
-        if not is_command(command):
-            command = 'register-python-argcomplete3'
-
-        if not is_command(command):
-            raise ClickableException(
-                'Cannot enable bash completion, because argcomplete is not installed.'
-            )
-
-        return command
-
     def setup_bash_completion(self):
         if not self.confirm(
-            'Do you want Clickable to set up bash completion by appending a '
-            'line to your ~/.bashrc?'
+            'Do you want Clickable to set up bash completion by appending an '
+            'argcomplete command to your ~/.bashrc?'
         ):
             logger.warning(
                 'Bash completion setup skipped. See https://kislyuk.github.io/argcomplete/ '
-                'for how to enable completion manually, including other shells.'
+                'for how to enable completion for different shells.'
             )
             return
 
-        argcomplete_command = self.find_argcomplete_command()
-        activation = '\n# Enable bash completion for Clickable\neval ' \
-                     f'"$({argcomplete_command} clickable)"'
+        activation = '''
+# Enable bash completion for Clickable
+if [ $(command -v register-python-argcomplete) ]; then
+  eval "$(register-python-argcomplete clickable)"
+elif [ $(command -v register-python-argcomplete3) ]; then
+  eval "$(register-python-argcomplete3 clickable)"
+else
+  echo "Cannot enable Clickable autocompletion, because argcomplete is not installed"
+fi
+'''.strip()
 
-        run_subprocess_check_call(f"echo '{activation}' >> ~/.bashrc", shell=True)
-        logger.info('Bash completion is set up. Open a new terminal to apply changes.')
+        run_subprocess_check_call(f"echo '\n{activation}' >> ~/.bashrc", shell=True)
+        logger.info('Bash completion is set up. Run "source ~/.bashrc" or open a new '
+                    'terminal to apply changes.')
