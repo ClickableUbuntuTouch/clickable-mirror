@@ -49,7 +49,8 @@ class LibConfig():
                             "build_args", "make_args", "postmake", "postbuild",
                             "prebuild",
                             "env_vars", "build_home",
-                            "dependencies_host", "dependencies_target", "dependencies_ppa"]
+                            "dependencies_host", "dependencies_target", "dependencies_ppa",
+                            "build"]
 
     path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
                  'cargo_home', 'build_home']
