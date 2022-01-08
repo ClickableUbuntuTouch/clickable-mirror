@@ -39,6 +39,7 @@ New features
 - Set ``CMAKE_INSTALL_PREFIX`` in Qt Creator run configurations.
 - ``dependencies_host``, ``dependencies_target`` and ``dependencies_ppa`` now support placeholders
 - Added Godot template
+- Support for running Clickable on arm64 MacOS devices (except for desktop mode)
 
 Breaking Changes
 ^^^^^^^^^^^^^^^^
