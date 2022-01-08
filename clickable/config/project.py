@@ -422,9 +422,15 @@ class ProjectConfig():
             logger.debug("Loading config file %s", config_path)
 
             with open(config_path, 'r', encoding='UTF-8') as f:
+                file_contents = f.readlines()
+                if os.path.splitext(config_path)[1] == '.json':
+                    # Handle tabs instead of spaces in json files
+                    file_contents = [re.sub('^\t+', '  ', line) for line in file_contents]
+
                 config_dict = {}
                 try:
-                    config_dict = yaml.safe_load(f)
+                    config_dict = yaml.safe_load("\n".join(file_contents))
+
                 except ValueError as err:
                     raise ClickableException(
                         f'Project config {config_path} is not a valid yaml file') from err
