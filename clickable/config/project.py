@@ -74,7 +74,8 @@ class ProjectConfig():
                             "prebuild",
                             "install_lib", "install_qml", "install_bin", "install_root_data",
                             "install_data", "env_vars", "build_home",
-                            "dependencies_host", "dependencies_target", "dependencies_ppa"]
+                            "dependencies_host", "dependencies_target", "dependencies_ppa",
+                            "build"]
 
     # Dicts where keys accept placeholders
     accepts_placeholders_keys = ["install_data", "env_vars"]
