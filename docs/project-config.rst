@@ -58,6 +58,8 @@ Parameters accepting placeholders:
 This is an ordered list. Parameters that are used as placeholders themselves accept only predecessors.
 Ex: ``${ROOT}`` can be used in ``src_dir``, but not vice-versa.
 
+Library placeholders can be used by subsequent libraries, but not predecessors.
+
 Example:
 
 .. code-block:: yaml
