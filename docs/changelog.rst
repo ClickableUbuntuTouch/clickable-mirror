@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.0.1
+-----------------
+
+- Fixed dependency issues
+
 Changes in v7.0.0
 -----------------
 

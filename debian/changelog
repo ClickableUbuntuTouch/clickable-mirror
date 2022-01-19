@@ -1,4 +1,10 @@
-clickable (7.0.0b) unstable; urgency=medium
+clickable (7.0.1) unstable; urgency=medium
+
+  * Fixed dependency issues
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Tue, 18 Jan 2022 23:29:00 -0500
+
+clickable (7.0.0) unstable; urgency=medium
 
   * Configure Clickable globally with a new configuration file.
   * Integrated bash completion, to set up run clickable setup completion.
