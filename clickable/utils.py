@@ -199,12 +199,8 @@ def get_make_jobs_from_args(make_args):
 
 
 def merge_make_jobs_into_args(make_args, make_jobs):
-    make_jobs_arg = f'-j{make_jobs}'
-
-    if make_args:
-        return f'{make_args} {make_jobs_arg}'
-
-    return make_jobs_arg
+    make_args = make_args if make_args else []
+    return make_args + [f'-j{make_jobs}']
 
 
 def flexible_string_to_list(variable, split=False):
