@@ -325,6 +325,8 @@ class ProjectConfig():
                     self.config['kill'] = desktop['Exec'] \
                         .replace('%u', '').replace('%U', '').strip()
 
+        self.config['make_args'] = flexible_string_to_list(self.config['make_args'], split=True)
+
         make_jobs_args = get_make_jobs_from_args(self.config['make_args'])
         if make_jobs_args:
             if self.config['make_jobs']:

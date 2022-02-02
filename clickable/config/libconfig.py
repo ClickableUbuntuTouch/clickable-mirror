@@ -212,16 +212,17 @@ class LibConfig():
                 self.config[key] = make_absolute(self.config[key])
 
     def cleanup_config(self):
-        if not self.config['make_jobs']:
-            self.config['make_jobs'] = multiprocessing.cpu_count()
-        self.make_args = merge_make_jobs_into_args(
-            make_args=self.make_args, make_jobs=self.make_jobs)
-
         for key in self.flexible_split_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=True)
 
         for key in self.flexible_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=False)
+
+        if not self.config['make_jobs']:
+            self.config['make_jobs'] = multiprocessing.cpu_count()
+
+        self.make_args = merge_make_jobs_into_args(
+            make_args=self.make_args, make_jobs=self.make_jobs)
 
     def check_config_errors(self):
         if not self.config['builder']:

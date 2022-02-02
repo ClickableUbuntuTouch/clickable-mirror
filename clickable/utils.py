@@ -185,9 +185,9 @@ def get_builders():
 
 
 def get_make_jobs_from_args(make_args):
-    for arg in flexible_string_to_list(make_args, split=True):
+    for arg in make_args:
         if arg.startswith('-j'):
-            jobs_str = arg[2:]
+            jobs_str = arg[2:].strip()
             try:
                 return int(jobs_str)
             except ValueError as err:
