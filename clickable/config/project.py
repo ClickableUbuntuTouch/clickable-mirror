@@ -114,6 +114,7 @@ class ProjectConfig():
     lib_configs = []
     global_config = None
     skip_image_setup = False
+    arch_inferred = False
 
     def __init__(self, args=None, cwd=None, commands=None, always_clean=False):
         if not commands:
@@ -244,6 +245,8 @@ class ProjectConfig():
             self.is_custom_docker_image = False
 
         if not self.config["arch"]:
+            self.arch_inferred = True
+
             if self.is_arch_agnostic():
                 self.config["arch"] = "all"
                 logger.debug(
@@ -285,6 +288,9 @@ class ProjectConfig():
             self.config['app_bin_dir'] = '${INSTALL_DIR}'
             self.config['app_qml_dir'] = '${INSTALL_DIR}/qml'
 
+        if self.config["arch"] == "host":
+            self.config["arch"] = Constants.host_arch
+
         if self.config['arch'] not in Constants.arch_triplet_mapping:
             raise ClickableException(
                 f'There is currently no support for architecture  "{self.config["arch"]}"'
@@ -318,6 +324,8 @@ class ProjectConfig():
                 if desktop and 'Exec' in desktop:
                     self.config['kill'] = desktop['Exec'] \
                         .replace('%u', '').replace('%U', '').strip()
+
+        self.config['make_args'] = flexible_string_to_list(self.config['make_args'], split=True)
 
         make_jobs_args = get_make_jobs_from_args(self.config['make_args'])
         if make_jobs_args:
@@ -653,6 +661,7 @@ class ProjectConfig():
             lib_init.name = name
             lib_init.config_dict = config
             lib_init.arch = self.config['arch']
+            lib_init.arch_inferred = self.arch_inferred
             lib_init.root_dir = self.config['root_dir']
             lib_init.qt_version = self.config['qt_version']
             lib_init.verbose = self.verbose

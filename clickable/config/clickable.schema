@@ -48,7 +48,8 @@
           "enum": [
             "armhf",
             "arm64",
-            "amd64"
+            "amd64",
+            "host"
           ]
         },
         "non_interactive": {"type": "boolean"},

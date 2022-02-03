@@ -185,9 +185,9 @@ def get_builders():
 
 
 def get_make_jobs_from_args(make_args):
-    for arg in flexible_string_to_list(make_args, split=True):
+    for arg in make_args:
         if arg.startswith('-j'):
-            jobs_str = arg[2:]
+            jobs_str = arg[2:].strip()
             try:
                 return int(jobs_str)
             except ValueError as err:
@@ -199,12 +199,8 @@ def get_make_jobs_from_args(make_args):
 
 
 def merge_make_jobs_into_args(make_args, make_jobs):
-    make_jobs_arg = f'-j{make_jobs}'
-
-    if make_args:
-        return f'{make_args} {make_jobs_arg}'
-
-    return make_jobs_arg
+    make_args = make_args if make_args else []
+    return make_args + [f'-j{make_jobs}']
 
 
 def flexible_string_to_list(variable, split=False):
