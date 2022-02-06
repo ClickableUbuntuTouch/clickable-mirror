@@ -365,26 +365,26 @@ class ProjectConfig():
         if self.needs_clickable_image():
             self.check_nvidia_mode()
 
-            if self.use_nvidia and not self.build_arch.endswith('-nvidia'):
-                if self.is_ide_command():
-                    self.build_arch = f"{self.build_arch}-nvidia-ide"
-                else:
-                    self.build_arch = f"{self.build_arch}-nvidia"
+            container_spec = self.build_arch
 
-            if self.is_ide_command() and not self.use_nvidia:
-                self.build_arch = f"{self.build_arch}-ide"
+            if self.use_nvidia:
+                container_spec += "-nvidia"
+
+            if self.is_ide_command():
+                container_spec += "-ide"
 
             image_framework = Constants.framework_image_mapping.get(
                 self.config['framework'], Constants.framework_fallback)
 
             container_mapping_host = Constants.container_mapping[Constants.host_arch]
-            if (image_framework, self.build_arch) not in container_mapping_host:
+            container = container_mapping_host.get((image_framework, container_spec), None)
+
+            if not container:
                 raise ClickableException(
-                    f'There is currently no docker image for {image_framework}/{self.build_arch}'
+                    f'There is currently no docker image for {image_framework}/{container_spec}'
                 )
-            self.config['docker_image'] = container_mapping_host[
-                (image_framework, self.build_arch)
-            ]
+
+            self.config['docker_image'] = container
             self.container_list = list(container_mapping_host.values())
 
     def setup_helpers(self):
@@ -631,7 +631,7 @@ class ProjectConfig():
                 self.config[key] = make_absolute(self.config[key], change_keys=True)
 
     def set_build_arch(self):
-        if self.config['arch'] == 'all':
+        if self.config['arch'] in ['all', 'host']:
             self.build_arch = Constants.host_arch
         else:
             self.build_arch = self.config['arch']
