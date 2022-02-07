@@ -15,10 +15,10 @@
         "armhf",
         "arm64",
         "amd64",
+        "host",
         "all"
       ]
     },
-    "arch": {"type": "string"},
     "builder": {
       "type": "string",
       "enum": [
@@ -193,6 +193,16 @@
           "dependencies_ppa": {
             "type": ["string","array"],
             "items": {"type": "string"}
+          },
+          "restrict_arch": {
+            "type": "string",
+            "enum": [
+              "armhf",
+              "arm64",
+              "amd64",
+              "host",
+              "all"
+            ]
           },
           "builder": {
             "type": "string",

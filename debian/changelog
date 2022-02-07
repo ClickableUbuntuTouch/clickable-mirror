@@ -1,3 +1,12 @@
+clickable (7.1.0) unstable; urgency=medium
+
+  * restrict_arch can now be used with libraries
+  * Fixed make_args not working as expected when specified as a list
+  * Removed desktop file places holder when executing an app in desktop mode
+  * Fixed clickable ide qtcreator not working
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Sat, 5 Feb 2022 23:16:00 -0500
+
 clickable (7.0.1) unstable; urgency=medium
 
   * Fixed dependency issues

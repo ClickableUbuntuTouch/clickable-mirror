@@ -19,6 +19,7 @@ class LibInitConfig:
         self.name = None
         self.config_dict = None
         self.arch = None
+        self.arch_inferred = False
         self.root_dir = None
         self.qt_version = None
         self.verbose = None
@@ -89,6 +90,7 @@ class LibConfig():
         self.config = {
             'name': config.name,
             'arch': config.arch,
+            'restrict_arch': None,
             'arch_triplet': None,
             'arch_rust': Constants.rust_arch_target_mapping[self.build_arch],
             'builder': None,
@@ -117,6 +119,12 @@ class LibConfig():
 
         self.config.update(config.config_dict)
 
+        if self.config["restrict_arch"] == "host":
+            self.config["restrict_arch"] = Constants.host_arch
+
+        if config.arch_inferred and self.config["restrict_arch"]:
+            self.config["arch"] = self.config["restrict_arch"]
+
         if self.config["docker_image"]:
             self.is_custom_docker_image = True
         else:
@@ -124,6 +132,11 @@ class LibConfig():
             self.config["docker_image"] = config.docker_image
 
         self.cleanup_config()
+
+        if self.config['arch'] not in Constants.arch_triplet_mapping:
+            raise ClickableException(
+                f'There is currently no support for architecture  "{self.config["arch"]}"'
+            )
 
         self.config['arch_triplet'] = Constants.arch_triplet_mapping[self.config['arch']]
         self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.config['arch']]
@@ -199,16 +212,17 @@ class LibConfig():
                 self.config[key] = make_absolute(self.config[key])
 
     def cleanup_config(self):
-        if not self.config['make_jobs']:
-            self.config['make_jobs'] = multiprocessing.cpu_count()
-        self.make_args = merge_make_jobs_into_args(
-            make_args=self.make_args, make_jobs=self.make_jobs)
-
         for key in self.flexible_split_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=True)
 
         for key in self.flexible_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=False)
+
+        if not self.config['make_jobs']:
+            self.config['make_jobs'] = multiprocessing.cpu_count()
+
+        self.make_args = merge_make_jobs_into_args(
+            make_args=self.make_args, make_jobs=self.make_jobs)
 
     def check_config_errors(self):
         if not self.config['builder']:

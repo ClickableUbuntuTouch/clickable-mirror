@@ -125,6 +125,15 @@ class BuildCommand(Command):
                         'project config'
                     )
 
+                for config in self.config.lib_configs:
+                    if lib == config.name:
+                        if config.restrict_arch and config.restrict_arch != config.arch:
+                            raise ClickableException(
+                                f'Cannot build library {config.name} for architecture '
+                                f'"{config.arch}" as it is restricted '
+                                f'to "{config.restrict_arch}" in the project config.'
+                            )
+
     def run(self):
         if self.libs is not None:
             self.build_libs()
