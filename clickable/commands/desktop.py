@@ -2,6 +2,7 @@ import os
 import shlex
 import subprocess
 from pathlib import Path
+import re
 
 from clickable.utils import (
     is_command,
@@ -222,6 +223,7 @@ class DesktopCommand(Command):
         if not execute:
             raise ClickableException(f'No "Exec" line found in the desktop file {desktop_path}')
 
+        execute = re.sub(' %\\w', '', execute)
         return execute[len('Exec='):].strip()
 
     def get_time_zone(self):

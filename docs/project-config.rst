@@ -491,8 +491,8 @@ It's a dictionary of dictionaries similar to the project config itself. Example:
 
 The keywords ``test``, ``install_dir``, ``prebuild``, ``build``, ``postbuild``,
 ``postmake``, ``make_jobs``, ``make_args``, ``env_vars``, ``build_args``, ``docker_image``,
-``dependencies_host``, ``dependencies_target``, ``dependencies_ppa``, ``test`` and
-``image_setup``.
+``dependencies_host``, ``dependencies_target``, ``dependencies_ppa``, ``test``,
+``restrict_arch``` and ``image_setup``.
 
 can be used for a library the same way as described above for the app.
 
