@@ -168,7 +168,7 @@ class Container():
 
         groups = run_subprocess_check_output(
             shlex.split(f'groups {getpass.getuser()}')
-        ).strip().split(':')[1].split()
+        ).strip().split()
 
         return 'docker' in groups
 
