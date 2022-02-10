@@ -1,5 +1,4 @@
 from clickable.logger import logger
-from clickable.exceptions import ClickableException
 from clickable.utils import run_subprocess_check_call
 
 from .base import Command
@@ -40,11 +39,8 @@ class SetupCommand(Command):
                 'Do you want Clickable to set up docker by adding you to the docker group?'):
             return
 
-        try:
-            self.container.setup_docker()
-            logger.info('Docker is set up and ready.')
-        except ClickableException:
-            logger.warning('Please log out or restart to apply changes')
+        self.container.setup_docker()
+        logger.info('Docker is set up and ready.')
 
     def setup_bash_completion(self):
         if not self.confirm(
