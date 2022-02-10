@@ -36,7 +36,9 @@ class SetupCommand(Command):
             return
 
         if not self.confirm(
-                'Do you want Clickable to set up docker by adding you to the docker group?'):
+                'Do you want Clickable to set up docker by adding you to the docker group?\n'
+                'See https://docs.docker.com/engine/security/#docker-daemon-attack-surface '
+                'for security implications.'):
             return
 
         self.container.setup_docker()
