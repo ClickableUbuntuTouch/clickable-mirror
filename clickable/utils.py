@@ -148,7 +148,7 @@ def check_command(command):
     if not is_command(command):
         raise ClickableException(
             f'The command "{command}" does not exist on this system, please install it for '
-            'clickable to work properly"'
+            'clickable to work properly'
         )
 
 

@@ -1,5 +1,4 @@
 import subprocess
-import time
 import shlex
 import os
 import shutil
@@ -113,32 +112,26 @@ class Container():
 
         return False
 
-    def check_docker(self, retries=3):
+    def check_docker(self):
         if not self.docker_mode:
             raise ClickableException(
                 "Container was not initialized with Container Mode. "
                 "This seems to be a bug in Clickable."
             )
 
-        check_command('docker')
-
-        if not (self.needs_docker_setup() and self.is_systemd_used()):
+        if env('CLICKABLE_SKIP_DOCKER_CHECKS'):
+            logger.debug('Skipping docker check because of env var.')
             return
 
-        self.setup_docker()
+        if not self.is_systemd_used():
+            logger.debug('Skipping docker check because systemd is not used.')
+            return
 
-        if not self.is_docker_service_running():
-            retries -= 1
-            if retries <= 0:
-                raise ClickableException(
-                    "Couldn't check docker. If you just installed Clickable you may "
-                    "need to reboot once."
-                )
+        if self.is_docker_ready():
+            return
 
-            self.start_docker()
-
-            time.sleep(3)  # Give it a sec to boot up
-            self.check_docker(retries)
+        raise ClickableException('Docker is not running or not properly set up.\n'
+                                 'Please run "clickable setup docker" first.')
 
     def is_systemd_used(self):
         return subprocess.call('command -v systemctl >> /dev/null', shell=True) == 0
@@ -172,21 +165,14 @@ class Container():
 
         return 'docker' in groups
 
-    def needs_docker_setup(self):
-        return (
-            not env('CLICKABLE_SKIP_DOCKER_CHECKS') and
-            not self.is_docker_ready()
-        )
+    def is_docker_ready(self):
+        return self.is_docker_configured() and self.is_docker_service_running()
 
     def setup_docker(self):
         logger.info('Setting up docker')
 
         if not self.is_docker_service_running():
             self.start_docker()
-
-        if self.is_docker_ready():
-            logger.info('Setup has already been completed')
-            return
 
         if not self.docker_group_exists():
             logger.info('Asking for root to create docker group')
@@ -198,10 +184,14 @@ class Container():
                 shlex.split(f'sudo usermod -aG docker {getpass.getuser()}')
             )
 
-        if self.user_in_docker_group_pending():
-            raise ClickableException('Log out or restart to gain docker access')
+        logger.info('Setup finished')
 
-    def is_docker_ready(self):
+        if self.user_in_docker_group_pending():
+            raise ClickableException('Please log out or restart to complete')
+
+    def is_docker_configured(self):
+        check_command('docker')
+
         return self.docker_group_exists() and self.proccess_in_docker_group()
 
     def pull_files(self, files, dst_parent):
