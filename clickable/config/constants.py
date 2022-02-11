@@ -66,9 +66,9 @@ class Constants():
         "ubuntu-sdk-16.04.3": "16.04.4",
         "ubuntu-sdk-16.04.4": "16.04.4",
         "ubuntu-sdk-16.04.5": "16.04.5",
+        "ubuntu-sdk-16.04.6": "16.04.5",
+        "ubuntu-sdk-16.04.7": "16.04.5",
     }
-
-    framework_fallback = "16.04.5"
 
     default_qt_framework_mapping = {
         '5.9': 'ubuntu-sdk-16.04.4',
@@ -76,6 +76,9 @@ class Constants():
     }
 
     default_qt = '5.12'
+
+    # First framework with Qt 5.12 should be a reasonable default
+    framework_fallback = default_qt_framework_mapping[default_qt]
 
     arch_triplet_mapping = {
         'armhf': 'arm-linux-gnueabihf',
