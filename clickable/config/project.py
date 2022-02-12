@@ -756,7 +756,7 @@ class ProjectConfig():
                                'the "clickable_minimum_required" field. See %s for details about '
                                'migration to Clickable 7.', clickable_required_numbers[0],
                                migration_link)
-        else:
+        elif not self.is_project_independent_cmd():
             logger.warning('This project does not have a required Clickable version configured '
                            '("clickable_minimum_required"). See %s for details about migration to '
                            'Clickable 7 if you run into issues.', migration_link)
