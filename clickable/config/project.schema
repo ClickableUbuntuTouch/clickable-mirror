@@ -6,7 +6,8 @@
   "type": "object",
   "properties": {
     "clickable_minimum_required": {
-      "type": "string",
+      "type": ["string", "number"],
+      "minimum": 0,
       "pattern": "^\\d+(\\.\\d+)*$"
     },
     "restrict_arch": {
