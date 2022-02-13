@@ -215,13 +215,6 @@ class ProjectConfig():
         if not self.commands:
             self.commands = self.config['default']
 
-        if (
-            self.config['always_clean']
-            and self.is_app_build_cmd()
-            and self.commands[0] != 'clean'
-        ):
-            self.commands = ['clean'] + self.commands
-
     def load_global_config(self, path):
         self.global_config = GlobalConfig(path)
 
@@ -703,11 +696,8 @@ class ProjectConfig():
     def is_ide_command(self):
         return "ide" in self.commands
 
-    def is_app_build_cmd(self):
-        return self.is_desktop_mode() or 'build' in self.commands
-
     def is_build_cmd(self):
-        return self.is_app_build_cmd() or 'build-libs' in self.commands
+        return self.is_desktop_mode() or 'build' in self.commands
 
     def is_project_independent_cmd(self):
         return bool(set(['no_lock', 'writable_image', 'screenshots', 'create', 'setup'
