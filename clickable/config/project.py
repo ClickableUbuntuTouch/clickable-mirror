@@ -727,15 +727,26 @@ class ProjectConfig():
         minimum_required = self.config['clickable_minimum_required']
 
         if self.config['clickable_minimum_required']:
-            # Check if specified version string is valid
-            if not re.fullmatch(r"\d+(\.\d+)*", self.config['clickable_minimum_required']):
-                raise ClickableException(
-                    f'"{minimum_required}" specified as "clickable_minimum_required" is not a '
-                    'valid version number'
-                )
+            clickable_required_numbers = []
 
-            clickable_required_numbers = split_version_numbers(
-                minimum_required)
+            if isinstance(self.config['clickable_minimum_required'], str):
+                # Check if specified version string is valid
+                if not re.fullmatch(r"\d+(\.\d+)*", self.config['clickable_minimum_required']):
+                    raise ClickableException(
+                        f'"{minimum_required}" specified as "clickable_minimum_required" is not a '
+                        'valid version number'
+                    )
+
+                clickable_required_numbers = split_version_numbers(
+                    minimum_required)
+            else:
+                value = self.config['clickable_minimum_required']
+                clickable_required_numbers.append(int(value))
+                fract = value % 1
+                if fract:
+                    # Get fract as integer without trailing zeros
+                    clickable_required_numbers.append(int(f'{fract:f}'[2:].strip("0")))
+
             if is_newer_than_running(clickable_required_numbers):
                 raise ClickableException(
                     f'This project requires Clickable version {minimum_required} '
