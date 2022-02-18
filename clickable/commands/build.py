@@ -209,7 +209,7 @@ class BuildCommand(Command):
         container.setup()
 
         if config.prebuild:
-            self.run_custom_commands(config.prebuild)
+            run_custom_commands(config.prebuild, config, container)
 
         run_builder(config, container, self.debug_build)
 
@@ -217,7 +217,7 @@ class BuildCommand(Command):
             self.install_additional_files()
 
         if config.postbuild:
-            self.run_custom_commands(config.postbuild)
+            run_custom_commands(config.postbuild, config, container)
 
     def install_files(self, pattern, dest_dir):
         if not is_sub_dir(dest_dir, self.config.install_dir):
@@ -334,10 +334,11 @@ class BuildCommand(Command):
 
         logger.debug('Click outputted to %s', self.click_path)
 
-    def run_custom_commands(self, commands):
-        if commands:
-            for cmd in commands:
-                self.container.run_command(cmd, cwd=self.config.cwd)
+
+def run_custom_commands(commands, config, container):
+    if commands:
+        for cmd in commands:
+            container.run_command(cmd, cwd=config.cwd)
 
 
 def run_builder(config, container, debug_build):
