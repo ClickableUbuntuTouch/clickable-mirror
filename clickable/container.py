@@ -312,6 +312,8 @@ class Container():
         if use_build_dir:
             kwargs['cwd'] = self.config.build_dir
 
+        logger.debug("Complete command to run:\n%s", wrapped_command)
+
         if get_output:
             return run_subprocess_check_output(shlex.split(wrapped_command), **kwargs)
 
