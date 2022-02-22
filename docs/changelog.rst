@@ -3,6 +3,14 @@
 Changelog
 =========
 
+Changes in v7.1.0
+-----------------
+
+- ``restrict_arch`` can now be used with libraries
+- Fixed ``make_args`` not working as expected when specified as a list
+- Removed desktop file places holder when executing an app in desktop mode
+- Fixed ``clickable ide qtcreator`` not working
+
 Changes in v7.0.1
 -----------------
 

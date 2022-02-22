@@ -21,7 +21,7 @@ Compile, build, and deploy Ubuntu Touch click packages all from the command line
 ### Via AUR (Arch Linux)
 
 * Using your favorite AUR helper, install the [clickable package](https://aur.archlinux.org/packages/clickable/)
-* Example: `pacaur -S clickable
+* Example: `pacaur -S clickable`
 
 ## After install
 
