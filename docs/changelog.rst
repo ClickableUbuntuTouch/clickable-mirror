@@ -3,6 +3,19 @@
 Changelog
 =========
 
+Changes in v7.1.1
+-----------------
+
+- Updated framework list
+- Fixed issue when setting up docker group
+- Docker is no longer automatically setup
+- ``clickable setup`` now includes warning about security implications adding the current user to the docker group
+- Fixed double cleaning when using the ``always_clean`` option
+- Fixed migration warning showing at the wrong times
+- Fixed ``clickable_minimum_required`` to also allow numbers
+- Fixed prebuild and postbuild for libraries
+- Added more logging for docker commands
+
 Changes in v7.1.0
 -----------------
 
