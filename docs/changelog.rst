@@ -8,7 +8,7 @@ Changes in v7.1.1
 
 - Updated framework list
 - Fixed issue when setting up docker group
-- Docker is no longer automatically setup
+- The current user is no longer automatically added to docker group
 - ``clickable setup`` now includes warning about security implications adding the current user to the docker group
 - Fixed double cleaning when using the ``always_clean`` option
 - Fixed migration warning showing at the wrong times
