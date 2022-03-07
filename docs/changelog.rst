@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.1.2
+-----------------
+
+- Fixed the Rust cargo settings for building armhf packages
+
 Changes in v7.1.1
 -----------------
 

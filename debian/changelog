@@ -1,3 +1,9 @@
+clickable (7.1.2) unstable; urgency=medium
+
+  * Fixed the Rust cargo settings for building armhf packages
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Tue, 1 Mar 2022 22:48:00 -0500
+
 clickable (7.1.1) unstable; urgency=medium
 
   * Updated framework list
@@ -11,7 +17,6 @@ clickable (7.1.1) unstable; urgency=medium
   * Added more logging for docker commands
 
  -- Clickable <bhdouglass+clickable@gmail.com>  Mon, 21 Feb 2022 23:34:00 -0500
-
 
 clickable (7.1.0) unstable; urgency=medium
 
