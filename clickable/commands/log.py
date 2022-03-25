@@ -8,6 +8,7 @@ class LogCommand(Command):
         super().__init__()
         self.cli_conf.name = 'log'
         self.cli_conf.help_msg = 'Outputs the existing app\'s log from the device'
+        self.command_conf.device_command = True
 
     def run(self):
         if self.config.is_desktop_mode():

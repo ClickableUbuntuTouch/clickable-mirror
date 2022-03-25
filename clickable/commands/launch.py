@@ -8,6 +8,7 @@ class LaunchCommand(Command):
         super().__init__()
         self.cli_conf.name = 'launch'
         self.cli_conf.help_msg = 'Launches the app on a device'
+        self.command_conf.device_command = True
 
         self.package = None
         self.skip_kill = False

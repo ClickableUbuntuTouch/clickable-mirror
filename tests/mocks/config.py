@@ -29,7 +29,8 @@ class ConfigMock(ProjectConfig):
                  mock_config_env=None,
                  mock_install_files=False,
                  respect_container_mode=False,
-                 *args, **kwargs):
+                 args=None,
+                 commands=['build']):
         container_mode_key = "CLICKABLE_CONTAINER_MODE"
 
         if respect_container_mode:
@@ -41,7 +42,8 @@ class ConfigMock(ProjectConfig):
         self.mock_config_env = mock_config_env
         self.mock_install_files = mock_install_files
 
-        super().__init__(*args, **kwargs)
+        super().__init__()
+        super().configure(commands=commands, global_config=GlobalConfigMock(), args=args)
 
     def load_project_config(self, config_path):
         if self.mock_config_json is None:
@@ -49,9 +51,6 @@ class ConfigMock(ProjectConfig):
 
         config_json = self.mock_config_json
         return config_json
-
-    def load_global_config(self, path):
-        self.global_config = GlobalConfigMock(path)
 
     def get_env_var(self, key):
         if self.mock_config_env is None:
@@ -73,5 +72,8 @@ class ConfigMock(ProjectConfig):
 
 
 class GlobalConfigMock(GlobalConfig):
+    def __init__(self):
+        super().__init__(custom_path=None)
+
     def load(self, path, is_custom):
         return {}

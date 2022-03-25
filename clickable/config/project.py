@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 import yaml
 
+from clickable.config.base import BaseConfig
 from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
 from clickable.version import __version__, is_newer_than_running, split_version_numbers
 from clickable.exceptions import ClickableException
@@ -32,7 +33,7 @@ from ..utils import (
 from ..logger import logger
 
 
-class ProjectConfig():
+class ProjectConfig(BaseConfig):
     config = {}
 
     ENV_MAP = {
@@ -103,9 +104,6 @@ class ProjectConfig():
                         'arch', 'template', 'dependencies_build', 'dirty']
 
     first_docker_info = True
-    device_serial_number = None
-    ssh = None
-    ssh_port = None
     container_mode = False
     use_nvidia = False
     avoid_nvidia = False
@@ -113,33 +111,24 @@ class ProjectConfig():
     interactive = True
     build_arch = None
     container_list = []
-    install_files = []
+    install_files = None
     lib_configs = []
     global_config = None
     skip_image_setup = False
     arch_inferred = False
 
-    def __init__(self, args=None, cwd=None, commands=None, always_clean=False):
-        if not commands:
-            commands = []
+    def __init__(self, custom_path=None, cwd=None):
+        super().__init__()
 
+        self.is_custom_docker_image = False
+        self.project_files = None
         self.placeholders = {}
-        self.placeholders.update(ProjectConfig.static_placeholders)
-
-        if not Constants.host_arch:
-            raise ClickableException(
-                f"No support for host architecture {platform.machine()}"
-            )
+        self.commands = []
+        self.configured = False
         self.cwd = cwd if cwd else os.getcwd()
-        self.project_files = ProjectFiles(self.cwd)
 
         self.set_default_config()
-        self.parse_configs(args, commands, always_clean)
-        self.check_paths()
-        self.set_builder_interactive()
-        self.set_conditional_defaults()
-        self.setup()
-        self.check_config_errors()
+        self.load(custom_path)
 
     def set_default_config(self):
         self.config = {
@@ -161,7 +150,7 @@ class ProjectConfig():
             'root_dir': self.cwd,
             'kill': None,
             'scripts': {},
-            'default': 'build install launch',
+            'default': [],
             'log': None,
             'dependencies_host': [],
             'dependencies_target': [],
@@ -196,12 +185,35 @@ class ProjectConfig():
             'ignore_review_errors': None,
         }
 
-    def parse_configs(self, args, commands, always_clean):
-        self.load_global_config(args.clickable_config if args else None)
-        config_path = args.config if args else None
+    def load(self, config_path):
         config_dict = self.load_project_config(config_path)
-
         self.config.update(config_dict)
+
+        self.harmonize_config()
+
+    def configure(self, global_config: GlobalConfig, commands, args=None, device_arch=None,
+                  cwd=None, always_clean=False):
+        self.global_config = global_config
+
+        self.placeholders.update(ProjectConfig.static_placeholders)
+
+        if not Constants.host_arch:
+            raise ClickableException(
+                f"No support for host architecture {platform.machine()}"
+            )
+        self.cwd = cwd if cwd else os.getcwd()
+        self.project_files = ProjectFiles(self.cwd)
+
+        self.parse_configs(args, commands, always_clean)
+        self.check_paths()
+        self.set_builder_interactive()
+        self.set_conditional_defaults(device_arch)
+        self.setup()
+        self.check_config_errors()
+
+        self.configured = True
+
+    def parse_configs(self, args, commands, always_clean):
         env_config = self.load_env_config(self.global_config.environment)
         self.config.update(env_config)
         self.config['env_vars'].update(self.config['env_env_vars'])
@@ -212,20 +224,14 @@ class ProjectConfig():
 
         self.merge_cli_config()
 
-        self.config['default'] = flexible_string_to_list(self.config['default'], split=True)
-
         self.commands = commands
         if always_clean:
             self.config['always_clean'] = True
 
-        if not self.commands:
-            self.commands = self.config['default']
-
-    def load_global_config(self, path):
-        self.global_config = GlobalConfig(path)
-
     def setup(self):
-        self.cleanup_config()
+        self.ignore.extend([
+            '.git', '.bzr', '.clickable', '.gitlab-ci.yml', 'build', '.gitignore', '.bzrignore'
+        ])
 
         self.setup_image()
         self.setup_libs()
@@ -236,11 +242,24 @@ class ProjectConfig():
         for key, value in self.config.items():
             logger.debug('App config value %s: %s', key, value)
 
-    def set_conditional_defaults(self):
+    def set_conditional_defaults(self, device_arch):
         if self.config["docker_image"]:
             self.is_custom_docker_image = True
         else:
             self.is_custom_docker_image = False
+
+        if self.config['arch'] == 'detect':
+            if device_arch:
+                self.config['arch'] = device_arch
+                logger.debug(
+                    'Architecture set to "%s" from device detection', self.config['arch']
+                )
+            else:
+                # This should be caught in the device class
+                raise ClickableException(
+                    'Architecture is set to "detect", but no device detected. '
+                    'This seems to be a bug in Clickable.'
+                )
 
         if not self.config["arch"]:
             self.arch_inferred = True
@@ -269,16 +288,20 @@ class ProjectConfig():
                 logger.debug(
                     'Architecture set to "%s" due to container mode', self.config['arch']
                 )
-            elif self.global_config.device.arch:
-                self.config['arch'] = self.global_config.device.arch
-                logger.debug(
-                    'Architecture set to "%s" from device config', self.config['arch']
+            elif device_arch:
+                self.config['arch'] = device_arch
+                logger.info(
+                    'Architecture set to "%s" from device', self.config['arch']
+                )
+            elif self.global_config.build.default_arch:
+                self.config['arch'] = self.global_config.build.default_arch
+                logger.info(
+                    'Architecture set to "%s" from Clickable config', self.config['arch']
                 )
             else:
                 self.config['arch'] = Constants.host_arch
-                logger.debug(
-                    'Architecture set to host arch "%s" because no architecture was '
-                    'specified', self.config['arch']
+                logger.info(
+                    'Architecture set to host arch "%s"', self.config['arch']
                 )
 
         if self.config['arch'] == 'all':
@@ -414,27 +437,33 @@ class ProjectConfig():
         else:
             super().__setattr__(name, value)
 
+    def find_project_config(self, config_path):
+        directory = self.cwd
+
+        while True:
+            for option in Constants.project_config_path_options:
+                candidate = os.path.join(directory, option)
+
+                if os.path.exists(candidate):
+                    config_path = candidate
+                    self.config['root_dir'] = directory
+                    os.chdir(directory)
+                    self.cwd = directory
+                    return config_path
+
+            parent = os.path.dirname(directory)
+            if parent == directory:
+                break
+            directory = parent
+
+        return None
+
     def load_project_config(self, config_path):
         config_dict = {}
         use_default_config = not config_path
+
         if use_default_config:
-            directory = self.cwd
-
-            while True:
-                for option in Constants.project_config_path_options:
-                    candidate = os.path.join(directory, option)
-
-                    if os.path.exists(candidate):
-                        config_path = candidate
-                        self.config['root_dir'] = directory
-                        os.chdir(directory)
-                        self.cwd = directory
-                        break
-
-                parent = os.path.dirname(directory)
-                if parent == directory:
-                    break
-                directory = parent
+            config_path = self.find_project_config(config_path)
 
         if config_path and os.path.isfile(config_path):
             logger.debug("Loading config file %s", config_path)
@@ -471,29 +500,12 @@ class ProjectConfig():
         return config_dict
 
     def merge_cli_config(self):
-        if self.global_config.cli.default_chain:
-            self.config['default'] = self.global_config.cli.default_chain
-
         if self.global_config.cli.scripts:
             self.config['scripts'].update(self.global_config.cli.scripts)
-
-    def parse_ssh_config(self, ssh_arg):
-        result = re.match("(.+):([0-9]+)", ssh_arg)
-        if result is not None:
-            self.ssh = result.group(1)
-            self.ssh_port = result.group(2)
-        else:
-            self.ssh = ssh_arg
 
     def load_env_config(self, config: EnvironmentConfig):
         if self.get_env_var('CLICKABLE_CONTAINER_MODE') or config.container_mode:
             self.container_mode = True
-
-        if self.get_env_var('CLICKABLE_SERIAL_NUMBER'):
-            self.device_serial_number = self.get_env_var('CLICKABLE_SERIAL_NUMBER')
-
-        if self.get_env_var('CLICKABLE_SSH'):
-            self.parse_ssh_config(self.get_env_var('CLICKABLE_SSH'))
 
         if self.get_env_var('CLICKABLE_NVIDIA') or config.nvidia == 'on':
             self.use_nvidia = True
@@ -524,12 +536,6 @@ class ProjectConfig():
         return env(key)
 
     def load_arg_config(self, args):
-        if args.serial_number:
-            self.device_serial_number = args.serial_number
-
-        if args.ssh:
-            self.parse_ssh_config(args.ssh)
-
         if args.container_mode:
             self.container_mode = args.container_mode
 
@@ -695,18 +701,12 @@ class ProjectConfig():
         self.placeholders.update(placeholders)
         self.config.update(injected_config)
 
-    def cleanup_config(self):
+    def harmonize_config(self):
         for key in self.flexible_split_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=True)
 
         for key in self.flexible_list:
             self.config[key] = flexible_string_to_list(self.config[key], split=False)
-
-        self.ignore.extend([
-            '.git', '.bzr', '.clickable', '.gitlab-ci.yml', 'build', '.gitignore', '.bzrignore'
-        ])
-
-        self.config['default'] = ' '.join(self.config['default'])
 
     def is_desktop_mode(self):
         return bool(set(['desktop', 'test-libs', 'test', 'ide']).intersection(self.commands))
@@ -894,20 +894,12 @@ class ProjectConfig():
                     f'{self.config[path]}'
                 )
 
-    def check_device_commands(self):
-        if (self.is_device_cmd()
-                and not self.is_project_independent_cmd()
-                and self.config['arch'] == 'amd64'):
-            logger.warning('For interaction with a target device you might want to specify the '
-                           'device architecture via --arch.')
-
     def check_config_errors(self):
         self.check_clickable_version()
         self.check_arch_restrictions()
         self.check_builder_rules()
         self.check_desktop_configs()
         self.check_path_sanity()
-        self.check_device_commands()
 
     def is_foreign_target(self):
         return self.build_arch != Constants.host_arch

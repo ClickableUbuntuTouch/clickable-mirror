@@ -10,7 +10,9 @@ except ImportError:
 import sys
 import subprocess
 import logging
+import platform
 
+from clickable.config.constants import Constants
 from clickable.logger import logger, log_file, console_handler
 from clickable.exceptions import ClickableException
 from clickable.cli import Cli
@@ -40,6 +42,11 @@ class Clickable():
         if self.verbose:
             console_handler.setLevel(logging.DEBUG)
         logger.debug('Clickable v' + __version__)
+
+        if not Constants.host_arch:
+            raise ClickableException(
+                f"No support for host architecture {platform.machine()}"
+            )
 
         if "func" not in args:
             default = ['default']

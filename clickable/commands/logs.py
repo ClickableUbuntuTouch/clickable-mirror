@@ -8,6 +8,7 @@ class LogsCommand(Command):
         super().__init__()
         self.cli_conf.name = 'logs'
         self.cli_conf.help_msg = 'Follow the app\'s log file on the device'
+        self.command_conf.device_command = True
 
     def run(self):
         if self.config.is_desktop_mode():

@@ -8,7 +8,7 @@ from clickable.utils import (
     validate_config_format,
 )
 
-from .device import DeviceConfig
+from .device import GlobalDeviceConfig
 from .build import BuildConfig
 from .environment import EnvironmentConfig
 from .cli import CliConfig
@@ -24,7 +24,7 @@ class GlobalConfig():
         schema = load_config_schema('clickable')
         validate_config_format(config, schema, 'Clickable', path)
 
-        self.device = DeviceConfig(config.get('device', {}))
+        self.device = GlobalDeviceConfig(config.get('device', {}))
         self.build = BuildConfig(config.get('build', {}))
         self.environment = EnvironmentConfig(config.get('environment', {}))
         self.cli = CliConfig(config.get('cli', {}))

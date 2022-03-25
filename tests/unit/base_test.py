@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from clickable.config.device import DeviceConfig
 from clickable.device import Device
 from clickable.container import Container
 from clickable.exceptions import ClickableException
@@ -17,6 +18,7 @@ class UnitTest(TestCase):
                     expect_exception=False,
                     mock_config_json={},
                     mock_config_env={},
+                    commands=['build'],
                     *args, **kwargs):
         self.config = None
         try:
@@ -24,12 +26,13 @@ class UnitTest(TestCase):
                 mock_config_json=mock_config_json,
                 mock_config_env=mock_config_env,
                 mock_install_files=True,
+                commands=commands,
                 *args, **kwargs
             )
             self.config.interactive = False
             if self.command:
                 self.command.config = self.config
-                self.command.device = Device(self.config)
+                self.command.device = Device(DeviceConfig(base={'selection': 'host'}))
                 self.command.container = Container(self.config)
 
             if expect_exception:
