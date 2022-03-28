@@ -130,6 +130,7 @@
     },
     "dirty": {"type": "boolean"},
     "always_clean": {"type": "boolean"},
+    "skip_review": {"type": "boolean"},
     "test": {"type": "string"},
     "image_setup": {
       "type": ["object"],

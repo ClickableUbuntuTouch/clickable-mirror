@@ -33,6 +33,8 @@ class BuildCommand(Command):
         self.debug_build = False
         self.app = True
         self.libs = None
+        self.accept_errors = False
+        self.accept_warnings = False
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -58,6 +60,17 @@ class BuildCommand(Command):
             default=False,
         )
         parser.add_argument(
+            '--accept-review-warnings',
+            action='store_true',
+            help='Return with exit-code 0 even when there are review warnings'
+        )
+        parser.add_argument(
+            '--accept-review-errors',
+            action='store_true',
+            help='Return with exit-code 0 even when there are review errors '
+            '(implies --accept-review-warnings)'
+        )
+        parser.add_argument(
             '--app',
             action='store_true',
             help='Build app after building libs (only needed when using --libs as well)',
@@ -79,12 +92,14 @@ class BuildCommand(Command):
     def configure(self, args):
         self.clean_app = args.clean
         self.clean_libs = args.clean and args.libs is not None
-        if args.skip_review:
+        if args.skip_review or self.config.skip_review:
             self.skip_review = True
         self.output_path = args.output
         self.debug_build = args.debug
         self.app = args.app or args.libs is None or args.all
         self.libs = [] if args.all else args.libs
+        self.accept_errors = args.accept_review_errors
+        self.accept_warnings = self.accept_errors or args.accept_review_warnings
 
         self.configure_common()
 
@@ -179,7 +194,10 @@ class BuildCommand(Command):
         if not self.skip_review:
             review = ReviewCommand()
             review.init_from_command(self)
-            review.check(self.click_path, raise_on_error=False)
+            review.check(
+                self.click_path,
+                raise_on_error=not self.accept_errors,
+                raise_on_warning=not self.accept_warnings)
 
     def build(self, config, container, is_app=True):
         try:

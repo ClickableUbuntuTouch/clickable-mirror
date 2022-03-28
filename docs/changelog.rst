@@ -3,6 +3,15 @@
 Changelog
 =========
 
+Changes in v7.2.0
+-----------------
+
+- Removed deprecated go build flag
+- Fixed the bash completion setup to only run the setup once
+- Fixed commands run in Docker containers not being stopped with CTRL+C
+- The ? wildcard can be used in install paths
+- The build command now fail if the review also fails, use ``skip_review`` for unconfined apps
+
 Changes in v7.1.2
 -----------------
 
