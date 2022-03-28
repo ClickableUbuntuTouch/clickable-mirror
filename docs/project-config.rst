@@ -336,6 +336,12 @@ disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` comm
 Does not affect libraries.
 The default is ``false``.
 
+skip_review
+-----------
+
+Optional, whether or not to skip review on click builds.
+The default is ``false``.
+
 .. _project-config-dependencies_host:
 
 dependencies_host

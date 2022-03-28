@@ -304,6 +304,18 @@ class Container():
             command_tty = "-t" if tty else ""
             network = '--network="host"' if localhost else ""
 
+            # make sure PID 1 process handles signals
+            if not tty:
+                command = f'''
+set -Eeou pipefail
+trap "exit" SIGINT
+trap "exit" SIGTERM
+{command} &
+bg_pid=$!
+wait $bg_pid
+exit $?
+                '''.strip()
+
             wrapped_command = f'docker run {mounts} {env_vars} {go_config} {user} ' \
                               f'-w {command_cwd} --rm {command_tty} {network} ' \
                               f'-i {self.docker_image} bash -c "{command}"'

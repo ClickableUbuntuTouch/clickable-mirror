@@ -188,6 +188,7 @@ class ProjectConfig():
             'rust_channel': None,
             'framework': None,
             'always_clean': False,
+            'skip_review': False,
         }
 
     def parse_configs(self, args, commands, always_clean):

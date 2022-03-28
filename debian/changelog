@@ -1,3 +1,13 @@
+clickable (7.2.0) unstable; urgency=medium
+
+  * Removed deprecated go build flag
+  * Fixed the bash completion setup to only run the setup once
+  * Fixed commands run in Docker containers not being stopped with CTRL+C
+  * The ? wildcard can be used in install paths
+  * The build command now fail if the review also fails, use ``skip_review`` for unconfined apps
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 25 Mar 2022 22:43:00 -0500
+
 clickable (7.1.2) unstable; urgency=medium
 
   * Fixed the Rust cargo settings for building armhf packages

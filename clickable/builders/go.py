@@ -11,7 +11,6 @@ class GoBuilder(Builder):
             '/usr/local/go/bin/go',
             'build',
             '-pkgdir', self.config.build_dir,
-            '-i',
             '-o', self.config.install_dir,
             '.',
         ]

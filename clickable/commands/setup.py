@@ -1,3 +1,6 @@
+import os
+import re
+
 from clickable.logger import logger
 from clickable.utils import run_subprocess_check_call
 
@@ -45,9 +48,27 @@ class SetupCommand(Command):
         logger.info('Docker is set up and ready.')
 
     def setup_bash_completion(self):
+        bashrc_file = os.path.expanduser('~/.bashrc')
+        search = re.compile(r"[^#]*register-python-argcomplete3? clickable\b(?![-]).*")
+        source_hint = f'Run "source {bashrc_file}" or open a new terminal to apply changes.'
+
+        try:
+            with open(bashrc_file, "r", encoding='UTF-8') as f:
+                for line in f.readlines():
+                    if search.match(line):
+                        logger.info('Bash completion seems to be already set up.')
+                        logger.info(source_hint)
+                        return
+        except FileNotFoundError:
+            logger.warning('%s not found. Clickable can create it for you.',
+                           bashrc_file)
+            logger.warning(
+                'If you are not using Bash, check %s for how to set up completion',
+                'https://kislyuk.github.io/argcomplete/')
+
         if not self.confirm(
             'Do you want Clickable to set up bash completion by appending an '
-            'argcomplete command to your ~/.bashrc?'
+            f'argcomplete command to your {bashrc_file}?'
         ):
             logger.warning(
                 'Bash completion setup skipped. See https://kislyuk.github.io/argcomplete/ '
@@ -66,6 +87,6 @@ else
 fi
 '''.strip()
 
-        run_subprocess_check_call(f"echo '\n{activation}' >> ~/.bashrc", shell=True)
-        logger.info('Bash completion is set up. Run "source ~/.bashrc" or open a new '
-                    'terminal to apply changes.')
+        run_subprocess_check_call(f"echo '\n{activation}' >> {bashrc_file}", shell=True)
+        logger.info('Bash completion is set up.')
+        logger.info(source_hint)
