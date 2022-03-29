@@ -92,7 +92,7 @@ class BuildCommand(Command):
     def configure(self, args):
         self.clean_app = args.clean
         self.clean_libs = args.clean and args.libs is not None
-        if args.skip_review or self.config.skip_review:
+        if args.skip_review:
             self.skip_review = True
         self.output_path = args.output
         self.debug_build = args.debug
@@ -107,7 +107,7 @@ class BuildCommand(Command):
         self.configure_common()
 
     def configure_common(self):
-        if self.config.global_config.build.skip_review:
+        if self.config.skip_review or self.config.global_config.build.skip_review:
             self.skip_review = True
 
         if self.config.always_clean or self.config.global_config.build.always_clean:
