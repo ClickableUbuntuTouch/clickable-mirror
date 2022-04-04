@@ -189,6 +189,8 @@ class ProjectConfig():
             'framework': None,
             'always_clean': False,
             'skip_review': False,
+            'ignore_review_warnings': None,
+            'ignore_review_errors': None,
         }
 
     def parse_configs(self, args, commands, always_clean):
