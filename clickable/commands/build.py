@@ -314,8 +314,8 @@ class BuildCommand(Command):
             return True
 
         if framework != self.config.framework:
-            logger.warning('Framework in manifest is "%s", Clickable expected "%s".',
-                           framework, self.config.framework)
+            logger.debug('Framework in manifest is "%s", Clickable expected "%s".',
+                         framework, self.config.framework)
 
         return False
 
