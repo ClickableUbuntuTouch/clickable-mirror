@@ -490,6 +490,7 @@ FROM {self.base_docker_image}
                 self.run_command(f'rustup target add {self.config.arch_rust}')
 
         if self.config.image_setup:
+            os.environ.update(self.config.image_setup.get('env', {}))
             for command in self.config.image_setup.get('run', []):
                 self.run_command(command, use_build_dir=False)
 
