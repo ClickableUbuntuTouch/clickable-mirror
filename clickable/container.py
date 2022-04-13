@@ -537,6 +537,8 @@ FROM {self.base_docker_image}
             elif self.needs_customized_container():
                 self.setup_customized_image()
 
+        self.config.set_env_vars()
+
     def clean_clickable(self):
         path = os.path.join(self.config.cwd, self.clickable_dir)
         if os.path.exists(path):

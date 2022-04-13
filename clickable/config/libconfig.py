@@ -146,7 +146,6 @@ class LibConfig():
                 self.config[key] = os.path.abspath(self.config[key])
 
         self.substitute_placeholders()
-        self.set_env_vars()
 
         self.check_config_errors()
 
