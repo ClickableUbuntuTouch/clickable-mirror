@@ -27,6 +27,17 @@ This means the ``clean-build`` command has been removed, as it is not needed
 anymore. This also means that the keyword ``dirty`` and the environment variable
 ``CLICKABLE_DIRTY`` are no longer needed nor supported.
 
+Unconfined Apps
+---------------
+
+The build command fails if there are review warnings or errors, because the Open
+Store refuses the upload of click packages in that case. Unconfined apps need to
+configure review warnings to be ignored:
+
+.. code-block:: javascript
+
+    "ignore_review_warnings": true
+
 Command Line Interface
 ----------------------
 

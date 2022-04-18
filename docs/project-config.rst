@@ -336,10 +336,23 @@ disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` comm
 Does not affect libraries.
 The default is ``false``.
 
+ignore_review_errors
+--------------------
+
+Optional, whether or not to let the build command fail if there are review errors.
+The default is ``false``.
+
+ignore_review_warnings
+----------------------
+
+Optional, whether or not to let the build command fail if there are review warnings.
+The default is ``false``.
+
 skip_review
 -----------
 
-Optional, whether or not to skip review on click builds.
+Optional, whether or not to skip review on click builds at all. Usually
+``ignore_review_warnings`` or ``ignore_review_errors`` should be preferred.
 The default is ``false``.
 
 .. _project-config-dependencies_host:
