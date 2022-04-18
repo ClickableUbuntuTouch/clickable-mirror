@@ -490,6 +490,7 @@ FROM {self.base_docker_image}
                 self.run_command(f'rustup target add {self.config.arch_rust}')
 
         if self.config.image_setup:
+            os.environ.update(self.config.image_setup.get('env', {}))
             for command in self.config.image_setup.get('run', []):
                 self.run_command(command, use_build_dir=False)
 
@@ -535,6 +536,8 @@ FROM {self.base_docker_image}
                 self.setup_container_mode()
             elif self.needs_customized_container():
                 self.setup_customized_image()
+
+        self.config.set_env_vars()
 
     def clean_clickable(self):
         path = os.path.join(self.config.cwd, self.clickable_dir)

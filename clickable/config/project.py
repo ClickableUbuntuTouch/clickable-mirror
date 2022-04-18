@@ -229,7 +229,6 @@ class ProjectConfig():
         self.handle_path_keys_and_placeholders()
 
         self.setup_helpers()
-        self.set_env_vars()
 
         for key, value in self.config.items():
             logger.debug('App config value %s: %s', key, value)
