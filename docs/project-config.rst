@@ -525,10 +525,10 @@ NAME          The library name (key name in the ``libraries`` dictionary)
 ============= ======
 
 A single library can be build by specifying its name as
-``clickable build-libs lib1 --arch arm64`` to build the library with name
+``clickable build --libs lib1 --arch arm64`` to build the library with name
 ``lib1`` for the architecture ``arm64``.
-``clickable clean-libs lib1 --arch arm64`` cleans the libraries build dir.
-``clickable test-libs lib1`` tests the library.
+``clickable clean --libs lib1 --arch arm64`` cleans the libraries build dir.
+``clickable test --libs lib1`` tests the library.
 
 builder
 ^^^^^^^
