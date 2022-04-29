@@ -3,6 +3,18 @@
 Changelog
 =========
 
+Changes in v7.3.0
+-----------------
+
+- Fix NUM_PROCS placeholder for libs
+- Updated docs for library commands
+- Fix env var issues between apps and libs
+- Updated container mode to use image_setup env vars
+- Added configuration options to ignore review warnings and/or errors
+- Moved warning about framework to a debug message
+- ``@`` is now allowed in paths
+- Fixed the skip_review option when chaining commands
+
 Changes in v7.2.0
 -----------------
 
