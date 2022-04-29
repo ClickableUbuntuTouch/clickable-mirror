@@ -1,3 +1,16 @@
+clickable (7.3.0) unstable; urgency=medium
+
+  * Fix NUM_PROCS placeholder for libs
+  * Updated docs for library commands
+  * Fix env var issues between apps and libs
+  * Updated container mode to use image_setup env vars
+  * Added configuration options to ignore review warnings and/or errors
+  * Moved warning about framework to a debug message
+  * @ is now allowed in paths
+  * Fixed the skip_review option when chaining commands
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 28 Apr 2022 23:13:00 -0500
+
 clickable (7.2.0) unstable; urgency=medium
 
   * Removed deprecated go build flag

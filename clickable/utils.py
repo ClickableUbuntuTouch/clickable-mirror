@@ -284,7 +284,7 @@ def is_path_sane(path):
                 return False
         return True
 
-    return re.match(r"^[$\w\d_\.\-\*\?/]+$", path)
+    return re.match(r"^[$\w\d_\.\-\*\?/@]+$", path)
 
 
 def is_sub_dir(path, parent):

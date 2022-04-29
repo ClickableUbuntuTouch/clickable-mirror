@@ -40,6 +40,7 @@ class LibConfig():
         "ARCH_TRIPLET": "arch_triplet",
         "ARCH_RUST": "arch_rust",
         "NAME": "name",
+        "NUM_PROCS": "make_jobs",
         "ROOT": "root_dir",
         "BUILD_DIR": "build_dir",
         "SRC_DIR": "src_dir",
@@ -146,7 +147,6 @@ class LibConfig():
                 self.config[key] = os.path.abspath(self.config[key])
 
         self.substitute_placeholders()
-        self.set_env_vars()
 
         self.check_config_errors()
 
@@ -221,8 +221,10 @@ class LibConfig():
         if not self.config['make_jobs']:
             self.config['make_jobs'] = multiprocessing.cpu_count()
 
-        self.make_args = merge_make_jobs_into_args(
-            make_args=self.make_args, make_jobs=self.make_jobs)
+        self.config['make_args'] = merge_make_jobs_into_args(
+            self.config['make_args'], self.config['make_jobs'])
+
+        self.config['make_jobs'] = str(self.config['make_jobs'])
 
     def check_config_errors(self):
         if not self.config['builder']:

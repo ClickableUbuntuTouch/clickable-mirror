@@ -131,6 +131,8 @@
     "dirty": {"type": "boolean"},
     "always_clean": {"type": "boolean"},
     "skip_review": {"type": "boolean"},
+    "ignore_review_warnings": {"type": "boolean"},
+    "ignore_review_errors": {"type": "boolean"},
     "test": {"type": "string"},
     "image_setup": {
       "type": ["object"],

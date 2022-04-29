@@ -56,7 +56,7 @@ class BuildCommand(Command):
         parser.add_argument(
             '--skip-review',
             action='store_true',
-            help='Do not review click package after build (useful for unconfined apps)',
+            help='Do not review click package after build',
             default=False,
         )
         parser.add_argument(
@@ -92,26 +92,42 @@ class BuildCommand(Command):
     def configure(self, args):
         self.clean_app = args.clean
         self.clean_libs = args.clean and args.libs is not None
-        if args.skip_review or self.config.skip_review:
+        if args.skip_review:
             self.skip_review = True
         self.output_path = args.output
         self.debug_build = args.debug
         self.app = args.app or args.libs is None or args.all
         self.libs = [] if args.all else args.libs
-        self.accept_errors = args.accept_review_errors
-        self.accept_warnings = self.accept_errors or args.accept_review_warnings
 
         self.configure_common()
+
+        if args.accept_review_warnings:
+            self.accept_warnings = True
+
+        if args.accept_review_errors:
+            self.accept_errors = True
+
+        if self.accept_errors:
+            self.accept_warnings = True
 
     def configure_nested(self):
         self.configure_common()
 
+        if self.accept_errors:
+            self.accept_warnings = True
+
     def configure_common(self):
-        if self.config.global_config.build.skip_review:
+        if self.config.skip_review or self.config.global_config.build.skip_review:
             self.skip_review = True
 
         if self.config.always_clean or self.config.global_config.build.always_clean:
             self.clean_app = True
+
+        if self.config.ignore_review_errors is not None:
+            self.accept_errors = self.config.ignore_review_errors
+
+        if self.config.ignore_review_warnings is not None:
+            self.accept_warnings = self.config.ignore_review_warnings
 
         self.parse_env()
         self.check_libs()
@@ -314,8 +330,8 @@ class BuildCommand(Command):
             return True
 
         if framework != self.config.framework:
-            logger.warning('Framework in manifest is "%s", Clickable expected "%s".',
-                           framework, self.config.framework)
+            logger.debug('Framework in manifest is "%s", Clickable expected "%s".',
+                         framework, self.config.framework)
 
         return False
 

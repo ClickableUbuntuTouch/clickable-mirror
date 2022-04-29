@@ -189,6 +189,8 @@ class ProjectConfig():
             'framework': None,
             'always_clean': False,
             'skip_review': False,
+            'ignore_review_warnings': None,
+            'ignore_review_errors': None,
         }
 
     def parse_configs(self, args, commands, always_clean):
@@ -227,7 +229,6 @@ class ProjectConfig():
         self.handle_path_keys_and_placeholders()
 
         self.setup_helpers()
-        self.set_env_vars()
 
         for key, value in self.config.items():
             logger.debug('App config value %s: %s', key, value)
@@ -400,7 +401,7 @@ class ProjectConfig():
             super().__setattr__(name, value)
 
     def load_project_config(self, config_path):
-        config = {}
+        config_dict = {}
         use_default_config = not config_path
         if use_default_config:
             directory = self.cwd
@@ -448,18 +449,12 @@ class ProjectConfig():
                 absolute_path = make_absolute(config_path)
                 relative_path = PurePath(absolute_path).relative_to(self.config['root_dir'])
                 validate_config_format(config_dict, schema, 'project', relative_path)
-
-                for key in self.config:
-                    value = config_dict.get(key, None)
-
-                    if value:
-                        config[key] = value
         elif not use_default_config:
             raise ClickableException(
                 f'Specified config file "{config_path}" does not exist.'
             )
 
-        return config
+        return config_dict
 
     def merge_cli_config(self):
         if self.global_config.cli.default_chain:

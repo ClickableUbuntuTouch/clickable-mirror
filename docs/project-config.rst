@@ -336,10 +336,23 @@ disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` comm
 Does not affect libraries.
 The default is ``false``.
 
+ignore_review_errors
+--------------------
+
+Optional, whether or not to let the build command fail if there are review errors.
+The default is ``false``.
+
+ignore_review_warnings
+----------------------
+
+Optional, whether or not to let the build command fail if there are review warnings.
+The default is ``false``.
+
 skip_review
 -----------
 
-Optional, whether or not to skip review on click builds.
+Optional, whether or not to skip review on click builds at all. Usually
+``ignore_review_warnings`` or ``ignore_review_errors`` should be preferred.
 The default is ``false``.
 
 .. _project-config-dependencies_host:
@@ -512,10 +525,10 @@ NAME          The library name (key name in the ``libraries`` dictionary)
 ============= ======
 
 A single library can be build by specifying its name as
-``clickable build-libs lib1 --arch arm64`` to build the library with name
+``clickable build --libs lib1 --arch arm64`` to build the library with name
 ``lib1`` for the architecture ``arm64``.
-``clickable clean-libs lib1 --arch arm64`` cleans the libraries build dir.
-``clickable test-libs lib1`` tests the library.
+``clickable clean --libs lib1 --arch arm64`` cleans the libraries build dir.
+``clickable test --libs lib1`` tests the library.
 
 builder
 ^^^^^^^
