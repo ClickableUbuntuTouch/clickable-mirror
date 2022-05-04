@@ -7,6 +7,7 @@ from clickable.utils import (
     makedirs,
     is_sub_dir,
     env,
+    make_absolute,
 )
 from clickable.container import Container
 from clickable.logger import logger
@@ -253,21 +254,38 @@ class BuildCommand(Command):
         if config.postbuild:
             run_custom_commands(config.postbuild, config, container)
 
-    def install_files(self, pattern, dest_dir):
+    def install_files(self, pattern, dest_dir, search_dirs=None):
         if not is_sub_dir(dest_dir, self.config.install_dir):
             dest_dir = os.path.abspath(self.config.install_dir + "/" + dest_dir)
 
         makedirs(dest_dir)
-        if '"' in pattern:
+
+        if "'" in pattern:
             # Make sure one cannot run random bash code through the "ls" command
             raise ClickableException(
-                "install_* patterns must not contain any '\"' quotation character."
+                "install_* patterns must not contain the ' quotation character."
             )
 
-        command = f'ls -d "{pattern}"'
+        name = pattern
+        if "/" in pattern:
+            [parent, name] = make_absolute(pattern).rsplit('/', 1)
+            parent += "/"
+        else:
+            if not search_dirs:
+                search_dirs = []
+            search_dirs.append(self.config.root_dir)
+
+            # deduplicate
+            search_dirs = list(set(search_dirs))
+            parent = " ".join(search_dirs)
+
+        command = f"find {parent} -name '{name}' -maxdepth 1 -mindepth 1"
         files = self.container.run_command(command, get_output=True).split()
 
-        logger.info("Installing %s", ", ".join(files))
+        if not files:
+            raise ClickableException(f'Files to install not found with pattern "{pattern}"')
+
+        logger.info("Installing\n  %s", "\n  ".join(files))
         self.container.pull_files(files, dest_dir)
 
     def install_qml_files(self, pattern, dest_dir):
@@ -289,20 +307,53 @@ class BuildCommand(Command):
             else:
                 self.install_files(pattern, dest_dir)
 
+    def join_libs(self, dirs):
+        lib_bin_dirs = []
+        for lib in self.config.lib_configs:
+            for d in dirs:
+                lib_bin_dirs.append(os.path.join(lib.install_dir, d[1:]))
+        return lib_bin_dirs
+
+    def get_library_dirs(self):
+        command = "cat /etc/ld.so.conf.d/*.conf"
+        dirs = self.container.run_command(command, get_output=True).splitlines()
+        dirs = [d for d in dirs if d.startswith("/")]
+        dirs += self.join_libs(dirs)
+
+        for lib in self.config.lib_configs:
+            dirs.append(os.path.join(lib.install_dir, "lib"))
+
+        return [d for d in dirs if os.path.isdir(d)]
+
+    def get_bin_dirs(self):
+        command = "echo ${PATH}"
+        dirs = self.container.run_command(command, get_output=True).split(":")
+        dirs += self.join_libs(dirs)
+
+        return [d for d in dirs if os.path.isdir(d)]
+
     def install_additional_files(self):
         for p in self.config.install_root_data:
             self.install_files(p, self.config.install_dir)
-        for p in self.config.install_lib:
-            self.install_files(p, os.path.join(self.config.install_dir,
-                                               self.config.app_lib_dir))
-        for p in self.config.install_bin:
-            self.install_files(p, os.path.join(self.config.install_dir,
-                                               self.config.app_bin_dir))
+
+        if self.config.install_lib:
+            lib_dirs = self.get_library_dirs()
+            for p in self.config.install_lib:
+                self.install_files(p, os.path.join(self.config.install_dir,
+                                                   self.config.app_lib_dir), lib_dirs)
+
+        if self.config.install_bin:
+            bin_dirs = self.get_bin_dirs()
+            for p in self.config.install_bin:
+                self.install_files(p, os.path.join(self.config.install_dir,
+                                                   self.config.app_bin_dir), bin_dirs)
+
         for p in self.config.install_qml:
             self.install_qml_files(p, os.path.join(
                 self.config.install_dir,
                 self.config.app_qml_dir
             ))
+
         for p, dest in self.config.install_data.items():
             self.install_files(p, dest)
 

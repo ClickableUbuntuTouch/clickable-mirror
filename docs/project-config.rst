@@ -214,18 +214,21 @@ Defaults to ``${BUILD_DIR}/install``
 install_lib
 -----------
 
-Optional, additional libraries that should be installed with the app and be in ``LD_LIBRARY_PATH`` at runtime.
+Optional, additional libraries that should be installed with the app and be in ``LD_LIBRARY_PATH``
+at runtime.
+If an entry is just a file name, then Clickable looks for it in common library locations
+(as listed in ``/etc/ld.so.conf.d/*.conf``) as well as the install dirs of libraries defined in the
+libraries section.
 The destination directory is ``${CLICK_LD_LIBRARY_PATH}``. Ex:
 
 .. code-block:: yaml
 
     install_lib:
+    - libasound.so*
     - /usr/lib/${ARCH_TRIPLET}/libasound.so*
 
-Relative paths are prepended with the project root dir.
-
-Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
-Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
+Can be specified as a string or a list of strings.
+Supports wildcards.
 
 install_qml
 -----------
@@ -244,24 +247,25 @@ Relative paths are prepended with the project root dir.
 QML modules will be installed to the correct directory based on the name of the module.
 In the above example it will be installed to ``lib/${ARCH_TRIPLET}/Qt/labs/calendar``
 because the module specified in the qmldir file is ``Qt.labs.calendar``.
-Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
-Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
+Can be specified as a string or a list of strings. Supports wildcards.
 
 install_bin
 -----------
 
 Optional, additional executables that should be installed with the app and be in ``PATH`` at runtime.
+If an entry is just a file name, then Clickable looks for it in ``PATH`` as well as the install
+dirs of libraries defined in the libraries section.
 The destination directory is ``${CLICK_PATH}``. Ex:
 
 .. code-block:: yaml
 
     install_bin:
+    - htop
     - /usr/bin/htop
 
 Relative paths are prepended with the project root dir.
 
-Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
-Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
+Can be specified as a string or a list of strings. Supports wildcards.
 
 install_root_data
 -----------------
@@ -275,8 +279,7 @@ root dir. Ex:
     - packaging/manifest.json
     - packaging/myapp.desktop
 
-Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
-Supports wildcards as this actually calls ``ls "<path>"`` in a bash.
+Can be specified as a string or a list of strings. Supports wildcards.
 
 install_data
 ------------
@@ -292,9 +295,8 @@ Needs to be specified as a dictionary with absolute source paths as keys and des
 Relative source paths are prepended with the project root dir and destination paths with
 the install dir.
 
-Can be specified as a string or a list of strings. Paths must not contain ``"`` characters.
-Supports wildcards as this actually calls ``ls "<src>"`` in a bash. ``${INSTALL_DIR}`` is
-added as prefix if path is not relative to the install dir.
+Can be specified as a string or a list of strings. Supports wildcards.
+``${INSTALL_DIR}`` is added as prefix if path is not relative to the install dir.
 
 kill
 ----
