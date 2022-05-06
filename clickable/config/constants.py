@@ -56,6 +56,7 @@ class Constants():
             ('16.04.5', 'amd64-nvidia'): 'clickable/amd64-16.04-amd64-nvidia:16.04.5',
             ('16.04.5', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.5',
             ('16.04.5', 'amd64-nvidia-ide'): 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
+            ('20.04', 'amd64'): 'clickable/amd64-20.04-amd64:20.04',
         }
     }
 
@@ -68,6 +69,7 @@ class Constants():
         "ubuntu-sdk-16.04.5": "16.04.5",
         "ubuntu-sdk-16.04.6": "16.04.5",
         "ubuntu-sdk-16.04.7": "16.04.5",
+        "ubuntu-sdk-20.04": "20.04",
     }
 
     default_qt_framework_mapping = {

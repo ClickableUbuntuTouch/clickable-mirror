@@ -53,6 +53,14 @@ class PublishCommand(Command):
         if not self.api_key:
             self.api_key = env('OPENSTORE_API_KEY')
 
+    def determine_channel(self):
+        if '16.04' in self.config.framework:
+            return 'xenial'
+        if '20.04' in self.config.framework:
+            return 'focal'
+        raise ClickableException(f'Clickable does not know an Open Store channel \
+                corresponding to framework {self.config.framework}')
+
     def run(self):
         if not REQUESTS_AVAILABLE:
             raise ClickableException(
@@ -71,7 +79,7 @@ class PublishCommand(Command):
 
         package_name = self.config.install_files.find_package_name()
         url = url + OPENSTORE_API_PATH.format(package_name)
-        channel = 'xenial'
+        channel = self.determine_channel()
         files = {'file': open(click_path, 'rb')}
         data = {
             'channel': channel,
