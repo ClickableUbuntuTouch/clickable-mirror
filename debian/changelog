@@ -1,3 +1,11 @@
+clickable (7.4.0) unstable; urgency=medium
+
+  * Added initial support for building clicks for Focal (Currently only supporting amd64 builds)
+  * When using ``install_lib``, common library locations will be searched
+  * When using ``install_bin``, the PATH will be searched
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 13 May 2022 22:53:00 -0500
+
 clickable (7.3.0) unstable; urgency=medium
 
   * Fix NUM_PROCS placeholder for libs

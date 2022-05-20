@@ -3,6 +3,13 @@
 Changelog
 =========
 
+Changes in v7.4.0
+-----------------
+
+- Added initial support for building clicks for Focal (Currently only supporting amd64 builds)
+- When using ``install_lib``, common library locations will be searched
+- When using ``install_bin``, the PATH will be searched
+
 Changes in v7.3.0
 -----------------
 
