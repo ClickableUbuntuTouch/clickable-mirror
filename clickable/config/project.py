@@ -80,11 +80,13 @@ class ProjectConfig():
     # Dicts where keys accept placeholders
     accepts_placeholders_keys = ["install_data", "env_vars"]
 
-    # Paths to be made absolute, iterates and recurses lists and dicts
-    path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
-                 'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
-                 'app_qml_dir', 'build_home',
-                 'install_qml', 'install_bin', 'install_lib', 'install_root_data']
+    # Paths to be checked for sanity, iterates and recurses lists and dicts
+    path_keys = ['install_qml', 'install_bin', 'install_lib']
+    # Like `path_keys`, but made absolute
+    absolute_path_keys = ['root_dir', 'build_dir', 'src_dir', 'install_dir',
+                          'cargo_home', 'gopath', 'app_lib_dir', 'app_bin_dir',
+                          'app_qml_dir', 'build_home',
+                          'install_root_data']
     # Same as for path_keys, except that for dicts the keys are made
     # absolute, not the values
     path_dict_keys = ['install_data']
@@ -602,7 +604,7 @@ class ProjectConfig():
 
         # Make paths absolute that don't accept placeholders.
         # They may be used as placeholders themselves.
-        for key in set(self.path_keys) - set(accepting):
+        for key in set(self.absolute_path_keys) - set(accepting):
             self.config[key] = make_absolute(self.config[key], change_keys=False)
         for key in set(self.path_dict_keys) - set(accepting):
             self.config[key] = make_absolute(self.config[key], change_keys=True)
@@ -614,7 +616,7 @@ class ProjectConfig():
             if key in self.accepts_placeholders_keys:
                 self.handle_accepting_key(key, change_keys=True)
 
-            if key in self.path_keys:
+            if key in self.absolute_path_keys:
                 self.config[key] = make_absolute(self.config[key], change_keys=False)
             if key in self.path_dict_keys:
                 self.config[key] = make_absolute(self.config[key], change_keys=True)
@@ -866,7 +868,7 @@ class ProjectConfig():
                 raise ClickableException('Desktop Mode in Container Mode is not supported.')
 
     def check_path_sanity(self):
-        for path in self.path_keys:
+        for path in self.path_keys + self.absolute_path_keys:
             if self.config[path] and not is_path_sane(self.config[path]):
                 raise ClickableException(
                     f'The "{path}" config contains special characters (e.g. spaces):\n'
