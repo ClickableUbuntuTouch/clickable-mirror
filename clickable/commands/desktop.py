@@ -288,7 +288,7 @@ class DesktopCommand(Command):
             'DISPLAY': os.environ['DISPLAY'],
             'QML2_IMPORT_PATH': lib_path,
             'LD_LIBRARY_PATH': lib_path,
-            'PATH': self.get_docker_path_env(working_directory),
+            'PATH': self.get_docker_path_env(working_directory) + self.get_image_path_var(),
             'HOME': Constants.device_home,
             'OXIDE_NO_SANDBOX': '1',
             'UBUNTU_APP_LAUNCH_ARCH': self.config.arch_triplet,
@@ -316,6 +316,17 @@ class DesktopCommand(Command):
             '/bin',
             '/usr/bin',
         ])
+
+    def get_image_path_var(self):
+        command = "docker inspect -f "\
+            "'{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' " \
+            f"{self.config.docker_image}"
+        image_env = run_subprocess_check_output(command).splitlines()
+        for var in image_env:
+            if var.startswith("PATH="):
+                return ":" + var.rsplit("=", 1)[1]
+
+        return ""
 
     def setup_volume_mappings(self):
         xauth_path = self.touch_xauth()
