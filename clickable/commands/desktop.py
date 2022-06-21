@@ -230,7 +230,7 @@ class DesktopCommand(Command):
         try:
             return run_subprocess_check_output(
                 'timedatectl show -p Timezone --value',
-                stderr=subprocess.DEVNULL)
+                stderr=subprocess.DEVNULL).strip()
         except Exception:  # pylint: disable=broad-except
             logger.debug(
                 'timedatectl show command failed. Falling back to alternative way '
