@@ -61,6 +61,18 @@ class Constants():
         }
     }
 
+    ci_container_mapping = {
+        ('16.04.4', 'armhf'): 'clickable/ci-16.04-armhf',
+        ('16.04.5', 'armhf'): 'clickable/ci-16.04-armhf',
+        ('20.04.1', 'armhf'): 'clickable/ci-20.04-armhf',
+        ('16.04.4', 'arm64'): 'clickable/ci-16.04-arm64',
+        ('16.04.5', 'arm64'): 'clickable/ci-16.04-arm64',
+        ('20.04.1', 'arm64'): 'clickable/ci-20.04-arm64',
+        ('16.04.4', 'amd64'): 'clickable/ci-16.04-amd64',
+        ('16.04.5', 'amd64'): 'clickable/ci-16.04-amd64',
+        ('20.04', 'amd64'): 'clickable/ci-20.04-amd64',
+    }
+
     framework_image_mapping = {
         "ubuntu-sdk-16.04": "16.04.4",
         "ubuntu-sdk-16.04.1": "16.04.4",
