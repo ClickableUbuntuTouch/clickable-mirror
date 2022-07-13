@@ -28,6 +28,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
         p = ''
         if (self.is_cmake_project() or
                 os.path.exists(os.path.join(self.project_path, 'clickable.yaml')) or
+                os.path.exists(os.path.join(self.project_path, 'clickable.yml')) or
                 os.path.exists(os.path.join(self.project_path, 'clickable.json'))):
             p = self.project_path
         return path.replace('qtcreator', f'qtcreator -settingspath {self.clickable_dir} {p}')
