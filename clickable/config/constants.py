@@ -16,6 +16,7 @@ class Constants():
 
     project_config_path_options = [
         "clickable.yaml",
+        "clickable.yml",
         "clickable.json"
     ]
 
