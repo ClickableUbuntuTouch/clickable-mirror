@@ -58,7 +58,9 @@ class Constants():
             ('16.04.5', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.5',
             ('16.04.5', 'amd64-nvidia-ide'): 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
             ('20.04', 'amd64'): 'clickable/amd64-20.04-amd64:20.04',
+            ('20.04', 'amd64-nvidia'): 'clickable/amd64-20.04-amd64-nvidia:20.04',
             ('20.04', 'amd64-ide'): 'clickable/amd64-20.04-amd64-ide:20.04',
+            ('20.04', 'amd64-nvidia-ide'): 'clickable/amd64-20.04-amd64-nvidia-ide:20.04',
         }
     }
 
