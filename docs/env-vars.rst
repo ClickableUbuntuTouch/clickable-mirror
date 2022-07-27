@@ -23,7 +23,7 @@ Overrides the project config's :ref:`qt_version <project-config-qt_version>`.
 ``CLICKABLE_FRAMEWORK``
 -----------------------
 
-Overrides the project config's :ref:`builder <project-config-framework>`.
+Overrides the project config's :ref:`framework <project-config-framework>`.
 
 ``CLICKABLE_BUILDER``
 ---------------------
