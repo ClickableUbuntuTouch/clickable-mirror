@@ -134,7 +134,9 @@ class Container():
                                  'Please run "clickable setup docker" first.')
 
     def is_systemd_used(self):
-        return subprocess.call('command -v systemctl >> /dev/null', shell=True) == 0
+        with open('/proc/1/comm', 'r', encoding='UTF-8') as f:
+            init_system = f.read().strip()
+            return init_system == "systemd"
 
     def docker_group_exists(self):
         group_exists = False
