@@ -79,7 +79,6 @@ class InstallCommand(Command):
         if self.config.ssh:
             command = f'scp {self.click_path} phablet@{self.config.ssh}:/home/phablet/'
             run_subprocess_check_call(command, cwd=cwd, shell=True)
-
         else:
             self.device.check_any_adb_attached()
 
@@ -98,9 +97,25 @@ class InstallCommand(Command):
             self.try_uninstall()
 
         logger.info("Installing the app.")
-        self.device.run_command(
-            f'pkcon install-local --allow-untrusted /home/phablet/{click}',
-            cwd=cwd
-        )
+
+        if self.config.get_framework_base() == '16.04':
+            logger.debug("Using UT 16.04 install command")
+            command = ['pkcon', 'install-local', '--allow-untrusted', f'/home/phablet/{click}']
+        else:
+            logger.debug("Using UT 20.04 install command")
+            command = [
+                'gdbus',
+                'call',
+                '--system',
+                '--dest com.lomiri.click',
+                '--object-path /com/lomiri/click',
+                '--method com.lomiri.click.Install',
+                f'/home/phablet/{click}']
+
+        command = ' '.join(command)
+
+        logger.debug("Running: %s", command)
+        self.device.run_command(command, cwd=cwd)
+
         logger.info("Cleaning up.")
         self.device.run_command(f'rm /home/phablet/{click}', cwd=cwd)

@@ -362,12 +362,14 @@ class ProjectConfig():
         if self.config['framework'] in Constants.framework_image_mapping:
             return Constants.framework_image_mapping[self.config['framework']]
 
-        framework_base = Constants.framework_base_default
+        return Constants.framework_image_fallback[self.get_framework_base()]
+
+    def get_framework_base(self):
         for base in Constants.framework_base:
             if self.config['framework'].find(base) != -1:
-                framework_base = base
+                return base
 
-        return Constants.framework_image_fallback[framework_base]
+        return Constants.framework_base_default
 
     def setup_image(self):
         if self.needs_clickable_image():
