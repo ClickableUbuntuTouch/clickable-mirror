@@ -318,7 +318,7 @@ class DesktopCommand(Command):
         ])
 
     def get_image_path_var(self):
-        command = "docker inspect -f "\
+        command = f"{self.container.docker_executable} inspect -f "\
             "'{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' " \
             f"{self.config.docker_image}"
         image_env = run_subprocess_check_output(command).splitlines()
@@ -360,7 +360,8 @@ class DesktopCommand(Command):
         if self.ide_delegate is not None:
             self.ide_delegate.before_run(self.config, docker_config)
 
-        command = docker_config.render_command()
+        id_mapping_string = self.container.render_id_mapping_string()
+        command = docker_config.render_command(self.container.docker_executable, id_mapping_string)
         logger.debug(command)
 
         subprocess.check_call(shlex.split(command), cwd=docker_config.working_directory)

@@ -73,7 +73,7 @@ class CiCommand(Command):
         logger.info("Running in container %s", self.image)
 
         if self.version == "latest":
-            update_image(self.image)
+            update_image(self.container.docker_executable, self.image)
 
         self.container.setup()
         self.container.run_command(

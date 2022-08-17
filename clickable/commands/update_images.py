@@ -7,9 +7,9 @@ from clickable.utils import (
 from .base import Command
 
 
-def update_image(image):
+def update_image(docker_executable, image):
     if image_exists(image):
-        command = f'docker pull {image}'
+        command = f'{docker_executable} pull {image}'
         run_subprocess_check_call(command)
 
 
@@ -26,4 +26,4 @@ class UpdateCommand(Command):
 
         container_mapping = Constants.container_mapping[Constants.host_arch]
         for image in container_mapping.values():
-            update_image(image)
+            update_image(self.container.docker_executable, image)

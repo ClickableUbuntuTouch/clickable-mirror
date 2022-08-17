@@ -2,7 +2,6 @@ import shlex
 
 
 class DockerConfig():
-    docker_executable = 'docker'
     volumes = {}
     environment = {}
     extra_options = {}
@@ -30,13 +29,15 @@ class DockerConfig():
     def add_extra_options(self, extra_options_dict):
         self.extra_options.update(extra_options_dict)
 
-    def render_command(self):
+    def render_command(self, docker_executable, id_mapping_string):
         volume_mapping_string = self.render_volume_mapping_string()
         environment_string = self.render_environment_string()
         extra_options_string = self.render_extra_options_string()
         extra_flags_string = self.render_extra_flags_string()
 
         return self.render_command_string(
+            docker_executable,
+            id_mapping_string,
             volume_mapping_string,
             environment_string,
             extra_options_string,
@@ -45,7 +46,7 @@ class DockerConfig():
 
     def render_volume_mapping_string(self):
         # e.g. "-v /host/path:/container/path:Z -v /other/path:/other/path:Z
-        return self.render_dictionary_as_mapping(self.volumes, '-v ', ':Z')
+        return self.render_dictionary_as_mapping(self.volumes, '-v ')
 
     def render_dictionary_as_mapping(self, dict, prefix='', suffix=''):
         return ' '.join(self.join_dictionary_items(dict, ':', prefix, suffix))
@@ -78,17 +79,20 @@ class DockerConfig():
 
     def render_command_string(
         self,
+        docker_executable,
+        id_mapping_string,
         volumes_string,
         environment_string,
         extra_options_string,
         extra_flags_string
     ):
         return (
-            '{docker} run --privileged --net=host {volumes} {env} {extra_options} '
-            '{extra_flags} -w {working_dir} --user={uid} '
-            '--rm {tty} -i {docker_image} bash -c "{executable}"'
+            '{docker} run --privileged --security-opt label=disable --net=host {id_mappings} '
+            '{volumes} {env} {extra_options} {extra_flags} -w {working_dir} '
+            '--user={uid} --rm {tty} -i {docker_image} bash -c "{executable}"'
         ).format(
-            docker=self.docker_executable,
+            docker=docker_executable,
+            id_mappings=id_mapping_string,
             volumes=volumes_string,
             env=environment_string,
             extra_options=extra_options_string,
