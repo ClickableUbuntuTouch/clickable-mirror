@@ -5,7 +5,7 @@ import os
 import shlex
 import glob
 import inspect
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, basename, isfile, isdir, join
 
 import yaml
 
@@ -38,6 +38,13 @@ def prepare_command(cmd, shell=False):
                 cmd[idx] = x.encode()
 
     return cmd
+
+
+def get_existing_dir(name, paths):
+    for path in paths:
+        if isdir(path):
+            return path
+    raise ClickableException(f'Cannot find required {name} directory.')
 
 
 def get_container_mapping():
@@ -152,6 +159,13 @@ def check_command(command):
         )
 
 
+def get_docker_command():
+    for command in ['podman', 'docker']:
+        if is_command(command):
+            return command
+    raise Exception('You must install either podman or docker')
+
+
 def env(name):
     value = None
     if name in os.environ and os.environ[name]:
@@ -244,7 +258,8 @@ def validate_config_format(config, schema, name, path):
 
 
 def image_exists(image):
-    command = f'docker image inspect {image}'
+    docker_executable = get_docker_command()
+    command = f'{docker_executable} image inspect {image}'
     return run_subprocess_call(
         command,
         stderr=subprocess.DEVNULL,

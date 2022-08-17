@@ -10,6 +10,7 @@ import json
 from clickable.utils import (
     run_subprocess_check_call,
     run_subprocess_check_output,
+    get_docker_command,
     image_exists,
     env,
     check_command,
@@ -28,6 +29,7 @@ class Container():
         self.base_docker_image = self.docker_image
 
         if self.docker_mode:
+            self.docker_executable = get_docker_command()
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
@@ -70,8 +72,8 @@ class Container():
 
             self.check_docker()
 
-            command_base = f'docker images -q {self.base_docker_image}'
-            command_cached = f'docker history -q {cached_image}'
+            command_base = f'{self.docker_executable} images -q {self.base_docker_image}'
+            command_cached = f'{self.docker_executable} history -q {cached_image}'
 
             hash_base = run_subprocess_check_output(command_base).strip()
             history_cached = run_subprocess_check_output(command_cached).strip()
@@ -84,9 +86,9 @@ class Container():
 
     def start_docker(self):
         check_command('systemctl')
-
-        logger.info('Asking for root to start docker')
-        run_subprocess_check_output(shlex.split('sudo systemctl start docker'))
+        if self.docker_executable == 'docker':
+            logger.info('Asking for root to start docker')
+            run_subprocess_check_output(shlex.split('sudo systemctl start docker'))
 
     def is_docker_service_running(self):
         if env('CLICKABLE_SKIP_DOCKER_CHECKS'):
@@ -118,6 +120,10 @@ class Container():
                 "Container was not initialized with Container Mode. "
                 "This seems to be a bug in Clickable."
             )
+
+        if self.docker_executable != 'docker':
+            logger.debug('Skipping docker check as %s is used instead.', self.docker_executable)
+            return
 
         if env('CLICKABLE_SKIP_DOCKER_CHECKS'):
             logger.debug('Skipping docker check because of env var.')
@@ -171,6 +177,10 @@ class Container():
         return self.is_docker_configured() and self.is_docker_service_running()
 
     def setup_docker(self):
+        if self.docker_executable != 'docker':
+            logger.debug('Skipping docker setup as %s is used instead.', self.docker_executable)
+            return
+
         logger.info('Setting up docker')
 
         if not self.is_docker_service_running():
@@ -213,14 +223,14 @@ class Container():
         else:  # Docker
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[self.config.root_dir]))
-            command_create = f'docker create {mounts} {self.docker_image}'
+            command_create = f'{self.docker_executable} create {mounts} {self.docker_image}'
             container = run_subprocess_check_output(command_create).strip()
 
             for f in files:
-                command_copy = f'docker cp {container}:{f} {dst_parent}'
+                command_copy = f'{self.docker_executable} cp {container}:{f} {dst_parent}'
                 run_subprocess_check_call(command_copy)
 
-            command_remove = f'docker rm {container}'
+            command_remove = f'{self.docker_executable} rm {container}'
             run_subprocess_check_call(command_remove,
                                       stdout=subprocess.DEVNULL)
 
@@ -263,6 +273,17 @@ class Container():
             for container, host in mounts.items()
         ])
 
+    def render_id_mapping_string(self, mapid=os.getuid()):
+        if self.docker_executable != 'podman':
+            return ''
+        uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
+        gidmap = self.render_single_id_mapping_string('--gidmap', mapid)
+        return f'{uidmap} {gidmap}'
+
+    def render_single_id_mapping_string(self, flag, mapid):
+        # e.g. "--uidmap 1000:0:1 --uidmap 0:1:1000"
+        return f'{flag} {mapid}:0:1 {flag} 0:1:{mapid}'
+
     def run_command(self,
                     command,
                     root_user=False,
@@ -299,6 +320,8 @@ class Container():
             if not root_user:
                 user = f"-u {os.getuid()}"
 
+            id_mappings = self.render_id_mapping_string()
+
             mounts = self.render_mounts(
                 self.get_docker_mounts(transparent=[cwd, self.config.root_dir]))
 
@@ -318,9 +341,9 @@ wait $bg_pid
 exit $?
                 '''.strip()
 
-            wrapped_command = f'docker run {mounts} {env_vars} {go_config} {user} ' \
-                              f'-w {command_cwd} --rm {command_tty} {network} ' \
-                              f'-i {self.docker_image} bash -c "{command}"'
+            wrapped_command = f'''{self.docker_executable} run {mounts} {env_vars} {go_config}
+                {user} {id_mappings} -w {command_cwd} --rm {command_tty} {network}
+                -i {self.docker_image} bash -c "{command}"'''
 
         kwargs = {}
         if use_build_dir:
@@ -387,7 +410,7 @@ FROM {self.base_docker_image}
         logger.debug('Generating new docker image')
         try:
             subprocess.check_call(
-                shlex.split(f'docker build -t {self.docker_image} .'),
+                shlex.split(f'{self.docker_executable} build -t {self.docker_image} .'),
                 cwd=self.clickable_dir
             )
         except subprocess.CalledProcessError:
@@ -408,7 +431,7 @@ FROM {self.base_docker_image}
             if dockerfile_content.strip() != f.read().strip():
                 return True
 
-        command = f'docker images -q {self.docker_image}'
+        command = f'{self.docker_executable} images -q {self.docker_image}'
         exists = run_subprocess_check_output(command).strip()
         return not exists
 
@@ -514,7 +537,9 @@ FROM {self.base_docker_image}
         version = 0
         try:
             format_string = '{{ index .Config.Labels "image_version"}}'
-            command = f"docker inspect --format '{format_string}' {self.docker_image}"
+            command = f"\
+                {self.docker_executable} inspect --format '{format_string}' {self.docker_image} \
+            "
             logger.debug('Checking docker image version via: %s', command)
 
             version_string = run_subprocess_check_output(command)
