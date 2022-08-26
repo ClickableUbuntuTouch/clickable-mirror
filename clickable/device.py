@@ -113,6 +113,8 @@ class Device():
             logger.debug("Accessing device via ADB")
             wrapped_command = self.get_adb_command(command, forward_port)
 
+        logger.debug("Running device command: %s", wrapped_command)
+
         if get_output:
             return run_subprocess_check_output(wrapped_command, cwd=cwd, shell=True)
 
