@@ -54,10 +54,23 @@ class InstallCommand(Command):
         version = self.try_find_installed_version(package_name)
 
         if version:
-            logger.info("Uninstalling the app first.")
-            self.device.run_command(
-                f'pkcon remove \\"{package_name};{version};all;local:click\\"'
-            )
+            if self.config.get_framework_base() == '16.04':
+                logger.debug("Using UT 16.04 uninstall command")
+                command = ['pkcon', 'remove', f'\\"{package_name};{version};all;local:click\\"']
+            else:
+                logger.debug("Using UT 20.04 uninstall command")
+                command = [
+                    'gdbus',
+                    'call',
+                    '--system',
+                    '--dest com.lomiri.click',
+                    '--object-path /com/lomiri/click',
+                    '--method com.lomiri.click.Remove',
+                    package_name]
+
+            logger.info("Trying to uninstall the app first.")
+            command = ' '.join(command)
+            self.device.run_command(command)
 
     def run(self):
         if self.config.is_desktop_mode():
@@ -113,8 +126,6 @@ class InstallCommand(Command):
                 f'/home/phablet/{click}']
 
         command = ' '.join(command)
-
-        logger.debug("Running: %s", command)
         self.device.run_command(command, cwd=cwd)
 
         logger.info("Cleaning up.")
