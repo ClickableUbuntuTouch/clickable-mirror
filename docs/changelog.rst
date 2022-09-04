@@ -3,6 +3,20 @@
 Changelog
 =========
 
+Changes in v7.5.0
+-----------------
+
+- Added support for running Clickable with Podman
+- Added support for running Clickable on Fedora
+- Added support for cross compiling Focal clicks
+- Added support for building Focal clicks on arm64 hosts
+- Added support for Focal for the ``ide`` and ``ci`` commands
+- Added support for Focal to the nvidia images
+- Fixed timezone in desktop mode
+- Added support for ``clickable.yml`` files in addition to ``clickable.yaml``
+- Added support for installing and launching clicks on Focal devices
+- Fixed some issues running Clickable on Windows Subsystem for Linux (support is not complete yet)
+
 Changes in v7.4.0
 -----------------
 

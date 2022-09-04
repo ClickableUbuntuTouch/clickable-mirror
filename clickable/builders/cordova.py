@@ -1,7 +1,6 @@
 import json
 import shutil
 import os
-from distutils.dir_util import copy_tree
 
 from clickable.config.constants import Constants
 
@@ -46,8 +45,7 @@ class CordovaBuilder(CMakeBuilder):
             full_dest_path = os.path.join(self.config.install_dir,
                                           file_to_copy_dest)
             if os.path.isdir(full_source_path):
-                # https://stackoverflow.com/a/31039095/6381767
-                copy_tree(full_source_path, full_dest_path)
+                shutil.copytree(full_source_path, full_dest_path, dirs_exist_ok=True)
             else:
                 shutil.copy(full_source_path, full_dest_path)
 

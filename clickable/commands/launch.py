@@ -67,9 +67,15 @@ class LaunchCommand(Command):
             self.package = self.config.install_files.find_full_package_name()
             cwd = self.config.build_dir
 
-        launch = f'ubuntu-app-launch {self.package}'
         if self.config.launch:
+            logger.debug("Using custom launch command")
             launch = self.config.launch
+        elif self.config.get_framework_base() == '16.04':
+            logger.debug("Using UT 16.04 launch command")
+            launch = f'ubuntu-app-launch {self.package}'
+        else:
+            logger.debug("Using UT 20.04 launch command")
+            launch = f'lomiri-app-launch {self.package}'
 
         logger.info("Launching app.")
         self.device.run_command(f'sleep 1s && {launch}', cwd=cwd)

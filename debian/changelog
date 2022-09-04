@@ -1,8 +1,23 @@
+clickable (7.5.0) unstable; urgency=medium
+
+  * Added support for running Clickable with Podman
+  * Added support for running Clickable on Fedora
+  * Added support for cross compiling Focal clicks
+  * Added support for building Focal clicks on arm64 hosts
+  * Added support for Focal for the ide and ci commands
+  * Added support for Focal to the nvidia images
+  * Fixed timezone in desktop mode
+  * Added support for clickable.yml files in addition to clickable.yaml
+  * Added support for installing and launching clicks on Focal devices
+  * Fixed some issues running Clickable on Windows Subsystem for Linux (support is not complete yet)
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 18 Aug 2022 20:28:29 -0500
+
 clickable (7.4.0) unstable; urgency=medium
 
   * Added initial support for building clicks for Focal (Currently only supporting amd64 builds)
-  * When using ``install_lib``, common library locations will be searched
-  * When using ``install_bin``, the PATH will be searched
+  * When using install_lib, common library locations will be searched
+  * When using install_bin, the PATH will be searched
 
  -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 13 May 2022 22:53:00 -0500
 
@@ -25,7 +40,7 @@ clickable (7.2.0) unstable; urgency=medium
   * Fixed the bash completion setup to only run the setup once
   * Fixed commands run in Docker containers not being stopped with CTRL+C
   * The ? wildcard can be used in install paths
-  * The build command now fail if the review also fails, use ``skip_review`` for unconfined apps
+  * The build command now fail if the review also fails, use skip_review for unconfined apps
 
  -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 25 Mar 2022 22:43:00 -0500
 

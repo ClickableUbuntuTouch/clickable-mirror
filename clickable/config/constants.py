@@ -16,6 +16,7 @@ class Constants():
 
     project_config_path_options = [
         "clickable.yaml",
+        "clickable.yml",
         "clickable.json"
     ]
 
@@ -41,6 +42,7 @@ class Constants():
         "arm64": {
             ('16.04.4', 'arm64'): 'clickable/arm64-16.04-arm64:16.04.4-qt5.9',
             ('16.04.5', 'arm64'): 'clickable/arm64-16.04-arm64:16.04.5',
+            ('20.04', 'arm64'): 'clickable/arm64-20.04-arm64',
         },
         "amd64": {
             ('16.04.4', 'armhf'): 'clickable/amd64-16.04-armhf:16.04.4-qt5.9',
@@ -56,8 +58,27 @@ class Constants():
             ('16.04.5', 'amd64-nvidia'): 'clickable/amd64-16.04-amd64-nvidia:16.04.5',
             ('16.04.5', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.5',
             ('16.04.5', 'amd64-nvidia-ide'): 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
-            ('20.04', 'amd64'): 'clickable/amd64-20.04-amd64:20.04',
+            ('20.04', 'amd64'): 'clickable/amd64-20.04-amd64',
+            ('20.04', 'armhf'): 'clickable/amd64-20.04-armhf',
+            ('20.04', 'arm64'): 'clickable/amd64-20.04-arm64',
+            ('20.04', 'amd64-nvidia'): 'clickable/amd64-20.04-amd64-nvidia',
+            ('20.04', 'amd64-ide'): 'clickable/amd64-20.04-amd64-ide',
+            ('20.04', 'amd64-nvidia-ide'): 'clickable/amd64-20.04-amd64-nvidia-ide',
         }
+    }
+
+    ci_container_mapping = {
+        ('16.04.4', 'armhf'): 'clickable/ci-16.04-armhf',
+        ('16.04.5', 'armhf'): 'clickable/ci-16.04-armhf',
+        ('20.04.1', 'armhf'): 'clickable/ci-20.04-armhf',
+        ('16.04.4', 'arm64'): 'clickable/ci-16.04-arm64',
+        ('16.04.5', 'arm64'): 'clickable/ci-16.04-arm64',
+        ('20.04.1', 'arm64'): 'clickable/ci-20.04-arm64',
+        ('16.04.4', 'amd64'): 'clickable/ci-16.04-amd64',
+        ('16.04.5', 'amd64'): 'clickable/ci-16.04-amd64',
+        ('20.04', 'amd64'): 'clickable/ci-20.04-amd64',
+        ('20.04', 'armhf'): 'clickable/ci-20.04-armhf',
+        ('20.04', 'arm64'): 'clickable/ci-20.04-arm64',
     }
 
     framework_image_mapping = {
@@ -71,6 +92,10 @@ class Constants():
         "ubuntu-sdk-16.04.7": "16.04.5",
         "ubuntu-sdk-20.04": "20.04",
     }
+    framework_image_fallback = {
+        '16.04': '16.04.5',
+        '20.04': '20.04',
+    }
 
     default_qt_framework_mapping = {
         '5.9': 'ubuntu-sdk-16.04.4',
@@ -79,8 +104,11 @@ class Constants():
 
     default_qt = '5.12'
 
-    # First framework with Qt 5.12 should be a reasonable default
-    framework_fallback = default_qt_framework_mapping[default_qt]
+    framework_base = [
+        '16.04',
+        '20.04',
+    ]
+    framework_base_default = '16.04'
 
     arch_triplet_mapping = {
         'armhf': 'arm-linux-gnueabihf',
@@ -97,11 +125,12 @@ class Constants():
 
     host_arch_mapping = {
         'x86_64': 'amd64',
-        'aarch64': 'arm64',  # Linux reports aarch64
-        'arm64': 'arm64',  # Mac reports arm64
+        'amd64': 'amd64',  # Windows
+        'aarch64': 'arm64',  # Linux
+        'arm64': 'arm64',  # Mac
         'armv7l': 'armhf',
     }
-    host_arch = host_arch_mapping.get(platform.machine(), None)
+    host_arch = host_arch_mapping.get(platform.machine().lower(), None)
 
     clickable_dir = os.path.expanduser('~/.clickable')
     clickable_config_path = os.path.join(clickable_dir, 'config.yaml')
