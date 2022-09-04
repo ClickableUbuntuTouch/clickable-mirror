@@ -1,6 +1,7 @@
 from clickable.exceptions import ClickableException
 from clickable.container import Container
 from clickable.logger import logger
+from clickable.config.constants import Constants
 
 from .base import Command
 from .update_images import update_image
@@ -25,11 +26,6 @@ class CiCommand(Command):
             help='Run as user (not as root)',
         )
         parser.add_argument(
-            '--dev',
-            action='store_true',
-            help='Run the nightly dev channel of Clickable',
-        )
-        parser.add_argument(
             '--clickable-version',
             default='latest',
             help='Clickable version of CI image (defaults to latest, \
@@ -43,11 +39,22 @@ class CiCommand(Command):
                     "-- clickable build -a arm64" (defaults to interactive shell)'
         )
 
+    def determine_ci_image(self):
+        image_framework = self.config.get_image_framework()
+        image_name = Constants.ci_container_mapping.get(
+            (image_framework, self.config.build_arch), None)
+
+        if not image_name:
+            raise ClickableException(
+                f'There is currently no CI docker image for \
+                        {image_framework}/{self.config.build_arch}')
+
+        return f"{image_name}:{self.version}"
+
     def configure(self, args):
         self.root_user = not args.user
         self.version = args.clickable_version
-        name = "ci-dev-16.04" if args.dev else "ci-16.04"
-        self.image = f"clickable/{name}-{self.config.build_arch}:{self.version}"
+        self.image = self.determine_ci_image()
 
         if args.command:
             self.command = ' '.join(args.command)
@@ -66,7 +73,7 @@ class CiCommand(Command):
         logger.info("Running in container %s", self.image)
 
         if self.version == "latest":
-            update_image(self.image)
+            update_image(self.container.docker_executable, self.image)
 
         self.container.setup()
         self.container.run_command(

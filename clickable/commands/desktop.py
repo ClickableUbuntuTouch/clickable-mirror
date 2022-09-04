@@ -230,7 +230,7 @@ class DesktopCommand(Command):
         try:
             return run_subprocess_check_output(
                 'timedatectl show -p Timezone --value',
-                stderr=subprocess.DEVNULL)
+                stderr=subprocess.DEVNULL).strip()
         except Exception:  # pylint: disable=broad-except
             logger.debug(
                 'timedatectl show command failed. Falling back to alternative way '
@@ -288,7 +288,7 @@ class DesktopCommand(Command):
             'DISPLAY': os.environ['DISPLAY'],
             'QML2_IMPORT_PATH': lib_path,
             'LD_LIBRARY_PATH': lib_path,
-            'PATH': self.get_docker_path_env(working_directory),
+            'PATH': self.get_docker_path_env(working_directory) + self.get_image_path_var(),
             'HOME': Constants.device_home,
             'OXIDE_NO_SANDBOX': '1',
             'UBUNTU_APP_LAUNCH_ARCH': self.config.arch_triplet,
@@ -316,6 +316,17 @@ class DesktopCommand(Command):
             '/bin',
             '/usr/bin',
         ])
+
+    def get_image_path_var(self):
+        command = f"{self.container.docker_executable} inspect -f "\
+            "'{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' " \
+            f"{self.config.docker_image}"
+        image_env = run_subprocess_check_output(command).splitlines()
+        for var in image_env:
+            if var.startswith("PATH="):
+                return ":" + var.rsplit("=", 1)[1]
+
+        return ""
 
     def setup_volume_mappings(self):
         xauth_path = self.touch_xauth()
@@ -349,7 +360,8 @@ class DesktopCommand(Command):
         if self.ide_delegate is not None:
             self.ide_delegate.before_run(self.config, docker_config)
 
-        command = docker_config.render_command()
+        id_mapping_string = self.container.render_id_mapping_string()
+        command = docker_config.render_command(self.container.docker_executable, id_mapping_string)
         logger.debug(command)
 
         subprocess.check_call(shlex.split(command), cwd=docker_config.working_directory)
