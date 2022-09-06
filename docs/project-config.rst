@@ -396,6 +396,12 @@ Optional, a list of PPAs, that will be enabled in the build container. Ex:
 
 Can be specified as a string or a list of strings.
 
+rust_channel
+------------
+Optional, rust channel that should installed in the image and used by the rust
+builder.
+Ex: ``nightly`` or ``1.56.0``
+
 .. _project-config-docker-image:
 
 image_setup
@@ -411,12 +417,6 @@ The image is based on the default image provided by Clickable. Example:
       run:
       - curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
       - apt-get install -y nodejs
-
-rust_channel
-------------
-Optional, rust channel that should installed in the image and used by the rust
-builder.
-Ex: ``nightly`` or ``1.56.0``
 
 run
 ^^^
