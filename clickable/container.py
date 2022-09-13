@@ -140,11 +140,17 @@ class Container():
                                  'Please run "clickable setup docker" first.')
 
     def is_systemd_used(self):
+        if sys.platform != "linux":
+            return False
+
         with open('/proc/1/comm', 'r', encoding='UTF-8') as f:
             init_system = f.read().strip()
             return init_system == "systemd"
 
     def docker_group_exists(self):
+        if sys.platform != "linux":
+            return False
+
         group_exists = False
         with open('/etc/group', 'r', encoding='UTF-8') as f:
             lines = f.readlines()
