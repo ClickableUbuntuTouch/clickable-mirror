@@ -93,9 +93,9 @@ class Device():
             self.forward_port_adb(forward_port, adb_args)
 
         if isinstance(command, list):
-            command = ";".join(command)
+            command = " && ".join(command)
 
-        return f'adb {adb_args} shell "{command}"'
+        return f'echo "{command}; exit" | adb {adb_args} shell'
 
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if self.container_mode:
