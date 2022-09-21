@@ -26,11 +26,18 @@ class PublishCommand(Command):
 
         self.api_key = None
         self.changelog = ''
+        self.timeout = 60
 
     def setup_parser(self, parser):
         parser.add_argument(
             '--apikey',
             help='Api key for the OpenStore',
+        )
+        parser.add_argument(
+            '--timeout',
+            default=self.timeout,
+            type=int,
+            help='Timeout in seconds on upload',
         )
         parser.add_argument(
             'changelog',
@@ -43,6 +50,7 @@ class PublishCommand(Command):
     def configure(self, args):
         self.api_key = args.apikey
         self.changelog = ' '.join(args.changelog)
+        self.timeout = args.timeout
 
         self.parse_env()
 
@@ -92,7 +100,8 @@ class PublishCommand(Command):
                     package_name,
                     channel,
                     self.config.arch)
-        response = requests.post(url, files=files, data=data, params=params)
+        response = requests.post(url, files=files, data=data, params=params,
+                                 timeout=self.timeout)
         if response.status_code == 200:
             logger.info('Upload successful')
         elif response.status_code == 404:
@@ -105,8 +114,7 @@ class PublishCommand(Command):
             try:
                 message = response.json()['message']
             except Exception:  # pylint: disable=broad-except
-                message = 'Unspecified Error'
-                logger.debug("Publish failed with: %s", response.text)
+                message = response.text
 
             raise ClickableException(
                 f'Failed to upload click: {message} ({response.status_code})'
