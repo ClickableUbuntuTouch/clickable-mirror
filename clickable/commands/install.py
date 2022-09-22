@@ -1,6 +1,5 @@
 import os
 
-from clickable.utils import run_subprocess_check_call
 from clickable.logger import logger
 
 from .base import Command
@@ -89,20 +88,7 @@ class InstallCommand(Command):
             self.click_path = os.path.join(self.config.build_dir, click)
             cwd = self.config.build_dir
 
-        if self.config.ssh:
-            command = f'scp {self.click_path} phablet@{self.config.ssh}:/home/phablet/'
-            run_subprocess_check_call(command, cwd=cwd, shell=True)
-        else:
-            self.device.check_any_adb_attached()
-
-            if self.config.device_serial_number:
-                command = f'adb -s {self.config.device_serial_number} push {self.click_path} ' \
-                          '/home/phablet/'
-            else:
-                self.device.check_multiple_adb_attached()
-                command = f'adb push {self.click_path} /home/phablet/'
-
-            run_subprocess_check_call(command, cwd=cwd, shell=True)
+        self.device.push_file(self.click_path, '/home/phablet/')
 
         if self.skip_uninstall:
             logger.info("Skipping uninstall pre-step.")

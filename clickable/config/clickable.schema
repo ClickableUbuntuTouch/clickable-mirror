@@ -11,6 +11,7 @@
       "additionalProperties": false,
       "properties": {
         "ipv4": {"type": "string"},
+        "ssh_port": {"type": "integer"},
         "serial_number": {"type": "string"},
         "arch": {
           "type": "string",

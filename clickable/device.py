@@ -20,6 +20,8 @@ class Device():
 
         if project.ssh:
             self.config.ipv4 = project.ssh
+            # in case project sets ssh without port, if project sets ssh, always copy port over
+            self.config.ssh_port = project.ssh_port
 
         if project.device_serial_number:
             self.config.serial_number = project.device_serial_number
@@ -68,15 +70,24 @@ class Device():
         if self.config.ipv4:
             dir_path = os.path.dirname(dst)
             self.run_command(f'mkdir -p {dir_path}')
-            command = f'scp {src} phablet@{self.config.ipv4}:{dst}'
+            command = ['scp']
+
+            # scp options has to be before src and dest
+            if self.config.ssh_port:
+                command += ['-o', f'Port={self.config.ssh_port}']
+
+            command += [f'{src}', f'phablet@{self.config.ipv4}:{dst}']
         else:
             adb_args = self.get_adb_args()
             command = f'adb {adb_args} push {src} {dst}'
 
-        run_subprocess_check_call(command, shell=True)
+        run_subprocess_check_call(command)
 
     def get_ssh_command(self, command, forward_port=None):
         ssh_args = ""
+
+        if self.config.ssh_port:
+            ssh_args = f"{ssh_args} -o Port={self.config.ssh_port}"
 
         if forward_port:
             ssh_args = f"{ssh_args} -L {forward_port}:localhost:{forward_port}"
