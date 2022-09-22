@@ -7,6 +7,7 @@ class DeviceConfig(BaseConfig):
 
         self.config = {
             'ipv4': None,
+            'ssh_port': None,
             'serial_number': None,
             'arch': None,
             'skip_uninstall': False,

@@ -5,6 +5,7 @@ import shlex
 from clickable.utils import (
     run_subprocess_call,
     run_subprocess_check_output,
+    run_subprocess_check_call
 )
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
@@ -114,7 +115,12 @@ class ShellCommand(Command):
         http://bazaar.launchpad.net/~phablet-team/phablet-tools/trunk/view/head:/phablet-shell
         '''
         if self.config.ssh:
-            subprocess.check_call(shlex.split(f'ssh phablet@{self.config.ssh}'))
+            command = ['ssh', f'phablet@{self.config.ssh}']
+
+            if self.config.ssh_port:
+                command += ['-o', f'Port={self.config.ssh_port}']
+
+            run_subprocess_check_call(command)
         else:
             port = self.setup_ssh_via_adb()
 

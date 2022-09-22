@@ -105,6 +105,7 @@ class ProjectConfig():
     first_docker_info = True
     device_serial_number = None
     ssh = None
+    ssh_port = None
     container_mode = False
     use_nvidia = False
     avoid_nvidia = False
@@ -476,6 +477,14 @@ class ProjectConfig():
         if self.global_config.cli.scripts:
             self.config['scripts'].update(self.global_config.cli.scripts)
 
+    def parse_ssh_config(self, ssh_arg):
+        result = re.match("(.+):([0-9]+)", ssh_arg)
+        if result is not None:
+            self.ssh = result.group(1)
+            self.ssh_port = result.group(2)
+        else:
+            self.ssh = ssh_arg
+
     def load_env_config(self, config: EnvironmentConfig):
         if self.get_env_var('CLICKABLE_CONTAINER_MODE') or config.container_mode:
             self.container_mode = True
@@ -484,7 +493,7 @@ class ProjectConfig():
             self.device_serial_number = self.get_env_var('CLICKABLE_SERIAL_NUMBER')
 
         if self.get_env_var('CLICKABLE_SSH'):
-            self.ssh = self.get_env_var('CLICKABLE_SSH')
+            self.parse_ssh_config(self.get_env_var('CLICKABLE_SSH'))
 
         if self.get_env_var('CLICKABLE_NVIDIA') or config.nvidia == 'on':
             self.use_nvidia = True
@@ -519,7 +528,7 @@ class ProjectConfig():
             self.device_serial_number = args.serial_number
 
         if args.ssh:
-            self.ssh = args.ssh
+            self.parse_ssh_config(args.ssh)
 
         if args.container_mode:
             self.container_mode = args.container_mode
