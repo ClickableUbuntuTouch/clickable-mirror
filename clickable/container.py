@@ -179,6 +179,9 @@ class Container():
 
         return 'docker' in groups
 
+    def is_docker(self):
+        return self.docker_executable == 'docker' and self.docker_mode
+
     def is_docker_ready(self):
         return self.is_docker_configured() and self.is_docker_service_running()
 

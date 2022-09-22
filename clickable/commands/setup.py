@@ -34,6 +34,9 @@ class SetupCommand(Command):
             self.setup_bash_completion()
 
     def setup_docker(self):
+        if not self.container.is_docker():
+            logger.info('Not using Docker, Docker set up not required')
+            return
         if self.container.is_docker_ready():
             logger.info('Docker is already set up')
             return
