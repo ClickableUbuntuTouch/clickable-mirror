@@ -13,7 +13,7 @@ except ImportError:
 
 __version__ = '7.5.0'
 
-__container_minimum_required__ = 8
+__container_minimum_required__ = 9
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
