@@ -115,7 +115,9 @@ class DesktopCommand(Command):
 
         if self.qmllive and self.skip_build:
             logger.warning(
-                'Combining --skip-build and --qmllive is dangerous, because files in source and install dir need to be identical at start for the live update to work.')
+                'Combining --skip-build and --qmllive is dangerous, \
+                        because QML files in source and install dir need to be identical \
+                        at start for the live update to work.')
 
         self.configure_common()
 
@@ -387,7 +389,8 @@ class DesktopCommand(Command):
         if self.qmllive:
             if 'qmlscene' not in docker_config.execute:
                 raise ClickableException(
-                    '--qmllive can only be used on apps that start via qmlscene (see your desktop file)')
+                    '--qmllive can only be used on apps that start via qmlscene \
+                            (see your desktop file)')
 
             docker_config.execute = docker_config.execute.replace('qmlscene', 'qmllive')
             self.run_qmllive_observer()
@@ -422,19 +425,21 @@ class DesktopCommand(Command):
             logger.warning('No QML files found for QML live update.')
         elif not file_map:
             logger.warning(
-                'No QML files could be matched between src dir and install dir for QML live update.')
+                'No QML files could be matched between src dir and install dir \
+                        for QML live update.')
 
         class Handler(FileSystemEventHandler):
-            fmap = file_map
+            def __init__(self, file_map):
+                super().__init__()
+                self.file_map = file_map
 
-            @staticmethod
-            def on_modified(event):
+            def on_modified(self, event):
                 src = os.path.normpath(event.src_path)
-                dst = Handler.fmap.get(src, None)
+                dst = self.file_map.get(src, None)
 
                 if dst and not filecmp.cmp(src, dst):
                     shutil.copy(src, dst)
 
         self.file_observer = Observer()
-        self.file_observer.schedule(Handler(), self.config.src_dir, recursive=True)
+        self.file_observer.schedule(Handler(file_map), self.config.src_dir, recursive=True)
         self.file_observer.start()
