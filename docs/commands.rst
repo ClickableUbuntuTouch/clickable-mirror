@@ -47,6 +47,9 @@ to test using a different language.
 
 Run ``clickable desktop --gdb`` to start the app via GDB.
 
+Run ``clickable desktop --qmllive`` on a QML only app enable QML live update when QML files are
+changed.
+
 The env var ``CLICKABLE_DESKTOP_MODE`` is set in desktop mode.
 
 .. _commands-ide:
