@@ -103,17 +103,6 @@ publish-focal:
     - debuild -S
     - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
 
-publish-impish:
-  stage: publish
-  image: clickable/build-deb:bionic
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~impish) impish/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
 publish-jammy:
   stage: publish
   image: clickable/build-deb:bionic
@@ -122,5 +111,16 @@ publish-jammy:
   script:
     - ./scripts/setup_gpg_keys.sh
     - sed -i "s/) unstable/~jammy) jammy/g" debian/changelog
+    - debuild -S
+    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
+
+publish-kinetic:
+  stage: publish
+  image: clickable/build-deb:bionic
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ./scripts/setup_gpg_keys.sh
+    - sed -i "s/) unstable/~kinetic) kinetic/g" debian/changelog
     - debuild -S
     - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
