@@ -106,7 +106,7 @@ class Device():
         if isinstance(command, list):
             command = " && ".join(command)
 
-        return f'echo "{command}; exit" | adb {adb_args} shell'
+        return f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
 
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if self.container_mode:
@@ -126,8 +126,11 @@ class Device():
 
         logger.debug("Running device command: %s", wrapped_command)
 
-        if get_output:
-            return run_subprocess_check_output(wrapped_command, cwd=cwd, shell=True)
+        output = run_subprocess_check_output(wrapped_command, cwd=cwd, shell=True)
 
-        run_subprocess_check_call(wrapped_command, cwd=cwd, shell=True)
+        if output.strip().endswith("ADB_COMMAND_FAILED"):
+            raise ClickableException("Command ran on device via ADB failed. See output above.")
+
+        if get_output:
+            return output
         return None
