@@ -57,7 +57,9 @@ def main():
     try:
         clickable.create_parser()
 
-        check_version(quiet=True)
+        is_version_check = '--version' in sys.argv[1:] or '-v' in sys.argv[1:]
+        check_version(quiet=True, force_download=is_version_check)
+
         clickable.run()
     except ClickableException as e:
         logger.error(str(e))
@@ -77,7 +79,6 @@ def main():
         if isinstance(e, OSError) and '28' in str(e):
             logger.critical('No space left on device')
             sys.exit(2)
-            return
 
         logger.debug('Encountered an unknown error', exc_info=e)
         if not clickable.verbose:

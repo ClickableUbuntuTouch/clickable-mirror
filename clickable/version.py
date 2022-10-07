@@ -42,12 +42,12 @@ def is_newer_than_running(version_numbers):
     return len(version_numbers) > len(running_version)
 
 
-def check_version(quiet=False):
+def check_version(quiet=False, force_download=False):
     if REQUESTS_AVAILABLE:
         version = None
         check = True
         version_check = expanduser('~/.clickable/version_check.json')
-        if isfile(version_check):
+        if isfile(version_check) and not force_download:
             with open(version_check, 'r', encoding='UTF-8') as f:
                 try:
                     version_check_data = json.load(f)
