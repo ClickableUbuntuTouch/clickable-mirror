@@ -30,6 +30,7 @@
         "custom",
         "cordova",
         "pure",
+        "qbs",
         "go",
         "rust",
         "precompiled"
@@ -213,6 +214,7 @@
             "enum":  [
               "cmake",
               "qmake",
+              "qbs",
               "rust",
               "custom"
             ]

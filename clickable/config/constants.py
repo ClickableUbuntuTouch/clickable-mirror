@@ -10,6 +10,7 @@ class Constants():
     CUSTOM = 'custom'
     CORDOVA = 'cordova'
     PURE = 'pure'
+    QBS = 'qbs'
     GO = 'go'
     RUST = 'rust'
     PRECOMPILED = 'precompiled'
@@ -28,6 +29,7 @@ class Constants():
         CUSTOM,
         CORDOVA,
         PURE,
+        QBS,
         GO,
         RUST,
         PRECOMPILED
