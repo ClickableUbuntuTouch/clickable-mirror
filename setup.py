@@ -24,6 +24,7 @@ requirements = [
     'PyYaml',
     'jsonschema',
     'argcomplete',
+    'watchdog',
 ]
 
 setup(
