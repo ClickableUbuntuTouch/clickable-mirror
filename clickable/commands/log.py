@@ -19,9 +19,19 @@ class LogCommand(Command):
             return
 
         package_name = self.config.install_files.find_full_package_name()
-        log = f'~/.cache/upstart/application-click-{package_name}.log'
+        if self.config.get_framework_base() == '16.04':
+            logger.debug("Using UT 16.04 log command")
 
-        if self.config.log:
-            log = self.config.log
+            log = f'~/.cache/upstart/application-click-{package_name}.log'
+            if self.config.log:
+                log = self.config.log
 
-        self.device.run_command(f'cat {log}')
+            self.device.run_command(f'cat {log}')
+        else:
+            logger.debug("Using UT 20.04 log command")
+
+            print(self.device.run_command(
+                f'journalctl --user --no-pager -u \
+                lomiri-app-launch--application-click--{package_name}--',
+                get_output=True
+            ))
