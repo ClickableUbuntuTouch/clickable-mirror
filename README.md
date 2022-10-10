@@ -20,12 +20,14 @@ Clickable with the [Atom Editor](https://atom.io) by installing
 
 ## Development
 
+Please base any development on the branch `dev` and file merge requests against it.
+
 ### Run Clickable from Repository
 
 You can run Clickable directly from sources via the `clickable-dev` script.
 Add the `--verbose` option for additional output.
 
-It is recommended to add your clickable repo folder to `PATH`. 
+It is recommended to add your clickable repo folder to `PATH`.
 This can be done by adding `export PATH="$PATH:$HOME/clickable"` to your `.bashrc`.
 Replace `$HOME/clickable` with your path.
 
