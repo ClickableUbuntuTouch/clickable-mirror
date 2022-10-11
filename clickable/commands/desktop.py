@@ -3,8 +3,18 @@ import shlex
 import subprocess
 from pathlib import Path
 import re
+import shutil
+import filecmp
+
+try:
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler
+    HAS_WATCHDOG = True
+except ImportError:
+    HAS_WATCHDOG = False
 
 from clickable.utils import (
+    find_pattern,
     is_command,
     makedirs,
     run_subprocess_check_output,
@@ -42,6 +52,8 @@ class DesktopCommand(Command):
         self.valgrind = False
         self.dark_mode = False
         self.desktop_locale = 'C'
+        self.qmllive = False
+        self.file_observer = None
 
         self.builder = BuildCommand(skip_review=True, skip_click=True)
 
@@ -71,6 +83,13 @@ class DesktopCommand(Command):
             default=False,
         )
         parser.add_argument(
+            '--qmllive',
+            action='store_true',
+            help='Enable live update of qml files. \
+                    Only works for apps that are started via "qmlscene".',
+            default=False,
+        )
+        parser.add_argument(
             '--dark-mode',
             action='store_true',
             help='Use the dark theme when running apps',
@@ -90,8 +109,15 @@ class DesktopCommand(Command):
         self.gdb_port = args.gdbserver
         self.gdb = args.gdb or self.gdb_port
         self.valgrind = args.valgrind
+        self.qmllive = args.qmllive
         self.dark_mode = args.dark_mode
         self.desktop_locale = args.lang
+
+        if self.qmllive and self.skip_build:
+            logger.warning(
+                'Combining --skip-build and --qmllive is dangerous, \
+                        because QML files in source and install dir need to be identical \
+                        at start for the live update to work.')
 
         self.configure_common()
 
@@ -360,8 +386,60 @@ class DesktopCommand(Command):
         if self.ide_delegate is not None:
             self.ide_delegate.before_run(self.config, docker_config)
 
+        if self.qmllive:
+            if 'qmlscene' not in docker_config.execute:
+                raise ClickableException(
+                    '--qmllive can only be used on apps that start via qmlscene \
+                            (see your desktop file)')
+
+            docker_config.execute = docker_config.execute.replace('qmlscene', 'qmllive')
+            self.run_qmllive_observer()
+
         id_mapping_string = self.container.render_id_mapping_string()
         command = docker_config.render_command(self.container.docker_executable, id_mapping_string)
         logger.debug(command)
 
         subprocess.check_call(shlex.split(command), cwd=docker_config.working_directory)
+
+        if self.qmllive:
+            self.file_observer.stop()
+
+    def run_qmllive_observer(self):
+        if not HAS_WATCHDOG:
+            raise ClickableException('The qmllive feature requres the python module "watchdog" \
+                    which is not installed')
+
+        qml_src_files = find_pattern(
+            "**/*.qml",
+            self.config.src_dir,
+            exclude_dir=self.config.install_dir)
+        qml_install_files = find_pattern("**/*.qml", self.config.install_dir)
+        file_map = {}
+
+        for install_file in qml_install_files:
+            for src_file in qml_src_files:
+                if filecmp.cmp(src_file, install_file):
+                    file_map[os.path.normpath(src_file)] = install_file
+
+        if not qml_install_files:
+            logger.warning('No QML files found for QML live update.')
+        elif not file_map:
+            logger.warning(
+                'No QML files could be matched between src dir and install dir \
+                        for QML live update.')
+
+        class Handler(FileSystemEventHandler):
+            def __init__(self, file_map):
+                super().__init__()
+                self.file_map = file_map
+
+            def on_modified(self, event):
+                src = os.path.normpath(event.src_path)
+                dst = self.file_map.get(src, None)
+
+                if dst and not filecmp.cmp(src, dst):
+                    shutil.copy(src, dst)
+
+        self.file_observer = Observer()
+        self.file_observer.schedule(Handler(file_map), self.config.src_dir, recursive=True)
+        self.file_observer.start()

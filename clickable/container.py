@@ -18,13 +18,16 @@ from clickable.utils import (
 from clickable.logger import logger
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
+from clickable.version import __container_minimum_required__
 
 
 class Container():
     def __init__(self, config, name=None, minimum_version=None):
         self.config = config
         self.docker_mode = self.config.needs_docker()
-        self.minimum_version = minimum_version
+        self.minimum_version = minimum_version \
+            if minimum_version \
+            else __container_minimum_required__
         self.docker_image = self.config.docker_image
         self.base_docker_image = self.docker_image
 

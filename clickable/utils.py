@@ -70,6 +70,21 @@ def run_subprocess_check_output(cmd, shell=False, **args):
     return subprocess.check_output(prepare_command(cmd, shell), shell=shell, **args).decode()
 
 
+def find_pattern(pattern, base_dir, exclude_dir=None):
+    # Starting from Python 3.10 we could pass "root_dir=base_dir" instead of changing cwd
+    old_cwd = os.getcwd()
+    os.chdir(base_dir)
+    files = glob.glob(pattern, recursive=True)
+    os.chdir(old_cwd)
+
+    files = [os.path.join(base_dir, f) for f in files]
+
+    if exclude_dir:
+        files = [f for f in files if not is_sub_dir(f, exclude_dir)]
+
+    return files
+
+
 def find(
     names,
     cwd,
