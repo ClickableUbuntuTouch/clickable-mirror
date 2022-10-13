@@ -12,6 +12,7 @@ from .config.project import ProjectConfig
 class Device():
     def __init__(self, project: ProjectConfig):
         self.config = project.global_config.device
+        self.framework_base = project.get_framework_base()
         self.container_mode = project.container_mode
         self.collect_configs(project)
 
@@ -106,7 +107,14 @@ class Device():
         if isinstance(command, list):
             command = " && ".join(command)
 
-        return f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
+        if self.framework_base == '16.04':
+            logger.debug("Using UT 16.04 adb command")
+            adb_command = f'adb {adb_args} shell "{command}"'
+        else:
+            logger.debug("Using UT 20.04 adb command")
+            adb_command = f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
+
+        return adb_command
 
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if self.container_mode:
