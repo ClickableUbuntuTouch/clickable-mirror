@@ -175,6 +175,12 @@ def check_command(command):
 
 
 def get_docker_command():
+    command_env = env('CLICKABLE_DOCKER_COMMAND')
+
+    if command_env:
+        check_command(command_env)
+        return command_env
+
     for command in ['podman', 'docker']:
         if is_command(command):
             return command
