@@ -1,6 +1,8 @@
 import logging
 import os
 
+from clickable.config.constants import Constants
+
 
 class Colors:
     DEBUG = '\033[94m'
@@ -38,7 +40,7 @@ console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
 try:
-    log_dir = os.path.expanduser('~/.clickable')
+    log_dir = Constants.clickable_dir
     log_file = os.path.join(log_dir, 'clickable.log')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)

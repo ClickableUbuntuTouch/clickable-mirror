@@ -370,8 +370,7 @@ class DesktopCommand(Command):
         }
 
         if self.custom_mode:
-            user_home = os.path.expanduser('~')
-            vol_map[user_home] = user_home
+            vol_map[Constants.host_home] = Constants.host_home
 
         return vol_map
 

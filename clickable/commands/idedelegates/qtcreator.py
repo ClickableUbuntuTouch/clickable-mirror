@@ -2,16 +2,16 @@ import os
 import tarfile
 import re
 
+from clickable.config.constants import Constants
 from clickable.logger import logger
 from .idedelegate import IdeCommandDelegate
 
 
 class QtCreatorDelegate(IdeCommandDelegate):
-    clickable_dir = os.path.expanduser('~/.clickable')
     project_path = os.getcwd()
     template_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'qtcreator')
     init_settings_path = os.path.join(template_path, 'QtProject.tar.xz')
-    target_settings_path = os.path.join(clickable_dir, 'QtProject')
+    target_settings_path = os.path.join(Constants.clickable_dir, 'QtProject')
     template_path = os.path.join(template_path, 'CMakeLists.txt.user.shared.in')
     pattern_cmake_vars = re.compile(r"set\(([-\w]+)\s+(.*)\)", flags=re.IGNORECASE)
     pattern_cmake_subvars = re.compile(r"\${([-\w]+)}")
@@ -31,14 +31,14 @@ class QtCreatorDelegate(IdeCommandDelegate):
                 os.path.exists(os.path.join(self.project_path, 'clickable.yml')) or
                 os.path.exists(os.path.join(self.project_path, 'clickable.json'))):
             p = self.project_path
-        return path.replace('qtcreator', f'qtcreator -settingspath {self.clickable_dir} {p}')
+        return path.replace('qtcreator', f'qtcreator -settingspath {Constants.clickable_dir} {p}')
 
     def before_run(self, config, docker_config):
         # if first qtcreator launch, install common settings
         if not os.path.isdir(self.target_settings_path):
-            logger.info('copy initial qtcreator settings to %s', self.clickable_dir)
+            logger.info('copy initial qtcreator settings to %s', Constants.clickable_dir)
             tar = tarfile.open(self.init_settings_path)
-            tar.extractall(self.clickable_dir)
+            tar.extractall(Constants.clickable_dir)
             tar.close()
 
         if self.is_cmake_project() and not os.path.isfile(os.path.join(
