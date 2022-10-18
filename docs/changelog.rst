@@ -3,6 +3,22 @@
 Changelog
 =========
 
+Changes in v7.6.0
+-----------------
+
+- Added new QBS builder
+- Added live reloading for qmlscene based apps in desktop mode
+- Added support to configure the SSH port
+- Added a configurable timeout when publishing click packages
+- Added more options for the clean command
+- Added ``CLICKABLE_DOCKER_COMMAND`` env variable to choose between podman and docker
+- ``clickable --version`` will always check for updates
+- Fixed Clickable trying to setup docker when podman is being used
+- Fixed running commands via adb on Focal devices
+- Fixed checking for systemd on non-Linux systems
+- Fixed getting logs from Focal devices
+- Fixed desktop mode crashing when pulse directories are not found
+
 Changes in v7.5.0
 -----------------
 
