@@ -60,6 +60,17 @@ Overrides the project config's :ref:`cargo_home <project-config-cargo_home>`.
 
 Overrides the project config's :ref:`docker_image <project-config-docker-image>`.
 
+``CLICKABLE_SKIP_DOCKER_CHECKS``
+--------------------------------
+
+Disables check whether docker is installed and properly set up.
+
+``CLICKABLE_DOCKER_COMMAND``
+----------------------------
+
+Replaces the docker command. This is useful on systems where both, docker and
+podman, are installed and Clickable would give podman precedence.
+
 ``CLICKABLE_BUILD_ARGS``
 ------------------------
 
