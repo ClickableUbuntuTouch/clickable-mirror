@@ -1,6 +1,7 @@
 import os
 import re
 
+from clickable.config.constants import Constants
 from clickable.logger import logger
 from clickable.utils import run_subprocess_check_call
 
@@ -51,7 +52,7 @@ class SetupCommand(Command):
         logger.info('Docker is set up and ready.')
 
     def setup_bash_completion(self):
-        bashrc_file = os.path.expanduser('~/.bashrc')
+        bashrc_file = os.path.join(Constants.host_home, '.bashrc')
         search = re.compile(r"[^#]*register-python-argcomplete3? clickable\b(?![-]).*")
         source_hint = f'Run "source {bashrc_file}" or open a new terminal to apply changes.'
 

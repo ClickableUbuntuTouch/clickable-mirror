@@ -1,8 +1,9 @@
-from os.path import expanduser, isfile
 from datetime import datetime, timedelta
+import os
 import json
 import re
 
+from clickable.config.constants import Constants
 from clickable.logger import logger
 
 REQUESTS_AVAILABLE = True
@@ -46,8 +47,8 @@ def check_version(quiet=False, force_download=False):
     if REQUESTS_AVAILABLE:
         version = None
         check = True
-        version_check = expanduser('~/.clickable/version_check.json')
-        if isfile(version_check) and not force_download:
+        version_check = os.path.join(Constants.clickable_dir, 'version_check.json')
+        if os.path.isfile(version_check) and not force_download:
             with open(version_check, 'r', encoding='UTF-8') as f:
                 try:
                     version_check_data = json.load(f)

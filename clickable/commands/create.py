@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 from .base import Command
 
@@ -151,7 +152,7 @@ class CreateCommand(Command):
                 'https://cookiecutter.readthedocs.io/en/latest/installation.html'
             )
 
-        config_file = os.path.expanduser('~/.clickable/cookiecutter_config.yaml')
+        config_file = os.path.join(Constants.clickable_dir, 'cookiecutter_config.yaml')
         if not os.path.isfile(config_file):
             config_file = None
 

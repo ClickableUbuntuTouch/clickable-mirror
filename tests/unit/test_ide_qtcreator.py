@@ -1,3 +1,4 @@
+from clickable.config.constants import Constants
 import os
 import shutil
 from clickable.commands.docker.docker_config import DockerConfig
@@ -25,7 +26,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         )
 
         self.idedelegate = QtCreatorDelegate(self.config)
-        self.idedelegate.clickable_dir = '/tmp/tests/.clickable'
+        Constants.clickable_dir = '/tmp/tests/.clickable'
         self.idedelegate.project_path = '/tmp/tests/qmlproject'
         self.output_file = os.path.join(
             self.idedelegate.project_path,
@@ -33,7 +34,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         )
 
         self.idedelegate.target_settings_path = os.path.join(
-            self.idedelegate.clickable_dir,
+            Constants.clickable_dir,
             'QtProject'
         )
 
@@ -45,7 +46,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         path_arg = self.idedelegate.override_command('qtcreator')
         self.assertEqual(
             path_arg,
-            'qtcreator -settingspath {} '.format(self.idedelegate.clickable_dir)
+            'qtcreator -settingspath {} '.format(Constants.clickable_dir)
         )
 
         # create a fake clickable.json file, overrided path should now be with the current dir
@@ -54,7 +55,7 @@ class TestIdeQtCreatorCommand(UnitTest):
         self.assertEqual(
             path_arg,
             'qtcreator -settingspath {} {}'.format(
-                self.idedelegate.clickable_dir,
+                Constants.clickable_dir,
                 self.idedelegate.project_path
             )
         )

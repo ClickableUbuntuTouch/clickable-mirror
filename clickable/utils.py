@@ -40,10 +40,15 @@ def prepare_command(cmd, shell=False):
     return cmd
 
 
-def get_existing_dir(name, paths):
+def get_existing_dir(name, paths, optional=False):
     for path in paths:
         if isdir(path):
             return path
+
+    if optional:
+        logger.debug('%s directory not found.', name)
+        return None
+
     raise ClickableException(f'Cannot find required {name} directory.')
 
 

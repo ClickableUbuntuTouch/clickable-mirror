@@ -2,6 +2,7 @@ import subprocess
 import os
 import shlex
 
+from clickable.config.constants import Constants
 from clickable.utils import (
     run_subprocess_call,
     run_subprocess_check_output,
@@ -68,13 +69,13 @@ class ShellCommand(Command):
 
         # Purge the device host key so that SSH doesn't print a scary warning about it
         # (it changes every time the device is reflashed and this is expected)
-        known_hosts = os.path.expanduser('~/.ssh/known_hosts')
+        known_hosts = os.path.join(Constants.host_home, '.ssh/known_hosts')
         subprocess.check_call(shlex.split(f'touch {known_hosts}'))
         subprocess.check_call(
             shlex.split(f'ssh-keygen -f {known_hosts} -R [localhost]:{port}')
         )
 
-        ssh_dir = os.path.expanduser('~/.ssh/')
+        ssh_dir = os.path.join(Constants.host_home, '.ssh/')
         id_pub_candidates = ["id_rsa.pub", "id_ed25519.pub"]
         id_pub = None
 

@@ -176,8 +176,8 @@ class ProjectConfig():
             'app_qml_dir': '${INSTALL_DIR}/lib/${ARCH_TRIPLET}',
             'ignore': [],
             'make_jobs': None,
-            'gopath': os.path.expanduser('~/.clickable/go'),
-            'cargo_home': os.path.expanduser('~/.clickable/cargo'),
+            'gopath': os.path.join(Constants.clickable_dir, 'go'),
+            'cargo_home': os.path.join(Constants.clickable_dir, 'cargo'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
@@ -833,7 +833,7 @@ class ProjectConfig():
     def check_paths(self):
         if (
             self.is_build_cmd() and
-            os.path.normpath(self.cwd) == os.path.normpath(os.path.expanduser('~'))
+            os.path.normpath(self.cwd) == os.path.normpath(Constants.host_home)
         ):
             raise ClickableException(
                 'Your are running a build command in your home directory.\nPlease navigate to '

@@ -107,7 +107,7 @@ class LibConfig():
             'dependencies_target': [],
             'dependencies_ppa': [],
             'make_jobs': None,
-            'cargo_home': os.path.expanduser('~/.clickable/cargo'),
+            'cargo_home': os.path.join(Constants.clickable_dir, 'cargo'),
             'docker_image': None,
             'build_args': [],
             'env_vars': {},
