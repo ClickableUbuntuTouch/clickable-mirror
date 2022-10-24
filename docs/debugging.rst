@@ -3,6 +3,10 @@
 Debugging
 =========
 
+Clickable does not separate build caches for different build types. Therefore make
+sure to create a clean debug build, e.g. via
+``clickable build --debug --clean --arch arm64``.
+
 Desktop Mode
 ------------
 
