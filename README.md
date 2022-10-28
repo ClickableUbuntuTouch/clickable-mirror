@@ -14,9 +14,7 @@ Compile, build, deploy an debug Ubuntu Touch click packages all from the command
 
 ## Code Editor Integrations
 
-Start QtCreator shipped by Clickable in a project folder via `clickable ide`. Or use
-Clickable with the [Atom Editor](https://atom.io) by installing
-[atom-clickable-plugin](https://atom.io/packages/atom-clickable-plugin).
+Start QtCreator shipped by Clickable in a project folder via `clickable ide`.
 
 ## Development
 

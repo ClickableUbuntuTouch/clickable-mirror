@@ -13,7 +13,7 @@ parameters.
 This documentation only lists some selected commands and parameters. Run
 ``clickable --help`` to see the list of all available commands and
 ``clickable <command> --help`` to get a command-specific help message listing its
-available parameters. 
+available parameters.
 
 Project-specific commands like ``build`` and ``install`` can be executed from the projec
 root or any of its sub-directories, given there is a project config in the project root.
@@ -57,8 +57,7 @@ The env var ``CLICKABLE_DESKTOP_MODE`` is set in desktop mode.
 ``ide``
 -------
 
-Will run an IDE inside the Clickable docker container, QtCreator by default. Atom can be
-started with ``clickable ide atom``.
+Will run an IDE inside the Clickable docker container, QtCreator by default.
 
 ``ci``
 ------
