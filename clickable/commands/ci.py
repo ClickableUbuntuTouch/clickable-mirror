@@ -1,10 +1,10 @@
+from clickable.utils import pull_image
 from clickable.exceptions import ClickableException
 from clickable.container import Container
 from clickable.logger import logger
 from clickable.config.constants import Constants
 
 from .base import Command
-from .update_images import update_image
 
 
 class CiCommand(Command):
@@ -73,7 +73,7 @@ class CiCommand(Command):
         logger.info("Running in container %s", self.image)
 
         if self.version == "latest":
-            update_image(self.container.docker_executable, self.image)
+            pull_image(self.image, skip_existing=False)
 
         self.container.setup()
         self.container.run_command(
