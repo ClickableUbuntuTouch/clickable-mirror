@@ -17,6 +17,7 @@ from clickable.utils import (
     find_pattern,
     is_command,
     makedirs,
+    pull_image,
     run_subprocess_check_output,
     env,
 )
@@ -344,6 +345,8 @@ class DesktopCommand(Command):
         ])
 
     def get_image_path_var(self):
+        pull_image(self.config.docker_image)
+
         command = f"{self.container.docker_executable} inspect -f "\
             "'{{range $index, $value := .Config.Env}}{{println $value}}{{end}}' " \
             f"{self.config.docker_image}"

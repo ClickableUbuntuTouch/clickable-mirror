@@ -283,6 +283,13 @@ def validate_config_format(config, schema, name, path):
         logger.warning('Dependency "jsonschema" not found. Could not validate config file.')
 
 
+def pull_image(image, skip_existing=True):
+    if not skip_existing or not image_exists(image):
+        docker_executable = get_docker_command()
+        command = f'{docker_executable} pull {image}'
+        run_subprocess_check_call(command)
+
+
 def image_exists(image):
     docker_executable = get_docker_command()
     command = f'{docker_executable} image inspect {image}'
