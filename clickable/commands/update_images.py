@@ -1,16 +1,10 @@
 from clickable.config.constants import Constants
 from clickable.utils import (
-    run_subprocess_check_call,
+    pull_image,
     image_exists,
 )
 
 from .base import Command
-
-
-def update_image(docker_executable, image):
-    if image_exists(image):
-        command = f'{docker_executable} pull {image}'
-        run_subprocess_check_call(command)
 
 
 class UpdateCommand(Command):
@@ -26,4 +20,5 @@ class UpdateCommand(Command):
 
         container_mapping = Constants.container_mapping[Constants.host_arch]
         for image in container_mapping.values():
-            update_image(self.container.docker_executable, image)
+            if image_exists(image):
+                pull_image(image, skip_existing=False)

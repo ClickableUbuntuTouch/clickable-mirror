@@ -1,3 +1,10 @@
+clickable (7.7.0) unstable; urgency=medium
+
+  * Removed Atom support from the ide command as it has been sunsetted
+  * Fixed crash in desktop mode when the docker container doesn't exist
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 03 Nov 2022 23:20:46 -0500
+
 clickable (7.6.0) unstable; urgency=medium
 
   * Added new QBS builder

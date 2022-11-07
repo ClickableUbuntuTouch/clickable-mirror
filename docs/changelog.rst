@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Changes in v7.7.0
+-----------------
+
+- Removed Atom support from the ``ide`` command as it has been [sunsetted](https://github.blog/2022-06-08-sunsetting-atom/)
+- Fixed crash in desktop mode when the docker container doesn't exist
+
 Changes in v7.6.0
 -----------------
 
