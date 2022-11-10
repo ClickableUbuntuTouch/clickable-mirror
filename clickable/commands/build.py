@@ -254,7 +254,7 @@ class BuildCommand(Command):
         if config.postbuild:
             run_custom_commands(config.postbuild, config, container)
 
-    def install_files(self, pattern, dest_dir, search_dirs=None):
+    def install_files(self, pattern, dest_dir, search_dirs=None, install_type=""):
         if not is_sub_dir(dest_dir, self.config.install_dir):
             dest_dir = os.path.abspath(self.config.install_dir + "/" + dest_dir)
 
@@ -285,8 +285,10 @@ class BuildCommand(Command):
         if not files:
             raise ClickableException(f'Files to install not found with pattern "{pattern}"')
 
-        logger.info("Installing\n  %s", "\n  ".join(files))
-        self.container.pull_files(files, dest_dir)
+        logger.info("Installing %s\n  %s", install_type, "\n  ".join(files))
+
+        files_joined = " ".join(files)
+        self.container.run_command(f"cp --recursive --no-dereference {files_joined} {dest_dir}")
 
     def install_qml_files(self, pattern, dest_dir):
         if '*' in pattern:
@@ -334,28 +336,29 @@ class BuildCommand(Command):
 
     def install_additional_files(self):
         for p in self.config.install_root_data:
-            self.install_files(p, self.config.install_dir)
+            self.install_files(p, self.config.install_dir, "root data")
 
         if self.config.install_lib:
             lib_dirs = self.get_library_dirs()
             for p in self.config.install_lib:
                 self.install_files(p, os.path.join(self.config.install_dir,
-                                                   self.config.app_lib_dir), lib_dirs)
+                                                   self.config.app_lib_dir), lib_dirs, "libraries")
 
         if self.config.install_bin:
             bin_dirs = self.get_bin_dirs()
             for p in self.config.install_bin:
                 self.install_files(p, os.path.join(self.config.install_dir,
-                                                   self.config.app_bin_dir), bin_dirs)
+                                                   self.config.app_bin_dir), bin_dirs, "binaries")
 
         for p in self.config.install_qml:
             self.install_qml_files(p, os.path.join(
                 self.config.install_dir,
-                self.config.app_qml_dir
+                self.config.app_qml_dir,
+                "QML modules"
             ))
 
         for p, dest in self.config.install_data.items():
-            self.install_files(p, dest)
+            self.install_files(p, dest, "data")
 
     def set_arch(self, manifest):
         arch = manifest.get('architecture', None)
