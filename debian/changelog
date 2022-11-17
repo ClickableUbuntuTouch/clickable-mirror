@@ -1,3 +1,9 @@
+clickable (7.7.1) unstable; urgency=medium
+
+  * Fixed installing files with podman
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 16 Nov 2022 00:03:56 -0500
+
 clickable (7.7.0) unstable; urgency=medium
 
   * Removed Atom support from the ide command as it has been sunsetted
