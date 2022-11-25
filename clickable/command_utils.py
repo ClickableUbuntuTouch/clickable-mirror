@@ -6,7 +6,7 @@ from clickable.commands.base import Command
 
 
 def get_commands():
-    commands = []
+    commands = {}
     scr_dir = dirname(__file__)
     modules = glob.glob(join(scr_dir, 'commands/*.py'))
     command_modules = [
@@ -24,7 +24,8 @@ def get_commands():
         for _, cls in inspect.getmembers(command_submodule):
             if (inspect.isclass(cls)
                     and issubclass(cls, Command)
-                    and cls != Command):
-                commands.append(cls())
+                    and cls != Command
+                    and cls.__name__ not in commands):
+                commands[cls.__name__] = cls()
 
-    return commands
+    return commands.values()
