@@ -139,6 +139,7 @@ class Device():
         if output.strip().endswith("ADB_COMMAND_FAILED"):
             raise ClickableException("Command ran on device via ADB failed. See output above.")
 
-        if get_output:
-            return output
-        return None
+        if not get_output:
+            print(output)
+
+        return output
