@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.7.1
+-----------------
+
+- Fixed installing files with podman
+
 Changes in v7.7.0
 -----------------
 
