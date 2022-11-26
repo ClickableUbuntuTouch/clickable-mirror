@@ -1,3 +1,10 @@
+clickable (7.7.2) unstable; urgency=medium
+
+  * Fixed crash when using Python 3.11
+  * Fixed command outputs not being displayed
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Sat, 26 Nov 2022 07:49:00 -0500
+
 clickable (7.7.1) unstable; urgency=medium
 
   * Fixed installing files with podman

@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Changes in v7.7.2
+-----------------
+
+- Fixed crash when using Python 3.11
+- Fixed command outputs not being displayed
+
 Changes in v7.7.1
 -----------------
 
