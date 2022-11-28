@@ -302,12 +302,13 @@ class BuildCommand(Command):
                 if line.startswith('module'):
                     module = line.split(' ')[1]
 
+            install_type = "QML modules"
             if module:
                 self.install_files(pattern, os.path.join(
-                    dest_dir, *module.split('.')[:-1])
+                    dest_dir, *module.split('.')[:-1]), install_type=install_type
                 )
             else:
-                self.install_files(pattern, dest_dir)
+                self.install_files(pattern, dest_dir, install_type=install_type)
 
     def join_libs(self, dirs):
         lib_bin_dirs = []
@@ -353,9 +354,8 @@ class BuildCommand(Command):
         for p in self.config.install_qml:
             self.install_qml_files(p, os.path.join(
                 self.config.install_dir,
-                self.config.app_qml_dir,
-                "QML modules"
-            ))
+                self.config.app_qml_dir)
+            )
 
         for p, dest in self.config.install_data.items():
             self.install_files(p, dest, "data")
