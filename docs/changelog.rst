@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.7.3
+-----------------
+
+- Fixed installing QML modules
+
 Changes in v7.7.2
 -----------------
 
