@@ -1,3 +1,9 @@
+clickable (7.7.3) unstable; urgency=medium
+
+  * Fixed installing QML modules
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 02 Dec 2022 23:09:15 -0500
+
 clickable (7.7.2) unstable; urgency=medium
 
   * Fixed crash when using Python 3.11
