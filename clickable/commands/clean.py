@@ -158,13 +158,13 @@ class CleanCommand(Command):
         package_name = self.config.install_files.find_package_name()
         if self.app_cache:
             logger.info("Cleaning Desktop Mode app cache")
-            clean(os.path.join(Constants.device_home, '.cache', package_name))
+            clean(os.path.join(Constants.desktop_device_home, '.cache', package_name))
         if self.app_config:
             logger.info("Cleaning Desktop Mode app config")
-            clean(os.path.join(Constants.device_home, '.config', package_name))
+            clean(os.path.join(Constants.desktop_device_home, '.config', package_name))
         if self.app_data:
             logger.info("Cleaning Desktop Mode app data")
-            clean(os.path.join(Constants.device_home, '.local', 'share', package_name))
+            clean(os.path.join(Constants.desktop_device_home, '.local', 'share', package_name))
 
 
 def is_set(val, default):
@@ -176,4 +176,4 @@ def clean(path):
         logger.info("  Deleting directory %s", path)
         shutil.rmtree(path)
     else:
-        logger.info("  Nothing to clean")
+        logger.info("  Nothing to clean, %s doesn't exist", path)
