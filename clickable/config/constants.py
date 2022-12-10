@@ -38,22 +38,13 @@ class Constants():
 
     container_mapping = {
         "armhf": {
-            ('16.04.4', 'armhf'): 'clickable/armhf-16.04-armhf:16.04.4-qt5.9',
             ('16.04.5', 'armhf'): 'clickable/armhf-16.04-armhf:16.04.5',
         },
         "arm64": {
-            ('16.04.4', 'arm64'): 'clickable/arm64-16.04-arm64:16.04.4-qt5.9',
             ('16.04.5', 'arm64'): 'clickable/arm64-16.04-arm64:16.04.5',
             ('20.04', 'arm64'): 'clickable/arm64-20.04-arm64',
         },
         "amd64": {
-            ('16.04.4', 'armhf'): 'clickable/amd64-16.04-armhf:16.04.4-qt5.9',
-            ('16.04.4', 'arm64'): 'clickable/amd64-16.04-arm64:16.04.4-qt5.9',
-            ('16.04.4', 'amd64'): 'clickable/amd64-16.04-amd64:16.04.4-qt5.9',
-            ('16.04.4', 'amd64-nvidia'): 'clickable/amd64-16.04-amd64-nvidia:16.04.4-qt5.9',
-            ('16.04.4', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.4-qt5.9',
-            ('16.04.4', 'amd64-nvidia-ide'):
-                'clickable/amd64-16.04-amd64-nvidia-ide:16.04.4-qt5.9',
             ('16.04.5', 'armhf'): 'clickable/amd64-16.04-armhf:16.04.5',
             ('16.04.5', 'arm64'): 'clickable/amd64-16.04-arm64:16.04.5',
             ('16.04.5', 'amd64'): 'clickable/amd64-16.04-amd64:16.04.5',
@@ -70,13 +61,8 @@ class Constants():
     }
 
     ci_container_mapping = {
-        ('16.04.4', 'armhf'): 'clickable/ci-16.04-armhf',
         ('16.04.5', 'armhf'): 'clickable/ci-16.04-armhf',
-        ('20.04.1', 'armhf'): 'clickable/ci-20.04-armhf',
-        ('16.04.4', 'arm64'): 'clickable/ci-16.04-arm64',
         ('16.04.5', 'arm64'): 'clickable/ci-16.04-arm64',
-        ('20.04.1', 'arm64'): 'clickable/ci-20.04-arm64',
-        ('16.04.4', 'amd64'): 'clickable/ci-16.04-amd64',
         ('16.04.5', 'amd64'): 'clickable/ci-16.04-amd64',
         ('20.04', 'amd64'): 'clickable/ci-20.04-amd64',
         ('20.04', 'armhf'): 'clickable/ci-20.04-armhf',
@@ -84,14 +70,7 @@ class Constants():
     }
 
     framework_image_mapping = {
-        "ubuntu-sdk-16.04": "16.04.4",
-        "ubuntu-sdk-16.04.1": "16.04.4",
-        "ubuntu-sdk-16.04.2": "16.04.4",
-        "ubuntu-sdk-16.04.3": "16.04.4",
-        "ubuntu-sdk-16.04.4": "16.04.4",
-        "ubuntu-sdk-16.04.5": "16.04.5",
-        "ubuntu-sdk-16.04.6": "16.04.5",
-        "ubuntu-sdk-16.04.7": "16.04.5",
+        "ubuntu-sdk-16.04": "16.04.5",
         "ubuntu-sdk-20.04": "20.04",
     }
     framework_image_fallback = {
@@ -100,7 +79,6 @@ class Constants():
     }
 
     default_qt_framework_mapping = {
-        '5.9': 'ubuntu-sdk-16.04.4',
         '5.12': 'ubuntu-sdk-16.04.5',
     }
 

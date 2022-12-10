@@ -10,10 +10,7 @@ class QMakeBuilder(MakeBuilder):
         self.container.run_command(f'make INSTALL_ROOT={self.config.install_dir}/ install')
 
     def build(self):
-        if (
-            self.config.is_foreign_target()
-            and self.config.qt_version != "5.9"
-        ):
+        if self.config.is_foreign_target():
             command = f'/usr/lib/{self.config.arch_triplet}/qt5/bin/qmake'
         else:
             command = 'qmake'
