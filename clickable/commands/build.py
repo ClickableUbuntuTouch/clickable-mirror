@@ -197,6 +197,8 @@ class BuildCommand(Command):
                 self.build(lib, container, is_app=False)
 
     def build_app(self):
+        self.create_lib_build_warning()
+
         if self.clean_app:
             clean_cmd = CleanCommand()
             clean_cmd.init_from_command(self)
@@ -421,6 +423,17 @@ class BuildCommand(Command):
             self.click_path = output_file
 
         logger.debug('Click outputted to %s', self.click_path)
+
+    def create_lib_build_warning(self):
+        missing = [lib.name for lib in self.config.lib_configs
+                   if not os.path.isdir(lib.build_dir)
+                   and lib.arch == self.config.arch]  # lib arch might be restricted
+
+        if missing:
+            logger.warning(
+                'Library build dir missing (%s). Please check the build instructions. '
+                'You might need to run "clickable build --libs".',
+                ", ".join(missing))
 
 
 def run_custom_commands(commands, config, container):
