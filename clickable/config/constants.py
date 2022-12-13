@@ -38,35 +38,36 @@ class Constants():
 
     container_mapping = {
         "armhf": {
-            ('16.04.5', 'armhf'): 'clickable/armhf-16.04-armhf:16.04.5',
+            ('16.04.5', 'armhf'): 'docker.io/clickable/armhf-16.04-armhf:16.04.5',
         },
         "arm64": {
-            ('16.04.5', 'arm64'): 'clickable/arm64-16.04-arm64:16.04.5',
-            ('20.04', 'arm64'): 'clickable/arm64-20.04-arm64',
+            ('16.04.5', 'arm64'): 'docker.io/clickable/arm64-16.04-arm64:16.04.5',
+            ('20.04', 'arm64'): 'docker.io/clickable/arm64-20.04-arm64',
         },
         "amd64": {
-            ('16.04.5', 'armhf'): 'clickable/amd64-16.04-armhf:16.04.5',
-            ('16.04.5', 'arm64'): 'clickable/amd64-16.04-arm64:16.04.5',
-            ('16.04.5', 'amd64'): 'clickable/amd64-16.04-amd64:16.04.5',
-            ('16.04.5', 'amd64-nvidia'): 'clickable/amd64-16.04-amd64-nvidia:16.04.5',
-            ('16.04.5', 'amd64-ide'): 'clickable/amd64-16.04-amd64-ide:16.04.5',
-            ('16.04.5', 'amd64-nvidia-ide'): 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
-            ('20.04', 'amd64'): 'clickable/amd64-20.04-amd64',
-            ('20.04', 'armhf'): 'clickable/amd64-20.04-armhf',
-            ('20.04', 'arm64'): 'clickable/amd64-20.04-arm64',
-            ('20.04', 'amd64-nvidia'): 'clickable/amd64-20.04-amd64-nvidia',
-            ('20.04', 'amd64-ide'): 'clickable/amd64-20.04-amd64-ide',
-            ('20.04', 'amd64-nvidia-ide'): 'clickable/amd64-20.04-amd64-nvidia-ide',
+            ('16.04.5', 'armhf'): 'docker.io/clickable/amd64-16.04-armhf:16.04.5',
+            ('16.04.5', 'arm64'): 'docker.io/clickable/amd64-16.04-arm64:16.04.5',
+            ('16.04.5', 'amd64'): 'docker.io/clickable/amd64-16.04-amd64:16.04.5',
+            ('16.04.5', 'amd64-nvidia'): 'docker.io/clickable/amd64-16.04-amd64-nvidia:16.04.5',
+            ('16.04.5', 'amd64-ide'): 'docker.io/clickable/amd64-16.04-amd64-ide:16.04.5',
+            ('16.04.5', 'amd64-nvidia-ide'):
+                'docker.io/clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
+            ('20.04', 'amd64'): 'docker.io/clickable/amd64-20.04-amd64',
+            ('20.04', 'armhf'): 'docker.io/clickable/amd64-20.04-armhf',
+            ('20.04', 'arm64'): 'docker.io/clickable/amd64-20.04-arm64',
+            ('20.04', 'amd64-nvidia'): 'docker.io/clickable/amd64-20.04-amd64-nvidia',
+            ('20.04', 'amd64-ide'): 'docker.io/clickable/amd64-20.04-amd64-ide',
+            ('20.04', 'amd64-nvidia-ide'): 'docker.io/clickable/amd64-20.04-amd64-nvidia-ide',
         }
     }
 
     ci_container_mapping = {
-        ('16.04.5', 'armhf'): 'clickable/ci-16.04-armhf',
-        ('16.04.5', 'arm64'): 'clickable/ci-16.04-arm64',
-        ('16.04.5', 'amd64'): 'clickable/ci-16.04-amd64',
-        ('20.04', 'amd64'): 'clickable/ci-20.04-amd64',
-        ('20.04', 'armhf'): 'clickable/ci-20.04-armhf',
-        ('20.04', 'arm64'): 'clickable/ci-20.04-arm64',
+        ('16.04.5', 'armhf'): 'docker.io/clickable/ci-16.04-armhf',
+        ('16.04.5', 'arm64'): 'docker.io/clickable/ci-16.04-arm64',
+        ('16.04.5', 'amd64'): 'docker.io/clickable/ci-16.04-amd64',
+        ('20.04', 'amd64'): 'docker.io/clickable/ci-20.04-amd64',
+        ('20.04', 'armhf'): 'docker.io/clickable/ci-20.04-armhf',
+        ('20.04', 'arm64'): 'docker.io/clickable/ci-20.04-arm64',
     }
 
     framework_image_mapping = {
