@@ -78,8 +78,8 @@ qt_version
 ----------
 
 Qt version consisting of major and minor version. This value is used to
-determine the framework automatically. Defaults to ``5.12``.
-Ex: ``5.9``
+determine the framework automatically. Defaults to ``5.12``. Currently, no
+other version is supported.
 
 .. _project-config-framework:
 
