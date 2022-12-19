@@ -3,6 +3,14 @@
 Changelog
 =========
 
+Changes in v7.8.0
+-----------------
+
+- Added warning when trying to build an app without libraries being built first
+- Dropped Qt 5.9 support
+- Switched to using fully qualified docker image names to fix an issue with Podman
+- Fixed bug cleaning desktop mode directories
+
 Changes in v7.7.3
 -----------------
 

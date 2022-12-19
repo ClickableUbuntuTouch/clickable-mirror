@@ -1,3 +1,12 @@
+clickable (7.8.0) unstable; urgency=medium
+
+  * Added warning when trying to build an app without libraries being built first
+  * Dropped Qt 5.9 support
+  * Switched to using fully qualified docker image names to fix an issue with Podman
+  * Fixed bug cleaning desktop mode directories
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Mon, 19 Dec 2022 08:35:42 -0500
+
 clickable (7.7.3) unstable; urgency=medium
 
   * Fixed installing QML modules
