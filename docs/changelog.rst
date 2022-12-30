@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Changes in v7.9.0
+-----------------
+
+- Added support for dark mode when using Focal based desktop mode
+- Fixed icons not showing correctly in desktop mode
+
 Changes in v7.8.0
 -----------------
 
