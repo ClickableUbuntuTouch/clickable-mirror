@@ -387,7 +387,11 @@ exit $?
 
         return []
 
-    def construct_dockerfile_content(self, commands, env_vars):
+    def construct_dockerfile_content(self, commands, env_vars, args):
+        args_strings = [
+            f'ARG {key}="{var}"' for key, var in args.items()
+        ]
+
         env_strings = [
             f'ENV {key}="{var}"' for key, var in env_vars.items()
         ]
@@ -396,11 +400,13 @@ exit $?
             f'RUN {cmd}' for cmd in commands
         ]
 
+        args_lines = '\n'.join(args_strings)
         env_lines = '\n'.join(env_strings)
         run_lines = '\n'.join(run_strings)
 
         return f'''
 FROM {self.base_docker_image}
+{args_lines}
 {env_lines}
 {run_lines}
         '''.strip()
@@ -458,6 +464,7 @@ FROM {self.base_docker_image}
 
         commands = []
         env_vars = self.config.image_setup.get('env', {})
+        args = self.config.get_env_vars()
 
         commands += self.get_ppa_adding_commands()
 
@@ -480,7 +487,7 @@ FROM {self.base_docker_image}
         if self.config.image_setup:
             commands.extend(self.config.image_setup.get('run', []))
 
-        dockerfile_content = self.construct_dockerfile_content(commands, env_vars)
+        dockerfile_content = self.construct_dockerfile_content(commands, env_vars, args)
 
         if self.is_dockerfile_outdated(dockerfile_content):
             self.create_custom_container(dockerfile_content)

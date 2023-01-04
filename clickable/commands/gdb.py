@@ -162,7 +162,8 @@ class GdbCommand(Command):
     def write_debug_symbols(self):
         logger.info("Writing debug symbols to %s", self.export_debug_symbols)
 
-        dst = os.path.join(self.export_debug_symbols, os.path.dirname(self.debug_symbols))
+        rel_path = os.path.relpath(self.debug_symbols, '/')
+        dst = os.path.dirname(os.path.join(self.export_debug_symbols, rel_path))
         self.container.pull_files([self.debug_symbols], dst)
 
     def write_script(self):
