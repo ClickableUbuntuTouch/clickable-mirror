@@ -547,7 +547,7 @@ FROM {self.base_docker_image}
             or self.config.rust_channel)
 
     def check_base_image_version(self):
-        if not self.minimum_version:
+        if not self.minimum_version or self.config.is_custom_docker_image:
             return
 
         if not image_exists(self.docker_image):
