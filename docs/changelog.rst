@@ -3,8 +3,17 @@
 Changelog
 =========
 
+Changes in v7.11.0
+------------------
+
+- Desktop mode commands (like ``test``) can now be used in container mode
+- Disabled the image version check when a custom Docker image is being used
+- Added ``--all`` flag to the ``clean`` command for cleaning all build dirs at once
+- Fixed cleaning build dirs when using the ``build`` command with ``--clean --all``
+- Reduced the number of Docker layers when Clickable generates an image
+
 Changes in v7.10.0
------------------
+------------------
 
 - Clickable placeholders are now available in ``image_setup``
 - ``desktop --gdb`` now implies ``--debug``
