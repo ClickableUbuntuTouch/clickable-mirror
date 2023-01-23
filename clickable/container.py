@@ -388,20 +388,25 @@ exit $?
         return []
 
     def construct_dockerfile_content(self, commands, env_vars, args):
+        args_lines = ''
+        env_lines = ''
+
         args_strings = [
-            f'ARG {key}="{var}"' for key, var in args.items()
+            f'{key}="{var}"' for key, var in args.items()
         ]
 
         env_strings = [
-            f'ENV {key}="{var}"' for key, var in env_vars.items()
+            f'{key}="{var}"' for key, var in env_vars.items()
         ]
 
         run_strings = [
             f'RUN {cmd}' for cmd in commands
         ]
 
-        args_lines = '\n'.join(args_strings)
-        env_lines = '\n'.join(env_strings)
+        if args_strings:
+            args_lines = 'ARG ' + ' '.join(args_strings)
+        if env_strings:
+            env_lines = 'ENV ' + ' '.join(env_strings)
         run_lines = '\n'.join(run_strings)
 
         return f'''
