@@ -8,6 +8,7 @@ import sys
 import json
 
 from clickable.utils import (
+    image_based_on,
     run_subprocess_check_call,
     run_subprocess_check_output,
     get_docker_command,
@@ -75,13 +76,7 @@ class Container():
 
             self.check_docker()
 
-            command_base = f'{self.docker_executable} images -q {self.base_docker_image}'
-            command_cached = f'{self.docker_executable} history -q {cached_image}'
-
-            hash_base = run_subprocess_check_output(command_base).strip()
-            history_cached = run_subprocess_check_output(command_cached).strip()
-
-            if hash_base in history_cached:
+            if image_based_on(cached_image, self.base_docker_image):
                 logger.debug("Found cached container")
                 self.docker_image = cached_image
             else:
