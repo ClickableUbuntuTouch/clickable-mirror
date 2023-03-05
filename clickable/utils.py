@@ -128,7 +128,7 @@ def find(
                     del dirs[:]
 
         for name in files:
-            ok = (name in names)
+            ok = name in names
 
             if extensions_only:
                 ok = any([name.endswith(n) for n in names])
@@ -189,7 +189,11 @@ def get_docker_command():
     for command in ['podman', 'docker']:
         if is_command(command):
             return command
-    raise Exception('You must install either podman or docker')
+
+    raise ClickableException(
+        'Neither the command "docker" nor "podman" does exist on this system, '
+        'please install either on for clickable to work properly'
+    )
 
 
 def env(name):
