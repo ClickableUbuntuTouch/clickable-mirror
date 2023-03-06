@@ -719,7 +719,8 @@ class ProjectConfig():
 
     def is_project_independent_cmd(self):
         return bool(set(['no_lock', 'writable_image', 'screenshots', 'create', 'setup'
-                    'shell', 'devices', 'update-images']).intersection(self.commands))
+                    'shell', 'devices', 'update-images', 'clean-images']
+                        ).intersection(self.commands))
 
     def is_device_cmd(self):
         return bool(set(['install', 'launch', 'log', 'logs', 'no_lock', 'writable_image',
@@ -733,7 +734,8 @@ class ProjectConfig():
                 not self.container_mode and
                 (self.is_build_cmd() or
                     bool(set(
-                        ['setup', 'run', 'ide', 'update-images', 'gdb', 'gdbserver', 'review']
+                        ['setup', 'run', 'ide', 'update-images',
+                            'clean-images', 'gdb', 'gdbserver', 'review']
                     ).intersection(self.commands))))
 
     def needs_docker(self):
