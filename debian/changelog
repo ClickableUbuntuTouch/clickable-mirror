@@ -1,3 +1,17 @@
+clickable (7.12.0) unstable; urgency=medium
+
+  * Added new command clean-images to remove obsolete Clickable Docker images
+  * Added environment variable to change the Docker registry used to pull images
+  * Docker images are now published on GitLab's container registry in addition to Docker Hub
+  * Changed automatically setting the CMake release type and prefix to not override any values set in the build args
+  * Improved Docker image lookup
+  * Improved timeout handling during the publish command
+  * Fixed QtCreator build
+  * Fixed the initial setup of CMake projects in QtCreator for Focal
+  * Fixed Go linker issue for Focal
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 16 Mar 2023 23:19:27 -0500
+
 clickable (7.11.0) unstable; urgency=medium
 
   * Desktop mode commands (like test) can now be used in container mode
