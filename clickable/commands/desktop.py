@@ -124,7 +124,6 @@ class DesktopCommand(Command):
 
     def configure_nested(self):
         self.builder.init_from_command(self)
-        self.builder.configure_nested()
         self.configure_common()
 
     def configure_common(self):
@@ -132,7 +131,7 @@ class DesktopCommand(Command):
             self.dark_mode = True
 
         if self.gdb or self.valgrind:
-            self.config.debug_build = True
+            self.builder.debug_build = True
 
         if self.valgrind and self.gdb:
             raise ClickableException(
