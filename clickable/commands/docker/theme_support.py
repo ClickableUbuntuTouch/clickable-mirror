@@ -12,14 +12,24 @@ class ThemeSupport(DockerSupport):
         self.dark_mode = dark_mode
 
     def update(self, docker_config: DockerConfig):
-        config_path = makedirs(os.path.join(
-            Constants.desktop_device_home,
-            '.config/ubuntu-ui-toolkit'
-        ))
+        if self.config.get_framework_base() == '16.04':
+            folder = "ubuntu-ui-toolkit"
+            theme_base = 'Ubuntu.Components.Themes'
+        else:
+            folder = "lomiri-ui-toolkit"
+            theme_base = 'Lomiri.Components.Themes'
 
-        theme = 'Ubuntu.Components.Themes.Ambiance'
         if self.dark_mode:
-            theme = 'Ubuntu.Components.Themes.SuruDark'
+            theme_name = 'SuruDark'
+        else:
+            theme_name = 'Ambiance'
 
-        with open(os.path.join(config_path, 'theme.ini'), 'w') as f:
-            f.write('[General]\ntheme=' + theme)
+        config_dir = os.path.join(
+            Constants.desktop_device_home,
+            '.config',
+            folder,
+        )
+
+        makedirs(config_dir)
+        with open(os.path.join(config_dir, 'theme.ini'), 'w') as f:
+            f.write(f'[General]\ntheme={theme_base}.{theme_name}')
