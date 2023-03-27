@@ -3,6 +3,7 @@ import shutil
 import os
 
 from clickable.config.constants import Constants
+from clickable.logger import logger
 
 from .cmake import CMakeBuilder
 
@@ -16,7 +17,6 @@ class CordovaBuilder(CMakeBuilder):
         super().__init__(*args, **kwargs)
 
         self.platform_dir = os.path.join(self.config.cwd, 'platforms/ubuntu/')
-        self.sdk = 'ubuntu-sdk-16.04'
 
         self.config.src_dir = os.path.join(self.platform_dir, 'build')
 
@@ -59,3 +59,6 @@ class CordovaBuilder(CMakeBuilder):
 
             with open(apparmor_file, 'w', encoding='UTF-8') as apparmor_writer:
                 json.dump(apparmor, apparmor_writer, indent=4)
+
+        logger.warning("The cordova builder is deprecated '\
+                '(https://gitlab.com/clickable/clickable/-/issues/407).")
