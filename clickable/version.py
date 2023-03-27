@@ -12,7 +12,7 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
-__version__ = '7.10.0'
+__version__ = '7.9.0'
 
 __container_minimum_required__ = 9
 

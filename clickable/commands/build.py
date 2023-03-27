@@ -136,6 +136,7 @@ class BuildCommand(Command):
     def parse_env(self):
         if env('CLICKABLE_DEBUG_BUILD'):
             self.debug_build = True
+            self.config.debug_build = True
             self.config.env_vars['DEBUG_BUILD'] = '1'
 
             for lib in self.config.lib_configs:

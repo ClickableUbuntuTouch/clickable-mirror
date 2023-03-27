@@ -3,13 +3,6 @@
 Changelog
 =========
 
-Changes in v7.10.0
------------------
-
-- Clickable placeholders are now available in ``image_setup``
-- ``desktop --gdb`` now implies ``--debug``
-- Fixed debug symbol export
-
 Changes in v7.9.0
 -----------------
 
