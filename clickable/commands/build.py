@@ -26,7 +26,8 @@ class BuildCommand(Command):
         self.cli_conf.name = 'build'
         self.cli_conf.help_msg = 'Build the app and/or libraries'
 
-        self.clean = False
+        self.clean_app = False
+        self.clean_libs = False
         self.output_path = None
         self.skip_review = skip_review or skip_click
         self.skip_click = skip_click
@@ -90,7 +91,8 @@ class BuildCommand(Command):
         )
 
     def configure(self, args):
-        self.clean = args.clean
+        self.clean_app = args.clean
+        self.clean_libs = args.clean and args.libs is not None
         if args.skip_review:
             self.skip_review = True
         self.output_path = args.output
@@ -120,7 +122,7 @@ class BuildCommand(Command):
             self.skip_review = True
 
         if self.config.always_clean or self.config.global_config.build.always_clean:
-            self.clean = True
+            self.clean_app = True
 
         if self.config.ignore_review_errors is not None:
             self.accept_errors = self.config.ignore_review_errors
@@ -174,7 +176,7 @@ class BuildCommand(Command):
             logger.warning('No libraries defined.')
             return
 
-        if self.clean:
+        if self.clean_libs:
             clean_cmd = CleanCommand(libs=self.libs, app=False)
             clean_cmd.init_from_command(self)
             clean_cmd.run()
@@ -196,7 +198,7 @@ class BuildCommand(Command):
     def build_app(self):
         self.create_lib_build_warning()
 
-        if self.clean:
+        if self.clean_app:
             clean_cmd = CleanCommand()
             clean_cmd.init_from_command(self)
             clean_cmd.run()

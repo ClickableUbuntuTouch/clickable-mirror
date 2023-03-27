@@ -38,12 +38,6 @@ class CleanCommand(Command):
             default=None,
         )
         parser.add_argument(
-            '--all',
-            action='store_true',
-            help='Clean all build dirs (equivalent to --libs --app)',
-            default=False,
-        )
-        parser.add_argument(
             '--app-cache',
             action='store_true',
             help='Clean app cache from Desktop Mode',
@@ -96,7 +90,7 @@ class CleanCommand(Command):
         )
 
     def configure(self, args):
-        default = args.libs is None
+        default = True
         (self.app_cache, default) = is_set(args.app_cache, default)
         (self.app_config, default) = is_set(args.app_config, default)
         (self.app_data, default) = is_set(args.app_data, default)
@@ -111,8 +105,8 @@ class CleanCommand(Command):
             self.app_data = True
             default = False
 
-        self.app = args.app or args.all or default
-        self.libs = [] if args.all else args.libs
+        self.app = args.app or (args.libs is None and default)
+        self.libs = args.libs
 
         if self.libs is not None:
             existing_libs = [lib.name for lib in self.config.lib_configs]

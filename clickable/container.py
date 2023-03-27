@@ -388,25 +388,20 @@ exit $?
         return []
 
     def construct_dockerfile_content(self, commands, env_vars, args):
-        args_lines = ''
-        env_lines = ''
-
         args_strings = [
-            f'{key}="{var}"' for key, var in args.items()
+            f'ARG {key}="{var}"' for key, var in args.items()
         ]
 
         env_strings = [
-            f'{key}="{var}"' for key, var in env_vars.items()
+            f'ENV {key}="{var}"' for key, var in env_vars.items()
         ]
 
         run_strings = [
             f'RUN {cmd}' for cmd in commands
         ]
 
-        if args_strings:
-            args_lines = 'ARG ' + ' '.join(args_strings)
-        if env_strings:
-            env_lines = 'ENV ' + ' '.join(env_strings)
+        args_lines = '\n'.join(args_strings)
+        env_lines = '\n'.join(env_strings)
         run_lines = '\n'.join(run_strings)
 
         return f'''
@@ -552,7 +547,7 @@ FROM {self.base_docker_image}
             or self.config.rust_channel)
 
     def check_base_image_version(self):
-        if not self.minimum_version or self.config.is_custom_docker_image:
+        if not self.minimum_version:
             return
 
         if not image_exists(self.docker_image):

@@ -41,7 +41,7 @@ class TestCommand(Command):
             for lib in self.libs:
                 if lib not in existing_libs:
                     raise ClickableException(
-                        f'Cannot test unknown library "{lib}", which is not in your '
+                        f'Cannot clean unknown library "{lib}", which is not in your '
                         'project config'
                     )
 

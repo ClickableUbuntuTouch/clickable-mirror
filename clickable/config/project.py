@@ -884,6 +884,9 @@ class ProjectConfig():
                     'be specified together.'
                 )
 
+            if self.container_mode:
+                raise ClickableException('Desktop Mode in Container Mode is not supported.')
+
     def check_path_sanity(self):
         for path in self.path_keys + self.absolute_path_keys:
             if self.config[path] and not is_path_sane(self.config[path]):
