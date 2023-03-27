@@ -1,10 +1,3 @@
-clickable (7.9.0) unstable; urgency=medium
-
-  * Added support for dark mode when using Focal based desktop mode
-  * Fixed icons not showing correctly in desktop mode
-
- -- Clickable <bhdouglass+clickable@gmail.com>  Mon, 26 Dec 2022 23:24:46 -0500
-
 clickable (7.8.0) unstable; urgency=medium
 
   * Added warning when trying to build an app without libraries being built first

@@ -319,7 +319,6 @@ class DesktopCommand(Command):
             'HOME': Constants.device_home,
             'OXIDE_NO_SANDBOX': '1',
             'UBUNTU_APP_LAUNCH_ARCH': self.config.arch_triplet,
-            'UITK_ICON_THEME': 'suru',
         }
 
         if self.custom_mode:
