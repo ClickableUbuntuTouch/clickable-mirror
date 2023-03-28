@@ -8,6 +8,7 @@ import sys
 import json
 
 from clickable.utils import (
+    image_based_on,
     run_subprocess_check_call,
     run_subprocess_check_output,
     get_docker_command,
@@ -75,13 +76,7 @@ class Container():
 
             self.check_docker()
 
-            command_base = f'{self.docker_executable} images -q {self.base_docker_image}'
-            command_cached = f'{self.docker_executable} history -q {cached_image}'
-
-            hash_base = run_subprocess_check_output(command_base).strip()
-            history_cached = run_subprocess_check_output(command_cached).strip()
-
-            if hash_base in history_cached:
+            if image_based_on(cached_image, self.base_docker_image):
                 logger.debug("Found cached container")
                 self.docker_image = cached_image
             else:
@@ -388,11 +383,10 @@ exit $?
         return []
 
     def construct_dockerfile_content(self, commands, env_vars, args):
-        args_lines = ''
         env_lines = ''
 
         args_strings = [
-            f'{key}="{var}"' for key, var in args.items()
+            f'ARG {key}="{var}"' for key, var in args.items()
         ]
 
         env_strings = [
@@ -403,8 +397,7 @@ exit $?
             f'RUN {cmd}' for cmd in commands
         ]
 
-        if args_strings:
-            args_lines = 'ARG ' + ' '.join(args_strings)
+        args_lines = '\n'.join(args_strings)
         if env_strings:
             env_lines = 'ENV ' + ' '.join(env_strings)
         run_lines = '\n'.join(run_strings)

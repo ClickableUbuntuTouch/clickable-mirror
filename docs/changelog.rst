@@ -3,6 +3,19 @@
 Changelog
 =========
 
+Changes in v7.12.0
+------------------
+
+- Added new command ``clean-images`` to remove obsolete Clickable Docker images
+- Added environment variable to change the Docker registry used to pull images
+- Docker images are now published on GitLab's container registry in addition to Docker Hub
+- Changed automatically setting the CMake release type and prefix to not override any values set in the build args
+- Improved Docker image lookup
+- Improved timeout handling during the publish command
+- Fixed QtCreator build
+- Fixed the initial setup of CMake projects in QtCreator for Focal
+- Fixed Go linker issue for Focal
+
 Changes in v7.11.0
 ------------------
 
