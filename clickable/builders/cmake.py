@@ -29,7 +29,7 @@ class CMakeBuilder(MakeBuilder):
             self.config.build_args.append(f'-D{BUILD_TYPE}=Release')
 
         if not has_arg(self.config.build_args, INSTALL_PREFIX):
-            self.config.build_args.append(f'-D{INSTALL_PREFIX}=/.')
+            self.config.build_args.append(f'-D{INSTALL_PREFIX}:PATH=/.')
 
         command += self.config.build_args
         command.append(self.config.src_dir)
