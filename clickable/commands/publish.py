@@ -1,6 +1,8 @@
 import os
 import urllib.parse
 
+from requests.exceptions import ConnectTimeout, ReadTimeout
+
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 from clickable.utils import env
@@ -27,6 +29,7 @@ class PublishCommand(Command):
         self.api_key = None
         self.changelog = ''
         self.timeout = 60
+        self.connect_timeout = 5
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -100,8 +103,17 @@ class PublishCommand(Command):
                     package_name,
                     channel,
                     self.config.arch)
-        response = requests.post(url, files=files, data=data, params=params,
-                                 timeout=self.timeout)
+        try:
+            response = requests.post(url, files=files, data=data, params=params,
+                                     timeout=(self.connect_timeout, self.timeout))
+        except (ReadTimeout, TimeoutError) as e:
+            raise ClickableException(
+                "Upload timed out. Consider setting a higher timeout via --timeout argument."
+            ) from e
+        except (ConnectTimeout, requests.exceptions.ConnectionError) as e:
+            raise ClickableException(
+                "Couldn't connect to the server. Check your internet connection.") from e
+
         if response.status_code == 200:
             logger.info('Upload successful')
         elif response.status_code == 404:

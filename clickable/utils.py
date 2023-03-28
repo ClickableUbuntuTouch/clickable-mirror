@@ -128,7 +128,7 @@ def find(
                     del dirs[:]
 
         for name in files:
-            ok = (name in names)
+            ok = name in names
 
             if extensions_only:
                 ok = any([name.endswith(n) for n in names])
@@ -189,7 +189,11 @@ def get_docker_command():
     for command in ['podman', 'docker']:
         if is_command(command):
             return command
-    raise Exception('You must install either podman or docker')
+
+    raise ClickableException(
+        'Neither the command "docker" nor "podman" does exist on this system, '
+        'please install either on for clickable to work properly'
+    )
 
 
 def env(name):
@@ -298,6 +302,18 @@ def image_exists(image):
         stderr=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL
     ) == 0
+
+
+def image_based_on(image, base):
+    docker_executable = get_docker_command()
+    command_template = f'{docker_executable} history --no-trunc -q'
+    command_base = f'{command_template} {base}'
+    command_image = f'{command_template} {image}'
+
+    hash_base = run_subprocess_check_output(command_base).split('\n', 1)[0]
+    history = run_subprocess_check_output(command_image).strip()
+
+    return hash_base in history
 
 
 def makedirs(path):

@@ -149,3 +149,11 @@ Adds custom env vars to the build container. E.g. set
 container.
 
 Overrides env vars in :ref:`test <project-config-env_vars>`.
+
+``CLICKABLE_DOCKER_REGISTRY``
+-----------------------------
+
+The Docker registry used to pull images. Defaults to ``docker.io`` to pull
+from `Docker Hub <https://hub.docker.com/u/clickable>`__.
+To use the `GitLab container registry <https://gitlab.com/groups/clickable/-/container_registries>`__
+change this to ``registry.gitlab.com/clickable``.

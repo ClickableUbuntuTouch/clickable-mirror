@@ -1,4 +1,5 @@
 from clickable.config.constants import Constants
+from clickable.logger import logger
 from clickable.utils import (
     pull_image,
     image_exists,
@@ -22,3 +23,6 @@ class UpdateCommand(Command):
         for image in container_mapping.values():
             if image_exists(image):
                 pull_image(image, skip_existing=False)
+
+        logger.info('Update complete. '
+                    'You may run "clickable clean-images" to delete obsolete ones.')

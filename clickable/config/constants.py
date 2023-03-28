@@ -36,38 +36,57 @@ class Constants():
     ]
     arch_agnostic_builders = [PURE_QML_QMAKE, PURE_QML_CMAKE, PURE]
 
+    docker_registry = os.environ.get(
+        'CLICKABLE_DOCKER_REGISTRY',
+        'docker.io'
+    )
+
     container_mapping = {
         "armhf": {
-            ('16.04.5', 'armhf'): 'docker.io/clickable/armhf-16.04-armhf:16.04.5',
+            ('16.04.5', 'armhf'):
+                os.path.join(docker_registry, 'clickable/armhf-16.04-armhf:16.04.5'),
         },
         "arm64": {
-            ('16.04.5', 'arm64'): 'docker.io/clickable/arm64-16.04-arm64:16.04.5',
-            ('20.04', 'arm64'): 'docker.io/clickable/arm64-20.04-arm64',
+            ('16.04.5', 'arm64'):
+                os.path.join(docker_registry, 'clickable/arm64-16.04-arm64:16.04.5'),
+            ('20.04', 'arm64'):
+                os.path.join(docker_registry, 'clickable/arm64-20.04-arm64'),
         },
         "amd64": {
-            ('16.04.5', 'armhf'): 'docker.io/clickable/amd64-16.04-armhf:16.04.5',
-            ('16.04.5', 'arm64'): 'docker.io/clickable/amd64-16.04-arm64:16.04.5',
-            ('16.04.5', 'amd64'): 'docker.io/clickable/amd64-16.04-amd64:16.04.5',
-            ('16.04.5', 'amd64-nvidia'): 'docker.io/clickable/amd64-16.04-amd64-nvidia:16.04.5',
-            ('16.04.5', 'amd64-ide'): 'docker.io/clickable/amd64-16.04-amd64-ide:16.04.5',
+            ('16.04.5', 'armhf'):
+                os.path.join(docker_registry, 'clickable/amd64-16.04-armhf:16.04.5'),
+            ('16.04.5', 'arm64'):
+                os.path.join(docker_registry, 'clickable/amd64-16.04-arm64:16.04.5'),
+            ('16.04.5', 'amd64'):
+                os.path.join(docker_registry, 'clickable/amd64-16.04-amd64:16.04.5'),
+            ('16.04.5', 'amd64-nvidia'):
+                os.path.join(docker_registry, 'clickable/amd64-16.04-amd64-nvidia:16.04.5'),
+            ('16.04.5', 'amd64-ide'):
+                os.path.join(docker_registry, 'clickable/amd64-16.04-amd64-ide:16.04.5'),
             ('16.04.5', 'amd64-nvidia-ide'):
-                'docker.io/clickable/amd64-16.04-amd64-nvidia-ide:16.04.5',
-            ('20.04', 'amd64'): 'docker.io/clickable/amd64-20.04-amd64',
-            ('20.04', 'armhf'): 'docker.io/clickable/amd64-20.04-armhf',
-            ('20.04', 'arm64'): 'docker.io/clickable/amd64-20.04-arm64',
-            ('20.04', 'amd64-nvidia'): 'docker.io/clickable/amd64-20.04-amd64-nvidia',
-            ('20.04', 'amd64-ide'): 'docker.io/clickable/amd64-20.04-amd64-ide',
-            ('20.04', 'amd64-nvidia-ide'): 'docker.io/clickable/amd64-20.04-amd64-nvidia-ide',
+                os.path.join(docker_registry, 'clickable/amd64-16.04-amd64-nvidia-ide:16.04.5'),
+            ('20.04', 'amd64'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-amd64'),
+            ('20.04', 'armhf'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-armhf'),
+            ('20.04', 'arm64'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-arm64'),
+            ('20.04', 'amd64-nvidia'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-amd64-nvidia'),
+            ('20.04', 'amd64-ide'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-amd64-ide'),
+            ('20.04', 'amd64-nvidia-ide'):
+                os.path.join(docker_registry, 'clickable/amd64-20.04-amd64-nvidia-ide'),
         }
     }
 
     ci_container_mapping = {
-        ('16.04.5', 'armhf'): 'docker.io/clickable/ci-16.04-armhf',
-        ('16.04.5', 'arm64'): 'docker.io/clickable/ci-16.04-arm64',
-        ('16.04.5', 'amd64'): 'docker.io/clickable/ci-16.04-amd64',
-        ('20.04', 'amd64'): 'docker.io/clickable/ci-20.04-amd64',
-        ('20.04', 'armhf'): 'docker.io/clickable/ci-20.04-armhf',
-        ('20.04', 'arm64'): 'docker.io/clickable/ci-20.04-arm64',
+        ('16.04.5', 'armhf'): os.path.join(docker_registry, 'clickable/ci-16.04-armhf'),
+        ('16.04.5', 'arm64'): os.path.join(docker_registry, 'clickable/ci-16.04-arm64'),
+        ('16.04.5', 'amd64'): os.path.join(docker_registry, 'clickable/ci-16.04-amd64'),
+        ('20.04', 'amd64'): os.path.join(docker_registry, 'clickable/ci-20.04-amd64'),
+        ('20.04', 'armhf'): os.path.join(docker_registry, 'clickable/ci-20.04-armhf'),
+        ('20.04', 'arm64'): os.path.join(docker_registry, 'clickable/ci-20.04-arm64'),
     }
 
     framework_image_mapping = {
