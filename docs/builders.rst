@@ -34,6 +34,8 @@ cordova
 
 A project that builds using cordova
 
+Note: This builder is deprecated and subject to removal in the next major version of Clickable.
+
 pure
 ----
 
