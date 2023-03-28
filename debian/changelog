@@ -1,3 +1,10 @@
+clickable (7.12.1) unstable; urgency=medium
+
+  * Fixed CMake install prefix bug
+  * Marked the Cordova builder as deprecated. It will be removed in v8.
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Tue, 28 Mar 2023 08:11:13 -0500
+
 clickable (7.12.0) unstable; urgency=medium
 
   * Added new command clean-images to remove obsolete Clickable Docker images

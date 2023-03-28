@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Changes in v7.12.1
+------------------
+
+- Fixed CMake install prefix bug
+- Marked the Cordova builder as deprecated. It will be removed in v8.
+
 Changes in v7.12.0
 ------------------
 
