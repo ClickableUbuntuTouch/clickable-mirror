@@ -89,7 +89,7 @@ framework
 The SDK framework which the app should be built for. This allows Clickable to
 choose the correct docker image and set the ``framework`` field in the manifest
 accordingly, if desired.
-Ex: ``ubuntu-sdk-16.04.4``
+Ex: ``ubuntu-sdk-16.04.5`` or ``ubuntu-sdk-20.04``
 
 .. _project-config-restrict_arch:
 
