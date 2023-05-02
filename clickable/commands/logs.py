@@ -34,6 +34,6 @@ class LogsCommand(Command):
             logger.debug("Using UT 20.04 log command")
 
             self.device.run_command(
-                f'journalctl --user --no-tail --follow -u \
-                lomiri-app-launch--application-click--{package_name}-- 1>&2',
+                'journalctl --user --no-tail --follow -u '
+                f'lomiri-app-launch--application-click--{package_name}-- 1>&2',
             )

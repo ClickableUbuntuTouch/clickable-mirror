@@ -32,7 +32,7 @@ class LogCommand(Command):
             logger.debug("Using UT 20.04 log command")
 
             print(self.device.run_command(
-                f'journalctl --user --no-pager -u \
-                lomiri-app-launch--application-click--{package_name}--',
+                'journalctl --user --no-pager -u '
+                f'lomiri-app-launch--application-click--{package_name}--',
                 get_output=True
             ))
