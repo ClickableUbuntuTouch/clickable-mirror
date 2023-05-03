@@ -61,7 +61,7 @@ lint:
 
 build-deb:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_BRANCH == 'dev'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -81,20 +81,9 @@ publish-pypi:
     - python3 setup.py sdist bdist_wheel
     - python3 -m twine upload dist/*
 
-publish-bionic:
-  stage: publish
-  image: clickable/build-deb:bionic
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~bionic) bionic/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
 publish-focal:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
   script:
@@ -105,7 +94,7 @@ publish-focal:
 
 publish-jammy:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
   script:
@@ -116,7 +105,7 @@ publish-jammy:
 
 publish-kinetic:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
   script:
@@ -127,7 +116,7 @@ publish-kinetic:
 
 publish-lunar:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
   script:
@@ -138,7 +127,7 @@ publish-lunar:
 
 publish-mantic:
   stage: publish
-  image: clickable/build-deb:bionic
+  image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
   script:
