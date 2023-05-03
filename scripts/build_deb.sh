@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RELEASE=${1:-bionic}
+RELEASE=${1:-focal}
 
 docker run \
     -v `pwd`/../:`pwd`/../ \
