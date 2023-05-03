@@ -124,3 +124,25 @@ publish-kinetic:
     - sed -i "s/) unstable/~kinetic) kinetic/g" debian/changelog
     - debuild -S
     - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
+
+publish-lunar:
+  stage: publish
+  image: clickable/build-deb:bionic
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ./scripts/setup_gpg_keys.sh
+    - sed -i "s/) unstable/~lunar) lunar/g" debian/changelog
+    - debuild -S
+    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
+
+publish-mantic:
+  stage: publish
+  image: clickable/build-deb:bionic
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ./scripts/setup_gpg_keys.sh
+    - sed -i "s/) unstable/~mantic) mantic/g" debian/changelog
+    - debuild -S
+    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
