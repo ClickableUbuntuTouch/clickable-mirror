@@ -151,7 +151,6 @@ class ProjectConfig(BaseConfig):
             'kill': None,
             'scripts': {},
             'default': [],
-            'log': None,
             'dependencies_host': [],
             'dependencies_target': [],
             'dependencies_ppa': [],

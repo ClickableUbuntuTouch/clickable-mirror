@@ -24,9 +24,6 @@ class LogCommand(Command):
             logger.debug("Using UT 16.04 log command")
 
             log = f'~/.cache/upstart/application-click-{package_name}.log'
-            if self.config.log:
-                log = self.config.log
-
             self.device.run_command(f'cat {log}')
         else:
             logger.debug("Using UT 20.04 log command")
