@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.12.2
+------------------
+
+- Added support for Lunar and Mantic to the Ubuntu PPA
+
 Changes in v7.12.1
 ------------------
 
