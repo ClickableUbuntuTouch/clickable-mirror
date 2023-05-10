@@ -1,3 +1,9 @@
+clickable (7.12.2) unstable; urgency=medium
+
+  * Added support for Lunar and Mantic to the Ubuntu PPA
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 10 May 2023 08:27:25 -0500
+
 clickable (7.12.1) unstable; urgency=medium
 
   * Fixed CMake install prefix bug
