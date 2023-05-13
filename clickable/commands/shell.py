@@ -3,6 +3,7 @@ import os
 import shlex
 from subprocess import CalledProcessError
 
+from clickable.utils import run_subprocess_check_call
 from clickable.config.constants import Constants
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
@@ -94,7 +95,8 @@ class ShellCommand(Command):
         http://bazaar.launchpad.net/~phablet-team/phablet-tools/trunk/view/head:/phablet-shell
         '''
         if self.device.connection == 'ssh':
-            self.device.run_command("bash")
+            command = self.device.get_ssh_command("", interactive=True)
+            run_subprocess_check_call(command)
         elif self.device.connection == 'adb':
             port = self.setup_ssh_via_adb()
 

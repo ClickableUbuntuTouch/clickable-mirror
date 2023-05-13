@@ -154,6 +154,7 @@ class Device():
                 command += ['-o', f'Port={self.config.ssh_port}']
 
             command += [src, f'phablet@{self.config.ipv4}:{dst}']
+            command = " ".join(command)
         elif self.connection == "adb":
             adb_args = self.get_adb_args()
             command = f'adb {adb_args} push {src} {dst}'
@@ -177,8 +178,9 @@ class Device():
 
         return f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
 
-    def get_ssh_command(self, command, forward_port=None):
-        return assemble_ssh_command(self.config.ipv4, self.config.ssh_port, command, forward_port)
+    def get_ssh_command(self, command, *args, **kwargs):
+        return assemble_ssh_command(
+            self.config.ipv4, self.config.ssh_port, command, *args, **kwargs)
 
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if not cwd:
@@ -228,8 +230,8 @@ def detect_adb_attached():
     return devices
 
 
-def assemble_ssh_command(ipv4, ssh_port, command, forward_port=None):
-    ssh_args = "-T"
+def assemble_ssh_command(ipv4, ssh_port, command, forward_port=None, interactive=False):
+    ssh_args = "" if interactive else "-T"
 
     if ssh_port:
         ssh_args = f"{ssh_args} -o Port={ssh_port}"
@@ -240,4 +242,6 @@ def assemble_ssh_command(ipv4, ssh_port, command, forward_port=None):
     if isinstance(command, list):
         command = " && ".join(command)
 
-    return f'echo "{command}" | ssh {ssh_args} phablet@{ipv4}'
+    command_pipe = f'echo "{command}" | ' if command else ""
+
+    return f'{command_pipe} ssh {ssh_args} phablet@{ipv4}'
