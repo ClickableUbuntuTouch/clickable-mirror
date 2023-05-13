@@ -293,7 +293,8 @@ class ProjectConfig(BaseConfig):
                 logger.info(
                     'Architecture set to "%s" from device', self.config['arch']
                 )
-            elif self.global_config.build.default_arch:
+            elif self.global_config.build.default_arch and \
+                    self.global_config.build.default_arch != "detect":
                 self.config['arch'] = self.global_config.build.default_arch
                 logger.info(
                     'Architecture set to "%s" from Clickable config', self.config['arch']

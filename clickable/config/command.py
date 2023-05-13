@@ -9,3 +9,4 @@ class CommandConf():
     def __init__(self):
         self.device_command = False
         self.arch_specific = False
+        self.build_command = False

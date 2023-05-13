@@ -18,6 +18,7 @@ class Device():
         self.config = config
         self.connection = None
         self.device_arch = None
+        self.ssh_welcome_touched = False
 
         self.determine_device()
 
@@ -67,9 +68,10 @@ class Device():
             return None
 
         logger.info('Trying to detect device via SSH at %s ...', self.config.ipv4)
-        command = get_ssh_command(self.config.ipv4, self.config.ssh_port, detect_command)
+        command = self.get_ssh_command(detect_command)
 
         try:
+            self.touch_ssh_welcome_message()
             self.device_arch = run_subprocess_check_output(command, shell=True).strip()
             self.connection = 'ssh'
             logger.info("Detected %s device via SSH", self.device_arch)
@@ -135,6 +137,12 @@ class Device():
     def forward_port_adb(self, host, target):
         self.forward_port_adb_with_args(host, target, self.get_adb_args())
 
+    def touch_ssh_welcome_message(self):
+        if not self.ssh_welcome_touched:
+            omit_welcome_command = self.get_ssh_command("touch /home/phablet/.hushlogin")
+            run_subprocess_check_call(omit_welcome_command, shell=True)
+            self.ssh_welcome_touched = True
+
     def push_file(self, src, dst):
         dir_path = os.path.dirname(dst)
         self.run_command(f'mkdir -p {dir_path}')
@@ -169,6 +177,9 @@ class Device():
 
         return f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
 
+    def get_ssh_command(self, command, forward_port=None):
+        return assemble_ssh_command(self.config.ipv4, self.config.ssh_port, command, forward_port)
+
     def run_command(self, command, cwd=None, get_output=False, forward_port=None):
         if not cwd:
             cwd = os.getcwd()
@@ -176,8 +187,8 @@ class Device():
         wrapped_command = ''
         if self.connection == "ssh":
             logger.debug("Accessing %s via SSH", self.config.ipv4)
-            wrapped_command = get_ssh_command(
-                self.config.ipv4, self.config.ssh_port, command, forward_port)
+            self.touch_ssh_welcome_message()
+            wrapped_command = self.get_ssh_command(command, forward_port)
         elif self.connection == "adb":
             logger.debug("Accessing device via ADB")
             wrapped_command = self.get_adb_command(command, forward_port)
@@ -217,8 +228,8 @@ def detect_adb_attached():
     return devices
 
 
-def get_ssh_command(ipv4, ssh_port, command, forward_port=None):
-    ssh_args = ""
+def assemble_ssh_command(ipv4, ssh_port, command, forward_port=None):
+    ssh_args = "-T"
 
     if ssh_port:
         ssh_args = f"{ssh_args} -o Port={ssh_port}"

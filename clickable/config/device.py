@@ -82,6 +82,9 @@ class DeviceConfig(BaseConfig):
         if self.config['selection'] == 'ssh' and not self.config['ipv4']:
             raise ClickableException("Cannot use SSH without an IP address specified")
 
+        if self.config['always_detect']:
+            self.config['required'] = True
+
 
 class GlobalDeviceConfig(BaseConfig):
     def __init__(self, config_file):

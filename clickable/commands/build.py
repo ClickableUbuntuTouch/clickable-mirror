@@ -25,6 +25,7 @@ class BuildCommand(Command):
         super().__init__()
         self.cli_conf.name = 'build'
         self.cli_conf.help_msg = 'Build the app and/or libraries'
+        self.command_conf.build_command = True
 
         self.clean = False
         self.output_path = None

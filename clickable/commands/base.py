@@ -37,11 +37,13 @@ class Command():
 
     def create_device(self, args):
         device_args = args if self.command_conf.device_command else None
-        device_required = self.command_conf.device_command or args.arch == 'detect'
+        device_required_pre = self.command_conf.device_command or args.arch == 'detect'
         device_config = DeviceConfig(self.global_config.device.config, device_args,
-                                     device_required)
+                                     device_required_pre)
 
-        if device_required or device_config.always_detect:
+        may_use = self.command_conf.build_command and \
+            self.global_config.build.default_arch == 'detect'
+        if device_config.required or may_use:
             self.device = Device(device_config)
 
     def check_errors(self):
