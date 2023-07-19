@@ -140,7 +140,6 @@ class LibConfig():
             )
 
         self.config['arch_triplet'] = Constants.arch_triplet_mapping[self.config['arch']]
-        self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.config['arch']]
 
         for key in self.path_keys:
             if key not in self.accepts_placeholders and self.config[key]:
