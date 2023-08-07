@@ -1,3 +1,9 @@
+clickable (7.12.3) unstable; urgency=medium
+
+  * Fixed crash when using arch "all" for libs
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 27 Jul 2023 12:30:13 -0500
+
 clickable (7.12.2) unstable; urgency=medium
 
   * Added support for Lunar and Mantic to the Ubuntu PPA

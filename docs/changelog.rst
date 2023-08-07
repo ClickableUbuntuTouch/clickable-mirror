@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v7.12.3
+------------------
+
+- Fixed crash when using arch "all" for libs
+
 Changes in v7.12.2
 ------------------
 
