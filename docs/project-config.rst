@@ -495,7 +495,7 @@ The default is ``qmltestrunner``.
 
 libraries
 ---------
-Optional, dependencies to be build by running ``clickable build-libs``.
+Optional, dependencies to be build by running ``clickable build --libs``.
 It's a dictionary of dictionaries similar to the project config itself. Example:
 
 .. code-block:: yaml
