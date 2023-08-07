@@ -3,10 +3,15 @@
 Changelog
 =========
 
-Changes in v7.12.2
+Changes in v7.12.3
 ------------------
 
 - Fixed crash when using arch "all" for libs
+
+Changes in v7.12.2
+------------------
+
+- Added support for Lunar and Mantic to the Ubuntu PPA
 
 Changes in v7.12.1
 ------------------
