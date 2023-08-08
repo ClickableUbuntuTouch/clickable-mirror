@@ -110,6 +110,14 @@ class Container():
         except subprocess.CalledProcessError:
             pass
 
+        try:
+            run_subprocess_check_output(
+                shlex.split('systemctl --user is-active --quiet docker-desktop'),
+                stderr=subprocess.STDOUT)
+            return True
+        except subprocess.CalledProcessError:
+            pass
+
         return False
 
     def check_docker(self):
