@@ -171,7 +171,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
 
         output_path = os.path.join(self.project_path, 'CMakeLists.txt.user.shared')
         # now read template and generate the .shared file to the root project dir
-        with open(self.template_path, 'r', encoding='UTF-8') as infile2,\
+        with open(self.template_path, 'r', encoding='UTF-8') as infile2, \
                 open(output_path, 'w', encoding='UTF-8') as outfile:
             for line in infile2:
                 for f_key, f_value in template_replacement.items():
