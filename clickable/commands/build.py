@@ -325,7 +325,7 @@ class BuildCommand(Command):
         for lib in self.config.lib_configs:
             dirs.append(os.path.join(lib.install_dir, "lib"))
 
-        return [d for d in dirs if os.path.isdir(d)]
+        return list({os.path.realpath(d) for d in dirs if os.path.isdir(d)})
 
     def get_bin_dirs(self):
         command = "echo ${PATH}"
