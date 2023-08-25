@@ -93,3 +93,7 @@ class TestTemplates(IntegrationTest):
     def test_rust(self):
         self.create_and_run('Rust', 'amd64')
         self.assertClickExists('amd64')
+
+    def test_godot_plugin(self):
+        self.create_and_run('Godot (Precompiled)', 'amd64')
+        self.assertClickExists('amd64')
