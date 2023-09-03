@@ -6,6 +6,7 @@ from clickable.commands.idedelegates.qtcreator import QtCreatorDelegate
 
 from .base_test import UnitTest
 from unittest import mock
+from ..mocks import true_fn
 
 
 class TestIdeQtCreatorCommand(UnitTest):
@@ -42,28 +43,68 @@ class TestIdeQtCreatorCommand(UnitTest):
 
     def test_command_overrided(self):
 
-        # path should not be added to qtcreator command if no clickable.json found
+        # project path should not be added to qtcreator command if not a cmake/qmake/qbs project
         path_arg = self.idedelegate.override_command('qtcreator')
         self.assertEqual(
             path_arg,
             'qtcreator -settingspath {} '.format(Constants.clickable_dir)
         )
 
-        # create a fake clickable.json file, overrided path should now be with the current dir
-        open(os.path.join(self.idedelegate.project_path, 'clickable.json'), 'a')
-        path_arg = self.idedelegate.override_command('qtcreator')
-        self.assertEqual(
-            path_arg,
-            'qtcreator -settingspath {} {}'.format(
-                Constants.clickable_dir,
-                self.idedelegate.project_path
-            )
+        # supported projects
+        expected_path = 'qtcreator -settingspath {} {}'.format(
+            Constants.clickable_dir,
+            self.idedelegate.project_path
         )
+
+        # cmake project
+        open(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt'), 'a').close()
+        path_arg = self.idedelegate.override_command('qtcreator')
+        self.assertEqual(path_arg, expected_path)
+        os.remove(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt'))
+
+        # qmake
+        open(os.path.join(self.idedelegate.project_path, 'fakeProject.pro'), 'a').close()
+        path_arg = self.idedelegate.override_command('qtcreator')
+        self.assertEqual(path_arg, expected_path)
+        os.remove(os.path.join(self.idedelegate.project_path, 'fakeProject.pro'))
+
+        # qbs
+        open(os.path.join(self.idedelegate.project_path, 'fakeProject.qbs'), 'a').close()
+        path_arg = self.idedelegate.override_command('qtcreator')
+        self.assertEqual(path_arg, expected_path)
+        os.remove(os.path.join(self.idedelegate.project_path, 'fakeProject.qbs'))
 
     def test_initialize_qtcreator_conf(self):
 
         self.idedelegate.before_run(None, self.docker_config)
         self.assertTrue(os.path.isdir('/tmp/tests/.clickable/QtProject'))
+
+    @mock.patch('clickable.commands.idedelegates.qtcreator.QtCreatorDelegate.init_cmake_project',
+                side_effect=true_fn)
+    def test_project_pre_configured(self, mock_init_cmake_project):
+
+        # no cmake file
+        self.idedelegate.before_run(None, self.docker_config)
+        mock_init_cmake_project.assert_not_called()
+
+        # project already configured
+        open(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt.user.shared'),
+             'a').close()
+        self.idedelegate.before_run(None, self.docker_config)
+        mock_init_cmake_project.assert_not_called()
+        os.remove(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt.user.shared'))
+
+        # if not a cmake builder, must not be called
+        for builder in [Constants.QBS, Constants.QMAKE, Constants.PURE_QML_QMAKE, Constants.RUST]:
+            self.config.builder = builder
+            self.idedelegate.before_run(None, self.docker_config)
+            mock_init_cmake_project.assert_not_called()
+
+        # now should try to pre-configure only if the project is a cmake project
+        self.config.builder = Constants.CMAKE
+        open(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt'), 'a').close()
+        self.idedelegate.before_run(None, self.docker_config)
+        mock_init_cmake_project.assert_called()
 
     def test_recurse_replace(self):
 
@@ -101,9 +142,9 @@ class TestIdeQtCreatorCommand(UnitTest):
     )
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_exec_args')
     def test_init_cmake_project_no_to_prompt(
-        self,
-        find_any_executable_mock,
-        find_any_exec_args_mock
+            self,
+            find_any_executable_mock,
+            find_any_exec_args_mock
     ):
         # mock prompt
         original_input = mock.builtins.input
@@ -145,9 +186,9 @@ class TestIdeQtCreatorCommand(UnitTest):
     )
     @mock.patch('clickable.config.file_helpers.ProjectFiles.find_any_exec_args', return_value=[])
     def test_init_cmake_project_exe_as_var(
-        self,
-        find_any_executable_mock,
-        find_any_exec_args_mock
+            self,
+            find_any_executable_mock,
+            find_any_exec_args_mock
     ):
         # Exec command as variable
         cmake_file = open(os.path.join(self.idedelegate.project_path, 'CMakeLists.txt'), 'w')
