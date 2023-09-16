@@ -289,7 +289,7 @@ class ProjectConfig(BaseConfig):
                 )
             elif device_arch:
                 self.config['arch'] = device_arch
-                logger.info(
+                logger.debug(
                     'Architecture set to "%s" from device', self.config['arch']
                 )
             elif self.global_config.build.default_arch and \

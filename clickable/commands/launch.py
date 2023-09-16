@@ -78,5 +78,5 @@ class LaunchCommand(Command):
             logger.debug("Using UT 20.04 launch command")
             launch = f'lomiri-app-launch {self.package}'
 
-        logger.info("Launching app.")
-        self.device.run_command(f'sleep 1s && {launch}', cwd=cwd)
+        logger.info("Launching app")
+        self.device.run_command(launch, cwd=cwd)

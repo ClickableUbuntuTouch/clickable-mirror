@@ -51,7 +51,7 @@ class Command():
                 and self.config.arch != "all" and self.config.arch != self.device.device_arch):
             raise ClickableException(
                 f'The device architecture {self.device.device_arch} does not match '
-                'the configured architecture {self.config.arch}')
+                f'the configured architecture {self.config.arch}.')
 
     def start(self, args):
         self.parse_common_options(args)
