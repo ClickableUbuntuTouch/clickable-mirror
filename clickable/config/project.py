@@ -9,7 +9,8 @@ import yaml
 
 from clickable.config.base import BaseConfig
 from clickable.system.queries.nvidia_drivers_in_use import NvidiaDriversInUse
-from clickable.version import __version__, is_newer_than_running, split_version_numbers
+from clickable.version import __version__, get_major_version, is_newer_than_running, \
+    split_version_numbers
 from clickable.exceptions import ClickableException
 
 from .libconfig import LibConfig, LibInitConfig
@@ -724,7 +725,8 @@ class ProjectConfig(BaseConfig):
 
     def is_device_cmd(self):
         return bool(set(['install', 'launch', 'log', 'logs', 'no_lock', 'writable_image',
-                    'screenshots', 'shell', 'devices', 'gdbserver']).intersection(self.commands))
+                    'screenshots', 'shell', 'devices', 'gdbserver', 'update-images',
+                         'clean-images']).intersection(self.commands))
 
     def needs_builder(self):
         return self.is_build_cmd()
@@ -745,6 +747,7 @@ class ProjectConfig(BaseConfig):
     def check_clickable_version(self):
         migration_link = 'https://clickable-ut.dev/en/dev/migration.html'
         minimum_required = self.config['clickable_minimum_required']
+        running_major = get_major_version()
 
         if self.config['clickable_minimum_required']:
             clickable_required_numbers = []
@@ -772,15 +775,15 @@ class ProjectConfig(BaseConfig):
                     f'This project requires Clickable version {minimum_required} '
                     f'({__version__} is used). Please update Clickable!')
 
-            if clickable_required_numbers[0] < 7:
+            if clickable_required_numbers[0] < running_major:
                 logger.warning('This project is configured for Clickable version %s according to '
                                'the "clickable_minimum_required" field. See %s for details about '
-                               'migration to Clickable 7.', clickable_required_numbers[0],
-                               migration_link)
+                               'migration to Clickable %s.', clickable_required_numbers[0],
+                               migration_link, running_major)
         elif not self.is_project_independent_cmd():
             logger.warning('This project does not have a required Clickable version configured '
                            '("clickable_minimum_required"). See %s for details about migration to '
-                           'Clickable 7 if you run into issues.', migration_link)
+                           'Clickable %s if you run into issues.', migration_link, running_major)
 
     def check_arch_restrictions(self):
         if self.is_arch_agnostic():

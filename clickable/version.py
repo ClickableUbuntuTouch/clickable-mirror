@@ -30,6 +30,10 @@ def split_version_numbers(version_string):
     ]
 
 
+def get_major_version():
+    return split_version_numbers(__version__)[0]
+
+
 def is_newer_than_running(version_numbers):
     running_version = split_version_numbers(__version__)
 
