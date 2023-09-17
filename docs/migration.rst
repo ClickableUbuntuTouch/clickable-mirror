@@ -41,9 +41,6 @@ removal of the ``cordova`` builder.
 Clickable Config
 ----------------
 
-Default Architecture
-====================
-
 Since Clickable 7, the default architecture is the host one, meant to
 facilitate the Desktop Mode Use Case, e.g. a seemless
 ``clickable build --libs``, followed by ``clickable desktop``. For testing
@@ -67,3 +64,24 @@ section became superfluous and is deprecated and ignored in Clickable 8.
 You can set a ``default_target`` in the ``device`` section. This way you can
 control whether SSH or ADB takes precedence or you can set the ``host`` target
 if you run Clickable inside an Ubuntu Touch environment.
+
+NodeJS Removal
+--------------
+
+With the drop of Cordova support, nodejs was removed from the docker images
+as well. If your app depends on it, you need to add it to your
+``dependencies_host``. In order to get an up-to-date version of nodejs,
+consider adding a repo via the ``image_setup`` field, e.g.:
+
+
+.. code-block:: yaml
+
+    image_setup:
+      run:
+      # Install instructions taken from https://github.com/nodesource/distributions#installation-instructions
+      - mkdir -p /etc/apt/keyrings
+      - curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+      - echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
+    dependencies_host:
+    - nodejs
