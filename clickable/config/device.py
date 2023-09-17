@@ -16,7 +16,7 @@ class DeviceConfig(BaseConfig):
             'serial_number': None,
             'skip_uninstall': False,
             'selection': 'detect',
-            'default_device': 'ssh',
+            'default_target': 'ssh',
             'required': device_required,
             'always_detect': False,
         }
@@ -58,8 +58,8 @@ class DeviceConfig(BaseConfig):
             self.config['ipv4'] = ssh_arg
 
     def configure(self, args=None):
-        if env('CLICKABLE_DEFAULT_DEVICE'):
-            self.config['default_device'] = env('CLICKABLE_DEFAULT_DEVICE')
+        if env('CLICKABLE_DEFAULT_TARGET'):
+            self.config['default_target'] = env('CLICKABLE_DEFAULT_TARGET')
 
         if env('CLICKABLE_SSH'):
             self.parse_ssh_config(env('CLICKABLE_SSH'))
@@ -100,7 +100,7 @@ class GlobalDeviceConfig(BaseConfig):
             'ssh_port': None,
             'serial_number': None,
             'skip_uninstall': False,
-            'default_device': None,
+            'default_target': None,
             'always_detect': False,
         }
 

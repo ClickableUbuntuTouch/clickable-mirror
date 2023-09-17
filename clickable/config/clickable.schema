@@ -13,7 +13,7 @@
         "ipv4": {"type": "string"},
         "ssh_port": {"type": "integer"},
         "serial_number": {"type": "string"},
-        "default_device": {
+        "default_target": {
           "type": "string",
           "enum": [
             "ssh",

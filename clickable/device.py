@@ -32,12 +32,12 @@ class Device():
             self.detect_arch(detect_command)
 
     def detect_connection(self, detect_command):
-        if self.config.default_device == 'host':
+        if self.config.default_target == 'host':
             self.set_host_device()
             return
 
         adb_checked = False
-        if self.config.default_device == 'adb':
+        if self.config.default_target == 'adb':
             adb_checked = True
             if self.detect_adb_arch(detect_command):
                 return

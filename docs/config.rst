@@ -53,7 +53,7 @@ Device serial number for connecting via ADB.
 
 Can be overwritten on command line with ``--serial-number``.
 
-default_device
+default_target
 ^^^^^^^^^^^^^^
 
 Target device used by default. Allowed values are ``ssh``, ``adb``, ``host``
