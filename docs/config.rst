@@ -39,6 +39,8 @@ device
 
 Default configurations for the target device.
 
+.. _ipv4
+
 ipv4
 ^^^^
 
@@ -52,6 +54,8 @@ serial_number
 Device serial number for connecting via ADB. 
 
 Can be overwritten on command line with ``--serial-number``.
+
+.. _default_target
 
 default_target
 ^^^^^^^^^^^^^^
