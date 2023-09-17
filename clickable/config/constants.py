@@ -8,7 +8,6 @@ class Constants():
     PURE_QML_CMAKE = 'pure-qml-cmake'
     CMAKE = 'cmake'
     CUSTOM = 'custom'
-    CORDOVA = 'cordova'
     PURE = 'pure'
     QBS = 'qbs'
     GO = 'go'
@@ -27,7 +26,6 @@ class Constants():
         PURE_QML_CMAKE,
         CMAKE,
         CUSTOM,
-        CORDOVA,
         PURE,
         QBS,
         GO,

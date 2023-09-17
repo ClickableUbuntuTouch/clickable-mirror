@@ -326,13 +326,8 @@ class ProjectConfig(BaseConfig):
             )
 
         if not self.config['kill']:
-            if self.config['builder'] == Constants.CORDOVA:
-                self.config['kill'] = 'cordova-ubuntu'
-            elif (
-                self.config['builder'] == Constants.PURE_QML_CMAKE or
-                self.config['builder'] == Constants.PURE_QML_QMAKE or
-                self.config['builder'] == Constants.PURE
-            ):
+            if self.config['builder'] in [Constants.PURE_QML_CMAKE,
+                                          Constants.PURE_QML_QMAKE, Constants.PURE]:
                 self.config['kill'] = 'qmlscene'
             else:
                 try:
@@ -923,7 +918,8 @@ class ProjectConfig(BaseConfig):
         directory = os.listdir(self.cwd)
 
         if 'config.xml' in directory:
-            builder = Constants.CORDOVA
+            logger.warning(
+                "This looks like a Cordova project. Cordova support was dropped in Clickable 8.")
 
         if not builder and 'CMakeLists.txt' in directory:
             builder = Constants.CMAKE

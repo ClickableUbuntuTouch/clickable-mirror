@@ -29,13 +29,6 @@ custom
 
 A custom build command will be used.
 
-cordova
--------
-
-A project that builds using cordova
-
-Note: This builder is deprecated and subject to removal in the next major version of Clickable.
-
 pure
 ----
 
@@ -55,11 +48,6 @@ qbs
 
 A project that builds using QBS.
 
-python
-------
-
-Deprecated, use "precompiled" instead.
-
 go
 --
 
@@ -69,3 +57,11 @@ rust
 ----
 
 A project that uses rust. Debug builds can be enabled by specifying ``--debug``.
+
+Removed Builders
+----------------
+
+The following builders are no longer supported:
+
+- ``python`` (use ``precompiled`` or ``pure`` instead)
+- ``cordova``
