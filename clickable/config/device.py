@@ -31,20 +31,20 @@ class DeviceConfig(BaseConfig):
         command_group = parser.add_mutually_exclusive_group()
         command_group.add_argument(
             '--ssh',
-            help='IPv4 address where device is reachable via SSH. '
-            'Disables device detection.',
+            help='IPv4 address or hostname where device is reachable via SSH. '
+            'Implies --target ssh.',
             default=None
         )
         command_group.add_argument(
             '--serial-number',
             '-s',
             help='Device or emulator with the given serial number or qualifier (using adb). '
-            'Disables device detection.',
+            'Implies --target adb.',
             default=None
         )
         command_group.add_argument(
-            '--device',
-            '-d',
+            '--target',
+            '-t',
             choices=['ssh', 'adb', 'host', 'detect'],
             help='Target device. "detect" considers SSH first, then ADB, but never "host".',
         )
@@ -68,14 +68,22 @@ class DeviceConfig(BaseConfig):
             self.config['serial_number'] = env('CLICKABLE_SERIAL_NUMBER')
 
         if args:
-            if args.device:
-                self.config['selection'] = args.device
+            if args.target:
+                self.config['selection'] = args.target
 
             if args.serial_number:
+                if args.target and args.target != 'abd':
+                    raise ClickableException(
+                        f'--target {args.target} cannot be combined with --serial-number')
+
                 self.config['serial_number'] = args.serial_number
                 self.config['selection'] = 'abd'
 
             if args.ssh:
+                if args.target and args.target != 'ssh':
+                    raise ClickableException(
+                        f'--target {args.target} cannot be combined with --ssh')
+
                 self.parse_ssh_config(args.ssh)
                 self.config['selection'] = 'ssh'
 
