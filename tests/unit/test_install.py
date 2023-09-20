@@ -2,7 +2,6 @@ from unittest import mock
 from unittest.mock import ANY
 
 from clickable.commands.install import InstallCommand
-from clickable.config.constants import Constants
 from ..mocks import empty_fn, true_fn
 from .base_test import UnitTest
 
@@ -12,17 +11,19 @@ class TestInstallCommand(UnitTest):
         self.command = InstallCommand()
         self.setUpWithTmpBuildDir()
 
-    @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     @mock.patch('clickable.device.Device.push_file', side_effect=empty_fn)
+    @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_install(
         self,
+        mock_run_command,
         mock_push_file,
-        mock_run_command
     ):
         self.command.run()
+
+        click_name = f'foo.bar_1.2.3_{self.command.config.arch}.click'
         mock_push_file.assert_called_once_with(
-            '/tmp/build/foo.bar_1.2.3_{}.click'.format(Constants.host_arch),
-            '/home/phablet/'
+            f'/tmp/build/{click_name}',
+            f'/home/phablet/{click_name}'
         )
         mock_run_command.assert_called_with(ANY, cwd='/tmp/build')
 

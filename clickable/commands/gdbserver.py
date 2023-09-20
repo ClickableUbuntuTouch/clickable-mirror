@@ -14,6 +14,8 @@ class GdbserverCommand(Command):
         self.cli_conf.name = 'gdbserver'
         self.cli_conf.help_msg = 'Opens a gdbserver session on the device accessible ' \
             'at localhost:<port> (port 3333 by default)'
+        self.command_conf.device_command = True
+        self.command_conf.arch_specific = True
 
         self.port = 3333
         self.app_dir = None
@@ -198,7 +200,7 @@ class GdbserverCommand(Command):
         self.device.push_file('/tmp/clickable/gdbserver', '/home/phablet/bin/gdbserver')
 
     def start_gdbserver(self):
-        if not self.config.ssh:
+        if self.device.connection != "ssh":
             logger.warning(
                 'SSH is recommended for the "gdbserver" command. If you experience '
                 'any issues, try again with "--ssh"'

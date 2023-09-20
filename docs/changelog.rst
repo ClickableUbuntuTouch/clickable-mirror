@@ -176,7 +176,7 @@ Changes in v7.0.1
 Changes in v7.0.0
 -----------------
 
-For information on breaking changes and how to migrate from Clickable v6, check the :ref:`Migration Guide <migration>`.
+For information on breaking changes and how to migrate from Clickable v6, check the :ref:`Migration Guide <migration7>`.
 There is also a migration tool referenced in the guide.
 
 New features

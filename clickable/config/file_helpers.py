@@ -1,10 +1,8 @@
 import os
 import glob
 import json
-from xml.etree import ElementTree
 
 from clickable.exceptions import ClickableException
-from .constants import Constants
 from ..utils import (
     find
 )
@@ -87,52 +85,25 @@ class InstallFiles():
         self.builder = builder
         self.arch = arch
 
-    def find_version(self):
-        if self.builder == Constants.CORDOVA:
-            tree = ElementTree.parse('config.xml')
-            root = tree.getroot()
-            version = root.attrib['version'] if 'version' in root.attrib else '1.0.0'
-        else:
-            version = self.get_manifest().get('version', '1.0')
+    def find_or_raise(self, key, name=None):
+        value = self.get_manifest().get(key, None)
 
-        return version
+        if not value:
+            name = name if name else key
+            raise ClickableException(
+                f'No {name} specified in manifest.json'
+            )
+
+        return value
+
+    def find_version(self):
+        return self.find_or_raise('version')
 
     def find_package_name(self):
-        if self.builder == Constants.CORDOVA:
-            tree = ElementTree.parse('config.xml')
-            root = tree.getroot()
-            package = root.attrib['id'] if 'id' in root.attrib else None
-
-            if not package:
-                raise ClickableException('No package name specified in config.xml')
-
-        else:
-            package = self.get_manifest().get('name', None)
-
-            if not package:
-                raise ClickableException(
-                    'No package name specified in manifest.json or project config'
-                )
-
-        return package
+        return self.find_or_raise('name', 'package name')
 
     def find_package_title(self):
-        if self.builder == Constants.CORDOVA:
-            tree = ElementTree.parse('config.xml')
-            root = tree.getroot()
-            title = root.attrib['name'] if 'name' in root.attrib else None
-
-            if not title:
-                raise ClickableException('No package title specified in config.xml')
-
-        else:
-            title = self.get_manifest().get('title', None)
-
-            if not title:
-                raise ClickableException(
-                    'No package title specified in manifest.json or project config')
-
-        return title
+        return self.find_or_raise('title', 'package title')
 
     def find_app_name(self):
         app = None

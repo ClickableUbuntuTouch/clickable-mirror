@@ -8,6 +8,7 @@ class LogsCommand(Command):
         super().__init__()
         self.cli_conf.name = 'logs'
         self.cli_conf.help_msg = 'Follow the app\'s log file on the device'
+        self.command_conf.device_command = True
 
     def run(self):
         if self.config.is_desktop_mode():
@@ -24,15 +25,12 @@ class LogsCommand(Command):
             logger.debug("Using UT 16.04 log command")
 
             log = f'~/.cache/upstart/application-click-{package_name}.log'
-            if self.config.log:
-                log = self.config.log
-
             self.device.run_command(f'tail -f {log}')
 
         else:
             logger.debug("Using UT 20.04 log command")
 
             self.device.run_command(
-                f'journalctl --user --no-tail --follow -u \
-                lomiri-app-launch--application-click--{package_name}-- 1>&2',
+                'journalctl --user --no-tail --follow -u '
+                f'lomiri-app-launch--application-click--{package_name}-- 1>&2',
             )

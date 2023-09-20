@@ -16,7 +16,8 @@ class TestLogsCommand(UnitTest):
         self.command.run()
 
         mock_run_command.assert_called_once_with(
-            'tail -f ~/.cache/upstart/application-click-foo.bar_foo_1.2.3.log'
+            'journalctl --user --no-tail --follow -u '
+            'lomiri-app-launch--application-click--foo.bar_foo_1.2.3-- 1>&2'
         )
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
@@ -24,7 +25,9 @@ class TestLogsCommand(UnitTest):
         self.config.log = 'foo.log'
         self.command.run()
 
-        mock_run_command.assert_called_once_with('tail -f foo.log')
+        mock_run_command.assert_called_once_with(
+            'journalctl --user --no-tail --follow -u '
+            'lomiri-app-launch--application-click--foo.bar_foo_1.2.3-- 1>&2')
 
     @mock.patch('clickable.config.project.ProjectConfig.is_desktop_mode', side_effect=true_fn)
     @mock.patch('clickable.commands.logs.logger.debug', side_effect=empty_fn)

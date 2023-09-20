@@ -27,7 +27,7 @@ class TestLaunchCommand(UnitTest):
         self.command.run()
 
         mock_run_command.assert_called_once_with(
-            'sleep 1s && ubuntu-app-launch foo.bar_foo_1.2.3',
+            'lomiri-app-launch foo.bar_foo_1.2.3',
             cwd='/tmp/build'
         )
 
@@ -36,4 +36,4 @@ class TestLaunchCommand(UnitTest):
         self.config.launch = 'foo'
         self.command.run()
 
-        mock_run_command.assert_called_once_with('sleep 1s && foo', cwd='/tmp/build')
+        mock_run_command.assert_called_once_with('foo', cwd='/tmp/build')
