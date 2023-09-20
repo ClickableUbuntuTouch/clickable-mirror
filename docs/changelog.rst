@@ -3,6 +3,33 @@
 Changelog
 =========
 
+Changes in v8.0.0
+-----------------
+
+For information on breaking changes and how to migrate from Clickable v6, check the :ref:`Migration Guide <migration8>`.
+
+New Features
+^^^^^^^^^^^^
+
+- Clickable will now :ref:`automatically detect device architecture <device-detection>` for you.
+    - This can be overriden by the new ``default_arch`` configuration.
+- A ``target`` can be specified (either ``adb``, ``ssh``, or ``host``). By default Clickable will auto detect the host.
+    - This can be overriden by the new ``default_target`` configuration.
+
+Breaking Changes
+^^^^^^^^^^^^^^^^
+
+- Focal is now the default framework. All clicks will be built against 20.04 :ref:`unless otherwise specified <project-config-framework>`.
+- Cordova support has been dropped as it is no longer maintained upstream.
+- Node.js has been removed from the Clickable docker images since it is no longer needed for Cordova.
+
+Bug Fixes
+^^^^^^^^^
+
+- Deduplicates directories for ``install_libs`` to reduce warnings.
+- Fixed warning popup when using QtCreator.
+- The ssh welcome message is now suppressed for cleaner log output.
+
 Changes in v7.12.3
 ------------------
 
@@ -182,7 +209,7 @@ There is also a migration tool referenced in the guide.
 New features
 ^^^^^^^^^^^^
 
-- Configure Clickable globally with a new :ref:`configuration file <config.yaml>`.
+- Configure Clickable globally with a new :ref:`configuration file <config>`.
 - Integrated bash completion, to set up run ``clickable setup completion``.
 - Run Clickable from sub-directories, not only project root.
 - Added new ``chain`` command to run multiple Clickable commands in a chain.
@@ -215,7 +242,7 @@ Breaking Changes
 ^^^^^^^^^^^^^^^^
 
 - Overhauled command line interface with proper sub-commands, each providing specific options. See ``clickable --help`` and ``clickable <sub-command> --help``.
-- The default architecture changed from ``armhf`` to the host architecture. If you want the architecture of your test device as default, it can be configured in the :ref:`Clickable config <config.yaml>`.
+- The default architecture changed from ``armhf`` to the host architecture. If you want the architecture of your test device as default, it can be configured in the :ref:`Clickable config <config>`.
 - The default now is to do dirty builds, if you want to do a clean build use ``clickable build --clean`` or set ``always_clean`` config field or ``CLICKABLE_ALWAYS_CLEAN=ON`` env var.
 - Merged the ``build-libs`` command into ``build``.
 - Merged the ``clean-libs`` command into ``clean``.

@@ -56,14 +56,16 @@ Device Access
 -------------
 
 Host Device
-===========
+^^^^^^^^^^^
 
 For Clickable running directly on a Ubuntu Touch system, the target device
 can be set to ``host`` (:ref:`default_target <default_target>` or
 ``--target host``).
 
+.. _device-detection:
+
 Device Detection
-================
+^^^^^^^^^^^^^^^^
 
 For commands accessing a target device, Clickable will try to detect
 whether the device is connected via SSH or ADB and the device architecture
@@ -78,7 +80,7 @@ Setting the (default) target to ``host`` disables the device detection.
 .. _ssh:
 
 Connecting to a device over SSH
-===============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 By default the device is connected to via ADB.
 If you want to access a device over SSH you need to either specify the device
@@ -89,7 +91,7 @@ on your device for this to work.
 .. _multiple-devices:
 
 Multiple connected ADB devices
-==============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 By default Clickable assumes that there is only one device connected to your
 computer via ADB. If you have multiple devices attached to your computer you

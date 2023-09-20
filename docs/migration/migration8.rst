@@ -1,4 +1,4 @@
-.. _migration:
+.. _migration8:
 
 Clickable 8 Migration
 =====================
