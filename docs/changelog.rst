@@ -6,7 +6,7 @@ Changelog
 Changes in v8.0.0
 -----------------
 
-For information on breaking changes and how to migrate from Clickable v6, check the :ref:`Migration Guide <migration8>`.
+For information on breaking changes and how to migrate from Clickable v7, check the :ref:`Migration Guide <migration8>`.
 
 New Features
 ^^^^^^^^^^^^

@@ -1,7 +1,7 @@
 clickable (8.0.0) unstable; urgency=medium
 
   * Clickable will now automatically detect device architecture for you.
-  * A target can be specified (either adb, ssh, or host). By default Clickable will auto detect the host.
+  * A target can be specified (either adb, ssh, or host). By default Clickable will auto detect the target (ssh or adb).
   * Focal is now the default framework. All clicks will be built against 20.04 unless otherwise specified.
   * Cordova support has been dropped as it is no longer maintained upstream.
   * Node.js has been removed from the Clickable docker images since it is no longer needed for Cordova.
