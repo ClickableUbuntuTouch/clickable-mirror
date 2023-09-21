@@ -38,7 +38,7 @@ thank you to all the `contributors <https://gitlab.com/clickable/clickable/graph
     :name: sec-changes
 
     changelog
-    migration/index
+    migration-guides
 
 Getting Started
 ---------------
