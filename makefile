@@ -10,7 +10,7 @@ test:
 	pytest ./tests
 
 test-unit:
-	pytest ./tests/unit
+	pytest --cov=clickable ./tests/unit
 
 test-integration:
-	pytest ./tests/integration
+	pytest --cov=clickable ./tests/integration
