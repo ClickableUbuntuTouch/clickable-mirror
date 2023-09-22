@@ -13,7 +13,7 @@ New Features
 
 - Clickable will now :ref:`automatically detect device architecture <device-detection>` for you.
     - This can be overriden by the new ``default_arch`` configuration.
-- A ``target`` can be specified (either ``adb``, ``ssh``, or ``host``). By default Clickable will auto detect the host.
+- A ``target`` can be specified (either ``adb``, ``ssh``, or ``host``). By default Clickable will auto detect the target (ssh or adb).
     - This can be overriden by the new ``default_target`` configuration.
 
 Breaking Changes
