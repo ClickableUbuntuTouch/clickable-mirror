@@ -39,7 +39,7 @@ device
 
 Default configurations for the target device.
 
-.. _ipv4
+.. _ipv4:
 
 ipv4
 ^^^^
@@ -51,11 +51,11 @@ Can be overwritten on command line with ``--ssh``.
 serial_number
 ^^^^^^^^^^^^^
 
-Device serial number for connecting via ADB. 
+Device serial number for connecting via ADB.
 
 Can be overwritten on command line with ``--serial-number``.
 
-.. _default_target
+.. _default_target:
 
 default_target
 ^^^^^^^^^^^^^^
@@ -154,7 +154,7 @@ Change the default chain of commands to be executed on a pure ``clickable`` or a
 scripts
 ^^^^^^^
 
-Add scripts to be used with the ``script`` command. 
+Add scripts to be used with the ``script`` command.
 
 ide
 ---

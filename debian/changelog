@@ -1,3 +1,17 @@
+clickable (8.0.0) unstable; urgency=medium
+
+  * Clickable will now automatically detect device architecture for you.
+  * A target can be specified (either adb, ssh, or host). By default Clickable will auto detect the target (ssh or adb).
+  * Focal is now the default framework. All clicks will be built against 20.04 unless otherwise specified.
+  * Cordova support has been dropped as it is no longer maintained upstream.
+  * Node.js has been removed from the Clickable docker images since it is no longer needed for Cordova.
+  * Deduplicates directories for install_libs to reduce warnings.
+  * Fixed warning popup when using QtCreator.
+  * The ssh welcome message is now suppressed for cleaner log output.
+  * For more details and breaking changes, see <https://clickable-ut.dev/en/latest/changelog.html>
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 20 Sep 2023 08:34:56 -0500
+
 clickable (7.12.3) unstable; urgency=medium
 
   * Fixed crash when using arch "all" for libs

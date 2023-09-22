@@ -10,26 +10,35 @@ Clickable is developed by `Brian Douglass <http://bhdouglass.com>`__ and
 `Jonatan Hatakeyama Zeidler <https://gitlab.com/jonnius>`__ with a huge
 thank you to all the `contributors <https://gitlab.com/clickable/clickable/graphs/master>`__.
 
-Using Clickable
----------------
-
 .. toctree::
     :maxdepth: 1
-    :name: clickable
+    :name: main
 
     install
     getting-started
     usage
-    config
-    debugging
     commands
+    debugging
+    continuous-integration
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Configuration
+    :name: sec-configuration
+
+    config
     project-config
     env-vars
     app-templates
     builders
-    continuous-integration
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Changes
+    :name: sec-changes
+
     changelog
-    migration
+    migration-guides
 
 Getting Started
 ---------------

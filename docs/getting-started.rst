@@ -9,10 +9,12 @@ Getting Started
 * When the app has finished generating, enter the newly created directory containing your app.
 * Run ``clickable`` to compile your app and install it on your phone.
 
+For more information on Clickable basics, check out the `UBports Clickable video <https://youtu.be/O4vSweahsHs?si=_EMcQGtQNmfJewBR>`__.
+
 Getting Logs
 ------------
 
-To get logs from your app simply run `clickable logs`. This will give you output
+To get logs from your app simply run ``clickable logs``. This will give you output
 from C++ (``QDebug() << "message"``) or from QML (``console.log("message")``)
 in addition to any errors or warnings.
 
