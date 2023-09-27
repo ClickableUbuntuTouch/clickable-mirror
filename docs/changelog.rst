@@ -29,6 +29,7 @@ Bug Fixes
 - Deduplicates directories for ``install_libs`` to reduce warnings.
 - Fixed warning popup when using QtCreator.
 - The ssh welcome message is now suppressed for cleaner log output.
+- Fixed Godot games not having hardware acceleration on Focal.
 
 Changes in v7.12.3
 ------------------

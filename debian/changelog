@@ -8,6 +8,7 @@ clickable (8.0.0) unstable; urgency=medium
   * Deduplicates directories for install_libs to reduce warnings.
   * Fixed warning popup when using QtCreator.
   * The ssh welcome message is now suppressed for cleaner log output.
+  * Fixed Godot games not having hardware acceleration on Focal.
   * For more details and breaking changes, see <https://clickable-ut.dev/en/latest/changelog.html>
 
  -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 20 Sep 2023 08:34:56 -0500
