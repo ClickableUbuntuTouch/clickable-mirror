@@ -12,9 +12,9 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
-__version__ = '7.12.3'
+__version__ = '8.0.0'
 
-__container_minimum_required__ = 9
+__container_minimum_required__ = 10
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
@@ -28,6 +28,10 @@ def split_version_numbers(version_string):
     return [
         int(n) for n in re.split(r'\.', version_string)
     ]
+
+
+def get_major_version():
+    return split_version_numbers(__version__)[0]
 
 
 def is_newer_than_running(version_numbers):

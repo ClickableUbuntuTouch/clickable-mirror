@@ -12,10 +12,10 @@ Example:
 
     device:
       ipv4: 192.168.178.41
-      arch: arm64
 
     build:
       skip_review: true
+      default_arch: arm64
 
     cli:
       default_chain:
@@ -39,6 +39,8 @@ device
 
 Default configurations for the target device.
 
+.. _ipv4:
+
 ipv4
 ^^^^
 
@@ -49,16 +51,32 @@ Can be overwritten on command line with ``--ssh``.
 serial_number
 ^^^^^^^^^^^^^
 
-Device serial number for connecting via ADB. 
+Device serial number for connecting via ADB.
 
 Can be overwritten on command line with ``--serial-number``.
 
-arch
-^^^^
+.. _default_target:
 
-Target architecture used by default.
+default_target
+^^^^^^^^^^^^^^
 
-Can be overwritten on command line with ``--arch``.
+Target device used by default. Allowed values are ``ssh``, ``adb``, ``host``
+and ``detect`` (default value).
+
+====== =================
+Value  Description
+====== =================
+host   Don't detect remote devices and interact with host system instead.
+detect Try to detect a remote device (default behavior)
+ssh    Check via SSH before checking for ADB devices (currently default behavior).
+adb    Check for ADB devices before checking via SSH.
+====== =================
+
+always_detect
+^^^^^^^^^^^^^
+
+Detect the remote device and its architecture even for commands that don't require
+a connection to the device (e.g. ``build``). Behaves like ``--arch detect``
 
 skip_uninstall
 ^^^^^^^^^^^^^^
@@ -66,6 +84,7 @@ skip_uninstall
 Skip uninstall step before installing an app.
 
 Can be overwritten on command line with ``install --skip-uninstall``.
+
 
 build
 -----
@@ -82,6 +101,14 @@ skip_review
 
 Skip automatic review after building. Review can still be executed manually
 using the ``review`` command.
+
+default_arch
+^^^^^^^^^^^^
+
+Target architecture used by default.
+
+Can be overwritten on command line with ``--arch``.
+Allowed values are ``armhf``, ``arm64``, ``amd64`` and ``detect``.
 
 
 environment
@@ -113,6 +140,7 @@ restrict_arch
 
 Restrict the architecture the environment can build for. This is meant to be used
 in conjunction with ``container_mode``.
+Allowed values are ``armhf``, ``arm64``, ``amd64`` and ``host``.
 
 cli
 ---
@@ -126,7 +154,7 @@ Change the default chain of commands to be executed on a pure ``clickable`` or a
 scripts
 ^^^^^^^
 
-Add scripts to be used with the ``script`` command. 
+Add scripts to be used with the ``script`` command.
 
 ide
 ---

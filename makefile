@@ -7,7 +7,7 @@ format:
 	autopep8 --in-place --recursive --aggressive tests
 
 test:
-	pytest --cov=clickable ./tests
+	pytest ./tests
 
 test-unit:
 	pytest --cov=clickable ./tests/unit

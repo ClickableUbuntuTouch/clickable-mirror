@@ -28,7 +28,6 @@
         "pure-qml-cmake",
         "cmake",
         "custom",
-        "cordova",
         "pure",
         "qbs",
         "go",

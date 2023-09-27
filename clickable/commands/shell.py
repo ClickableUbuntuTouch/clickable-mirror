@@ -1,13 +1,10 @@
 import subprocess
 import os
 import shlex
+from subprocess import CalledProcessError
 
+from clickable.utils import run_subprocess_check_call
 from clickable.config.constants import Constants
-from clickable.utils import (
-    run_subprocess_call,
-    run_subprocess_check_output,
-    run_subprocess_check_call
-)
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
 
@@ -20,6 +17,7 @@ class ShellCommand(Command):
         self.cli_conf.name = 'shell'
         self.cli_conf.help_msg = 'Opens a shell on the device via ssh'
         self.aliases = ['ssh']
+        self.command_conf.device_command = True
 
     def toggle_ssh(self, on=False):
         toggle = 'true' if on else 'false'
@@ -27,42 +25,23 @@ class ShellCommand(Command):
                   'com.canonical.PropertyService -o /com/canonical/PropertyService ' \
                   f'-m com.canonical.PropertyService.SetProperty ssh {toggle}\''
 
-        adb_args = ''
-        if self.config.device_serial_number:
-            adb_args = f'-s {self.config.device_serial_number}'
-
-        run_subprocess_call(
-            shlex.split(f'adb {adb_args} shell "{command}"'),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        self.device.run_command(command)
 
     def setup_ssh_via_adb(self):
-        self.device.check_any_adb_attached()
+        output = self.device.run_command("pgrep sshd", get_output=True)
 
-        adb_args = ''
-        if self.config.device_serial_number:
-            adb_args = f'-s {self.config.device_serial_number}'
-        else:
-            self.device.check_multiple_adb_attached()
-
-        output = run_subprocess_check_output(
-            shlex.split(f'adb {adb_args} shell pgrep sshd')
-        ).split()
         if not output:
             self.toggle_ssh(on=True)
 
         # Use the usb cable rather than worrying about going over wifi
         port = 0
         for p in range(2222, 2299):
-            error_code = run_subprocess_call(
-                shlex.split(f'adb {adb_args} forward tcp:{p} tcp:22'),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            if error_code == 0:
+            try:
+                self.device.forward_port_adb(p, 22)
                 port = p
                 break
+            except CalledProcessError:
+                pass
 
         if port == 0:
             raise ClickableException('Failed to open a port to the device')
@@ -98,9 +77,9 @@ class ShellCommand(Command):
         self.device.run_command('[ -d ~/.ssh ] || mkdir ~/.ssh')
         self.device.run_command('touch  ~/.ssh/authorized_keys')
 
-        output = run_subprocess_check_output(
-            f'adb {adb_args} shell "grep \\"{public_key}\\" ~/.ssh/authorized_keys"',
-            shell=True
+        output = self.device.run_command(
+            f"grep '{public_key}' ~/.ssh/authorized_keys",
+            get_output=True
         ).strip()
         if not output or 'No such file or directory' in output:
             logger.info('Inserting ssh public key on the connected device')
@@ -115,14 +94,10 @@ class ShellCommand(Command):
         Inspired by
         http://bazaar.launchpad.net/~phablet-team/phablet-tools/trunk/view/head:/phablet-shell
         '''
-        if self.config.ssh:
-            command = ['ssh', f'phablet@{self.config.ssh}']
-
-            if self.config.ssh_port:
-                command += ['-o', f'Port={self.config.ssh_port}']
-
+        if self.device.connection == 'ssh':
+            command = self.device.get_ssh_command("", interactive=True)
             run_subprocess_check_call(command)
-        else:
+        elif self.device.connection == 'adb':
             port = self.setup_ssh_via_adb()
 
             subprocess.check_call(
@@ -132,3 +107,6 @@ class ShellCommand(Command):
                 )
             )
             self.toggle_ssh(on=False)
+        else:
+            raise ClickableException(
+                f"Shell command does not support {self.device.connection} connection.")

@@ -6,9 +6,9 @@ Continuous Integration
 Clickable CI Docker Images
 --------------------------
 
-Two docker images are available for easily using Clickable with a continuous
-integration setup. They can be found on Docker hub: ``clickable/ci-16.04-armhf``,
-``clickable/ci-16.04-amd64`` and ``clickable/ci-16.04-arm64``.
+CI docker images are available for easily using Clickable with a continuous
+integration setup. They can be found on Docker hub: ``clickable/ci-20.04-armhf``,
+``clickable/ci-20.04-amd64`` and ``clickable/ci-20.04-arm64``.
 The images come with Clickable pre installed and already setup in container mode.
 
 GitLab CI Tutorial

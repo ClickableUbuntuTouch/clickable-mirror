@@ -45,8 +45,8 @@ class Container():
                 self.restore_cached_image()
 
         if self.config.builder == Constants.RUST and self.config.cargo_home:
-            logger.info("Caching cargo related files in %s",
-                        self.config.cargo_home)
+            logger.debug("Caching cargo related files in %s",
+                         self.config.cargo_home)
 
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):

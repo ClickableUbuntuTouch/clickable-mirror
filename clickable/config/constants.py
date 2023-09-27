@@ -8,7 +8,6 @@ class Constants():
     PURE_QML_CMAKE = 'pure-qml-cmake'
     CMAKE = 'cmake'
     CUSTOM = 'custom'
-    CORDOVA = 'cordova'
     PURE = 'pure'
     QBS = 'qbs'
     GO = 'go'
@@ -27,7 +26,6 @@ class Constants():
         PURE_QML_CMAKE,
         CMAKE,
         CUSTOM,
-        CORDOVA,
         PURE,
         QBS,
         GO,
@@ -99,7 +97,7 @@ class Constants():
     }
 
     default_qt_framework_mapping = {
-        '5.12': 'ubuntu-sdk-16.04.5',
+        '5.12': 'ubuntu-sdk-20.04',
     }
 
     default_qt = '5.12'
@@ -108,7 +106,7 @@ class Constants():
         '16.04',
         '20.04',
     ]
-    framework_base_default = '16.04'
+    framework_base_default = '20.04'
 
     arch_triplet_mapping = {
         'armhf': 'arm-linux-gnueabihf',

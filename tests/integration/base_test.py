@@ -4,6 +4,7 @@ import shutil
 
 from clickable.cli import Cli
 from clickable.container import Container
+from clickable.config.device import DeviceConfig
 from clickable.device import Device
 from clickable.exceptions import ClickableException
 from clickable.command_utils import get_commands
@@ -30,7 +31,7 @@ class IntegrationTest(TestCase):
             self.config.interactive = False
             if self.command:
                 self.command.config = self.config
-                self.command.device = Device(self.config)
+                self.command.device = Device(DeviceConfig(base={'selection': 'host'}))
                 self.command.container = Container(self.config)
 
             if expect_exception:

@@ -103,17 +103,6 @@ publish-jammy:
     - debuild -S
     - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
 
-publish-kinetic:
-  stage: publish
-  image: clickable/build-deb:focal
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~kinetic) kinetic/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
 publish-lunar:
   stage: publish
   image: clickable/build-deb:focal

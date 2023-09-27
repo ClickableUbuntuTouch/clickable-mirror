@@ -25,6 +25,7 @@ class BuildCommand(Command):
         super().__init__()
         self.cli_conf.name = 'build'
         self.cli_conf.help_msg = 'Build the app and/or libraries'
+        self.command_conf.build_command = True
 
         self.clean = False
         self.output_path = None
@@ -325,7 +326,7 @@ class BuildCommand(Command):
         for lib in self.config.lib_configs:
             dirs.append(os.path.join(lib.install_dir, "lib"))
 
-        return [d for d in dirs if os.path.isdir(d)]
+        return list({os.path.realpath(d) for d in dirs if os.path.isdir(d)})
 
     def get_bin_dirs(self):
         command = "echo ${PATH}"

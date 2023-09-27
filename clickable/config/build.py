@@ -8,6 +8,7 @@ class BuildConfig(BaseConfig):
         self.config = {
             'always_clean': False,
             'skip_review': False,
+            'default_arch': None,
         }
 
         self.update(config_file)

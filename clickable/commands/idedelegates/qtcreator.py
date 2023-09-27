@@ -26,11 +26,11 @@ class QtCreatorDelegate(IdeCommandDelegate):
         # share the same configuration
         # also add current project's dir to make qtcreator open directly the project
         p = ''
-        if (self.is_cmake_project() or
-                os.path.exists(os.path.join(self.project_path, 'clickable.yaml')) or
-                os.path.exists(os.path.join(self.project_path, 'clickable.yml')) or
-                os.path.exists(os.path.join(self.project_path, 'clickable.json'))):
+        if self.has_cmake_file() or self.has_qmake_file() or self.has_qbs_file():
             p = self.project_path
+        else:
+            logger.info('Unrecognized project, launch QtCreator without project preloaded')
+
         return path.replace('qtcreator', f'qtcreator -settingspath {Constants.clickable_dir} {p}')
 
     def before_run(self, config, docker_config):
@@ -41,10 +41,10 @@ class QtCreatorDelegate(IdeCommandDelegate):
             tar.extractall(Constants.clickable_dir)
             tar.close()
 
-        if self.is_cmake_project() and not os.path.isfile(os.path.join(
+        if self.has_cmake_file() and not os.path.isfile(os.path.join(
             self.project_path,
             'CMakeLists.txt.user'
-        )):
+        )) and self.config.config['builder'] in [Constants.CMAKE, Constants.PURE_QML_CMAKE]:
             self.init_cmake_project(config, docker_config)
 
         # delete conflicting env vars in some cases
@@ -52,8 +52,20 @@ class QtCreatorDelegate(IdeCommandDelegate):
         docker_config.environment.pop("APP_DIR", None)
         docker_config.environment.pop("SRC_DIR", None)
 
-    def is_cmake_project(self):
+    def has_cmake_file(self):
         return os.path.isfile(os.path.join(self.project_path, 'CMakeLists.txt'))
+
+    def has_qmake_file(self):
+        for fname in os.listdir(self.project_path):
+            if fname.endswith('.pro'):
+                return True
+        return False
+
+    def has_qbs_file(self):
+        for fname in os.listdir(self.project_path):
+            if fname.endswith('.qbs'):
+                return True
+        return False
 
     # guess exec command and args from CMakeLists.txt
     # return None if nothing found
@@ -171,7 +183,7 @@ class QtCreatorDelegate(IdeCommandDelegate):
 
         output_path = os.path.join(self.project_path, 'CMakeLists.txt.user.shared')
         # now read template and generate the .shared file to the root project dir
-        with open(self.template_path, 'r', encoding='UTF-8') as infile2,\
+        with open(self.template_path, 'r', encoding='UTF-8') as infile2, \
                 open(output_path, 'w', encoding='UTF-8') as outfile:
             for line in infile2:
                 for f_key, f_value in template_replacement.items():

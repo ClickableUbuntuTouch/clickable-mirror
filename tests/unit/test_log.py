@@ -14,17 +14,11 @@ class TestLogCommand(UnitTest):
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_log(self, mock_run_command):
         self.command.run()
-
         mock_run_command.assert_called_once_with(
-            'cat ~/.cache/upstart/application-click-foo.bar_foo_1.2.3.log'
+            'journalctl --user --no-pager -u '
+            'lomiri-app-launch--application-click--foo.bar_foo_1.2.3--',
+            get_output=True
         )
-
-    @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
-    def test_custom_log_file(self, mock_run_command):
-        self.config.log = 'foo.log'
-        self.command.run()
-
-        mock_run_command.assert_called_once_with('cat foo.log')
 
     @mock.patch('clickable.config.project.ProjectConfig.is_desktop_mode', side_effect=true_fn)
     @mock.patch('clickable.commands.log.logger.debug', side_effect=empty_fn)

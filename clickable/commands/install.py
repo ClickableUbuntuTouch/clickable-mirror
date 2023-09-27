@@ -1,5 +1,6 @@
 import os
 
+from clickable.config.constants import Constants
 from clickable.logger import logger
 
 from .base import Command
@@ -10,6 +11,8 @@ class InstallCommand(Command):
         super().__init__()
         self.cli_conf.name = 'install'
         self.cli_conf.help_msg = 'Takes a built click package and installs it on a device'
+        self.command_conf.device_command = True
+        self.command_conf.arch_specific = True
 
         self.click_path = None
         self.skip_uninstall = False
@@ -88,7 +91,8 @@ class InstallCommand(Command):
             self.click_path = os.path.join(self.config.build_dir, click)
             cwd = self.config.build_dir
 
-        self.device.push_file(self.click_path, '/home/phablet/')
+        dst_path = os.path.join(Constants.device_home, click)
+        self.device.push_file(self.click_path, dst_path)
 
         if self.skip_uninstall:
             logger.info("Skipping uninstall pre-step.")
@@ -115,4 +119,4 @@ class InstallCommand(Command):
         self.device.run_command(command, cwd=cwd)
 
         logger.info("Cleaning up.")
-        self.device.run_command(f'rm /home/phablet/{click}', cwd=cwd)
+        self.device.run_command(f'rm {dst_path}', cwd=cwd)

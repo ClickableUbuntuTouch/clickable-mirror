@@ -35,7 +35,7 @@ class Cli():
         )
 
         self.add_common_options(parser)
-        command.setup_parser(parser)
+        command.setup_complete_parser(parser)
 
         parser.set_defaults(func=command.start)
 
@@ -59,21 +59,9 @@ class Cli():
             default=None
         )
         parser.add_argument(
-            '--serial-number',
-            '-s',
-            help='Directs command to the device or emulator with the given serial number or '
-                 'qualifier (using adb)',
-            default=None
-        )
-        parser.add_argument(
-            '--ssh',
-            help='Directs command to the device with the given IP address (using ssh)',
-            default=None
-        )
-        parser.add_argument(
             '--arch',
             '-a',
-            choices=['armhf', 'arm64', 'amd64', 'all'],
+            choices=['armhf', 'arm64', 'amd64', 'all', 'detect'],
             help='Use the specified arch when building'
         )
         parser.add_argument(
