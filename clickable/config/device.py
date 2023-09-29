@@ -19,6 +19,7 @@ class DeviceConfig(BaseConfig):
             'default_target': 'ssh',
             'required': device_required,
             'always_detect': False,
+            'xenial_adb': False,
         }
 
         if base:
@@ -49,6 +50,14 @@ class DeviceConfig(BaseConfig):
             help='Target device. "detect" considers SSH first, then ADB, but never "host".',
         )
 
+        parser.add_argument(
+            '--xenial-adb',
+            action='store_true',
+            help='Use this when your target device is running Ubuntu 16.04 Xenial '
+                 'and you are connected via ADB',
+            default=False,
+        )
+
     def parse_ssh_config(self, ssh_arg):
         result = re.match("(.+):([0-9]+)", ssh_arg)
         if result is not None:
@@ -68,6 +77,9 @@ class DeviceConfig(BaseConfig):
             self.config['serial_number'] = env('CLICKABLE_SERIAL_NUMBER')
 
         if args:
+            if args.xenial_adb:
+                self.config['xenial_adb'] = True
+
             if args.target:
                 self.config['selection'] = args.target
 
