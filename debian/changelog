@@ -1,3 +1,11 @@
+clickable (8.0.1) unstable; urgency=medium
+
+  * Changed default framework to 20.04.1
+  * Improved error message when the manifest is missing
+  * Added --xenial-adb to revert to the old adb method when developing with Xenial devices
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 29 Sep 2023 19:46:25 -0500
+
 clickable (8.0.0) unstable; urgency=medium
 
   * Clickable will now automatically detect device architecture for you.
