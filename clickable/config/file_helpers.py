@@ -141,6 +141,13 @@ class InstallFiles():
 
     def load_manifest(self, manifest_path):
         manifest = {}
+
+        if not os.path.exists(manifest_path):
+            arch_arg = "" if self.arch == "all" else f" --arch {self.arch}"
+            raise ClickableException(f"Can't find the app manifest in the install dir. "
+                                     "Please build the app first with "
+                                     f'"clickable build{arch_arg}".')
+
         with open(manifest_path, 'r', encoding='UTF-8') as f:
             try:
                 manifest = json.load(f)
