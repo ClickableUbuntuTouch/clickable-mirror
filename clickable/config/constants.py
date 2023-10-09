@@ -130,6 +130,7 @@ class Constants():
         'armv7l': 'armhf',
     }
     host_arch = host_arch_mapping.get(platform.machine().lower(), None)
+    host_arch_triplet = arch_triplet_mapping.get(host_arch, None)
 
     host_home = os.path.expanduser('~')
     clickable_dir = os.path.join(host_home, '.clickable')
