@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from clickable.config.constants import Constants
 
 from clickable.utils import (
     get_builder,
@@ -326,6 +327,9 @@ class BuildCommand(Command):
             candidate = os.path.join(lib.install_dir, "lib")
             if os.path.isdir(candidate):
                 dirs.append(candidate)
+
+        if self.config.is_foreign_target():
+            dirs = [d for d in dirs if Constants.host_arch_triplet not in d]
 
         return list({os.path.realpath(d) for d in dirs})
 
