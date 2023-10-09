@@ -34,6 +34,14 @@ class Container():
 
         if self.docker_mode:
             self.docker_executable = get_docker_command()
+            if self.docker_executable == 'docker':
+                tmp_args = "{{.OperatingSystem}}"
+                self.docker_desktop = 'Docker Desktop' in run_subprocess_check_output(
+                    shlex.split(f'{self.docker_executable} info --format {tmp_args}')
+                )
+            else:
+                self.docker_desktop = False
+
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
@@ -289,6 +297,9 @@ class Container():
         ])
 
     def render_id_mapping_string(self, mapid=os.getuid()):
+
+        if self.docker_desktop:
+            return f'--user 0:0'
         if self.docker_executable != 'podman':
             return ''
         uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
