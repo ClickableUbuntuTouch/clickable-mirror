@@ -299,7 +299,7 @@ class Container():
     def render_id_mapping_string(self, mapid=os.getuid()):
 
         if self.docker_desktop:
-            return f'--user 0:0'
+            return '--user 0:0'
         if self.docker_executable != 'podman':
             return ''
         uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
