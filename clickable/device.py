@@ -1,7 +1,7 @@
 import os
 import shutil
 import getpass
-from subprocess import CalledProcessError
+from subprocess import CalledProcessError, TimeoutExpired
 
 from .utils import (
     run_subprocess_check_output,
@@ -91,7 +91,17 @@ class Device():
             return False
 
         command = self.get_adb_command(detect_command)
-        self.device_arch = run_subprocess_check_output(command, shell=True).strip()
+        try:
+            self.device_arch = run_subprocess_check_output(command, shell=True, timeout=3).strip()
+        except TimeoutExpired:
+            if self.config.xenial_adb:
+                raise
+
+            self.config.xenial_adb = True
+            logger.warning(
+                "ADB architecture detection timed out. Retrying, assuming a xenial device...")
+            return self.detect_adb_arch(detect_command)
+
         self.connection = 'adb'
         logger.info("Detected %s device via ADB", self.device_arch)
 
