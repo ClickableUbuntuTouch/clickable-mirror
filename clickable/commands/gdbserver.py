@@ -111,7 +111,7 @@ class GdbserverCommand(Command):
         app_exec[0] = path
         return " ".join(app_exec)
 
-    def get_app_env(self):
+    def get_app_env_xenial(self):
         package_name = self.config.install_files.find_package_name()
         app_name = self.config.install_files.find_app_name()
         app_id = self.get_app_id()
@@ -162,9 +162,81 @@ class GdbserverCommand(Command):
 
         return environ
 
+    def get_app_env(self):
+        if self.config.get_framework_base() == '16.04':
+            return self.get_app_env_xenial()
+
+        package_name = self.config.install_files.find_package_name()
+        app_name = self.config.install_files.find_app_name()
+        app_id = self.get_app_id()
+
+        environ = {
+            "APP_DESKTOP_FILE_PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/{app_name}.desktop",  # noqa=E501
+            "APP_DIR": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}",
+            "APP_ID": app_id,
+            "APP_XMIR_ENABLE": "0",
+            "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/32011/bus",
+            "DESKTOP_FILE_HINT": "app_id",
+            "DESKTOP_SESSION": "ubuntu-touch",
+            "GDMSESSION": "ubuntu-touch",
+            "GTK_IM_MODULE": "Maliit",
+            "LD_LIBRARY_PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}:/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib",  # noqa=E501
+            "LD_PRELOAD": "libtls-padding.so",
+            "LOMIRI_APPLICATION_ISOLATION": "1",
+            "MIR_SERVER_ENABLE_MIRCLIENT": "1",
+            "MIR_SERVER_ENABLE_X11": "1",
+            "MIR_SERVER_FILE": "/run/user/32011/mir_socket",
+            "MIR_SERVER_HOST_SOCKET": "/run/mir_socket",
+            "MIR_SERVER_NAME": "session-0",
+            "MIR_SERVER_XWAYLAND_PATH": "/usr/libexec/Xwayland.lomiri",
+            "MIR_SOCKET": "/run/user/32011/mir_socket",
+            "PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}/bin:/opt/click.ubuntu.com/.click/users/@all/{package_name}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/phablet/bin",  # noqa=E501
+            "PULSE_PROP": "media.role=multimedia",
+            "QML2_IMPORT_PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}:/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}/qml",  # noqa=E501
+            "QMLSCENE_DEVICE": "haliumqsgcontext",
+            "QTWEBENGINE_CHROMIUM_FLAGS": "--enable-gpu-rasterization --enable-accelerated-video-decode --enable-features=MojoVideoDecoder",  # noqa=E501
+            "QTWEBENGINE_DICTIONARIES_PATH": "/usr/share/hunspell-bdic/",
+            "QTWEBKIT_DPR": "2.0",
+            "QT_EXCLUDE_GENERIC_BEARER": "1",
+            "QT_FILE_SELECTORS": "ubuntu-touch",
+            "QT_IM_MODULE": "maliitphablet",
+            "QT_QPA_PLATFORM": "ubuntumirclient",
+            "QT_QUICK_CONTROLS_MOBILE": "1",
+            "QT_QUICK_CONTROLS_STYLE": "Suru",
+            "QV4_ENABLE_JIT_CACHE": "1",
+            "SHELL": "/bin/bash",
+            "SSH_AGENT_LAUNCHER": "gnome-keyring",
+            "SSH_AUTH_SOCK": "/run/user/32011/keyring/ssh",
+            "TMPDIR": f"/run/user/32011/confined/{package_name}",
+            "WAYLAND_DISPLAY": "wayland-0",
+            "XDG_CACHE_HOME": "/home/phablet/.cache",
+            "XDG_CONFIG_DIRS": "/etc/xdg/xdg-ubuntu-touch:/etc/xdg",
+            "XDG_CONFIG_HOME": "/home/phablet/.config",
+            "XDG_CURRENT_DESKTOP": "Lomiri",
+            "XDG_DATA_DIRS": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}:/usr/share/ubuntu-touch:/usr/local/share:/usr/share:/custom/usr/share/",  # noqa=E501
+            "XDG_DATA_HOME": "/home/phablet/.local/share",
+            "XDG_GREETER_DATA_DIR": "/var/lib/lightdm-data/phablet",
+            "XDG_RUNTIME_DIR": "/run/user/32011",
+            "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",
+            "XDG_SESSION_CLASS": "user",
+            "XDG_SESSION_DESKTOP": "ubuntu-touch",
+            "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session0",
+            "XDG_SESSION_TYPE": "mir",
+            "ZEITGEIST_DATA_PATH": "/home/phablet/.local/share/zeitgeist",
+            "__GL_SHADER_DISK_CACHE_PATH": f"/home/phablet/.cache/{package_name}",
+        }
+
+        return environ
+
     def get_cached_desktop_path(self):
+        if self.config.get_framework_base() == '16.04':
+            return os.path.join(
+                "/home/phablet/.cache/ubuntu-app-launch/desktop",
+                f"{self.get_app_id()}.desktop"
+            )
+
         return os.path.join(
-            "/home/phablet/.cache/ubuntu-app-launch/desktop",
+            "/home/phablet/.cache/lomiri-app-launch/desktop",
             f"{self.get_app_id()}.desktop"
         )
 
@@ -234,6 +306,7 @@ class GdbserverCommand(Command):
         ]
 
         self.set_signal_handler()
+        logger.debug(" ".join(commands))
         self.device.run_command(commands, forward_port=self.port)
 
     def run(self):
