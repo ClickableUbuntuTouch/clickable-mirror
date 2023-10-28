@@ -714,7 +714,7 @@ class ProjectConfig(BaseConfig):
         return self.is_desktop_mode() or 'build' in self.commands
 
     def is_project_independent_cmd(self):
-        return bool(set(['no_lock', 'writable_image', 'screenshots', 'create', 'setup'
+        return bool(set(['no_lock', 'writable_image', 'screenshots', 'create', 'setup',
                     'shell', 'devices', 'update-images', 'clean-images']
                         ).intersection(self.commands))
 
