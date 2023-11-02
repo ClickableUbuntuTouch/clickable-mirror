@@ -8,7 +8,11 @@ Changes in v8.0.1
 
 - Changed default framework to 20.04.1
 - Improved error message when the manifest is missing
-- Added ``--xenial-adb`` to revert to the old adb method when developing with Xenial devices
+- Added workaround for ADB access on Xenial devices (added ``--xenial-adb`` to enforce and speed it up)
+- Fixed using gdbserver on Focal
+- Fixed ``shell`` and ``setup`` commands warning about missing project
+- Fix installing libraries by name instead of full path via ``install_lib``
+- Fix reusing cached docker images
 
 Changes in v8.0.0
 -----------------
