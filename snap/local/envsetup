@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# For Podman
+#if [ ! -d $XDG_RUNTIME_DIR ]; then
+#    mkdir -p $XDG_RUNTIME_DIR
+#fi
+
+$@
+
+# Prevent adb from sticking around and stalling Snap updates
+adb kill-server

@@ -1,0 +1,45 @@
+name: clickable
+version: v8.0.0
+summary: Compile, build, and deploy Ubuntu Touch click packages.
+description: |
+  Build and compile Ubuntu Touch apps easily from the command line.
+  Deploy your apps to your Ubuntu Touch device for testing or test them on any desktop Linux distribution.
+  Get logs for debugging and directly access a terminal on your device.
+
+  Clickable is fully Open Source and can be found on GitLab.
+  Clickable is developed by Brian Douglass and Jonatan Hatakeyama Zeidler with a huge thank you to all the contributors.
+confinement: strict
+base: core22
+compression: lzo
+
+architectures:
+- build-on: amd64
+- build-on: arm64
+- build-on: armhf
+
+apps:
+  clickable:
+    environment:
+      CLICKABLE_SKIP_DOCKER_CHECKS: 1
+      XDG_DATA_HOME: ${SNAP_USER_COMMON}/.local/share
+      LD_LIBRARY_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/android:${LD_LIBRARY_PATH}
+    command-chain:
+      - bin/envsetup
+    command: bin/clickable
+    plugs: [ home, removable-media, network, network-bind, ssh-keys, ssh-public-keys, adb-support, raw-usb, docker ]
+
+parts:
+  clickable:
+    source: .
+    plugin: python
+    stage-packages:
+     - python3.10-minimal
+     - python3-cookiecutter
+     - adb
+     - openssh-client
+     - docker.io
+  wrapper:
+    plugin: dump
+    source: snap/local
+    organize:
+      envsetup: bin/envsetup
