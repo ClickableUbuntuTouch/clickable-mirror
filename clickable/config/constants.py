@@ -90,6 +90,7 @@ class Constants():
     framework_image_mapping = {
         "ubuntu-sdk-16.04": "16.04.5",
         "ubuntu-sdk-20.04": "20.04",
+        "ubuntu-sdk-20.04.1": "20.04",
     }
     framework_image_fallback = {
         '16.04': '16.04.5',
@@ -97,7 +98,7 @@ class Constants():
     }
 
     default_qt_framework_mapping = {
-        '5.12': 'ubuntu-sdk-20.04',
+        '5.12': 'ubuntu-sdk-20.04.1',
     }
 
     default_qt = '5.12'
@@ -129,6 +130,7 @@ class Constants():
         'armv7l': 'armhf',
     }
     host_arch = host_arch_mapping.get(platform.machine().lower(), None)
+    host_arch_triplet = arch_triplet_mapping.get(host_arch, None)
 
     host_home = os.path.expanduser('~')
     clickable_dir = os.path.join(host_home, '.clickable')

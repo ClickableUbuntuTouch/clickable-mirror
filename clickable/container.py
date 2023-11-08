@@ -447,9 +447,7 @@ FROM {self.base_docker_image}
             if dockerfile_content.strip() != f.read().strip():
                 return True
 
-        command = f'{self.docker_executable} images -q {self.docker_image}'
-        exists = run_subprocess_check_output(command).strip()
-        return not exists
+        return not image_exists(self.docker_image)
 
     def get_apt_install_cmd(self, dependencies):
         joined_deps = ' '.join(dependencies)

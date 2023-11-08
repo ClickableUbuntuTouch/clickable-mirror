@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from clickable.config.constants import Constants
 
 from clickable.utils import (
     get_builder,
@@ -315,18 +316,22 @@ class BuildCommand(Command):
         for lib in self.config.lib_configs:
             for d in dirs:
                 lib_bin_dirs.append(os.path.join(lib.install_dir, d[1:]))
-        return lib_bin_dirs
+        return [d for d in lib_bin_dirs if os.path.isdir(d)]
 
     def get_library_dirs(self):
-        command = "cat /etc/ld.so.conf.d/*.conf"
+        command = "readlink -e $(cat /etc/ld.so.conf.d/*.conf) || true"
         dirs = self.container.run_command(command, get_output=True).splitlines()
-        dirs = [d for d in dirs if d.startswith("/")]
         dirs += self.join_libs(dirs)
 
         for lib in self.config.lib_configs:
-            dirs.append(os.path.join(lib.install_dir, "lib"))
+            candidate = os.path.join(lib.install_dir, "lib")
+            if os.path.isdir(candidate):
+                dirs.append(candidate)
 
-        return list({os.path.realpath(d) for d in dirs if os.path.isdir(d)})
+        if self.config.is_foreign_target():
+            dirs = [d for d in dirs if Constants.host_arch_triplet not in d]
+
+        return list({os.path.realpath(d) for d in dirs})
 
     def get_bin_dirs(self):
         command = "echo ${PATH}"

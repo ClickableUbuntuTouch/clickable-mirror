@@ -1,3 +1,15 @@
+clickable (8.0.1) unstable; urgency=medium
+
+  * Changed default framework to 20.04.1
+  * Improved error message when the manifest is missing
+  * Added workaround for ADB access on Xenial devices (added --xenial-adb to enforce and speed it up)
+  * Fixed using gdbserver on Focal
+  * Fixed shell and setup commands warning about missing project
+  * Fix installing libraries by name instead of full path via install_lib
+  * Fix reusing cached docker images
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 29 Sep 2023 19:46:25 -0500
+
 clickable (8.0.0) unstable; urgency=medium
 
   * Clickable will now automatically detect device architecture for you.

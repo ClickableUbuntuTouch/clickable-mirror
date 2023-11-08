@@ -1,7 +1,7 @@
 import os
 import shutil
 import getpass
-from subprocess import CalledProcessError
+from subprocess import CalledProcessError, TimeoutExpired
 
 from .utils import (
     run_subprocess_check_output,
@@ -91,7 +91,17 @@ class Device():
             return False
 
         command = self.get_adb_command(detect_command)
-        self.device_arch = run_subprocess_check_output(command, shell=True).strip()
+        try:
+            self.device_arch = run_subprocess_check_output(command, shell=True, timeout=3).strip()
+        except TimeoutExpired:
+            if self.config.xenial_adb:
+                raise
+
+            self.config.xenial_adb = True
+            logger.warning(
+                "ADB architecture detection timed out. Retrying, assuming a xenial device...")
+            return self.detect_adb_arch(detect_command)
+
         self.connection = 'adb'
         logger.info("Detected %s device via ADB", self.device_arch)
 
@@ -176,6 +186,9 @@ class Device():
         if isinstance(command, list):
             command = ";".join(command)
 
+        if self.config.xenial_adb:
+            return f'adb {adb_args} shell "{command}"'
+
         return f'echo "{command} || echo ADB_COMMAND_FAILED" | adb {adb_args} shell'
 
     def get_ssh_command(self, command, *args, **kwargs):
@@ -204,7 +217,7 @@ class Device():
 
         output = run_subprocess_check_output(wrapped_command, cwd=cwd, shell=True)
 
-        if output.strip().endswith("ADB_COMMAND_FAILED"):
+        if self.connection == "adb" and output.strip().endswith("ADB_COMMAND_FAILED"):
             print(output)
             raise ClickableException("Command ran on device via ADB failed. See output above.")
 
