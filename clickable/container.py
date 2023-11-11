@@ -32,15 +32,14 @@ class Container():
         self.docker_image = self.config.docker_image
         self.base_docker_image = self.docker_image
 
+        self.docker_desktop = False
+
         if self.docker_mode:
             self.docker_executable = get_docker_command()
             if self.docker_executable == 'docker':
-                tmp_args = "{{.OperatingSystem}}"
-                self.docker_desktop = 'Docker Desktop' in run_subprocess_check_output(
-                    shlex.split(f'{self.docker_executable} info --format {tmp_args}')
-                )
-            else:
-                self.docker_desktop = False
+                format_args = "{{.OperatingSystem}}"
+                command = f'{self.docker_executable} info --format {format_args}'
+                self.docker_desktop = 'Docker Desktop' in run_subprocess_check_output(command)
 
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
@@ -104,7 +103,7 @@ class Container():
 
         try:
             run_subprocess_check_output(
-                shlex.split('systemctl is-active --quiet snap.docker.dockerd.service'),
+                'systemctl is-active --quiet snap.docker.dockerd.service',
                 stderr=subprocess.STDOUT)
             return True
         except subprocess.CalledProcessError:
@@ -112,7 +111,7 @@ class Container():
 
         try:
             run_subprocess_check_output(
-                shlex.split('systemctl is-active --quiet docker'),
+                'systemctl is-active --quiet docker',
                 stderr=subprocess.STDOUT)
             return True
         except subprocess.CalledProcessError:
@@ -120,7 +119,7 @@ class Container():
 
         try:
             run_subprocess_check_output(
-                shlex.split('systemctl --user is-active --quiet docker-desktop'),
+                'systemctl --user is-active --quiet docker-desktop',
                 stderr=subprocess.STDOUT)
             return True
         except subprocess.CalledProcessError:
@@ -300,11 +299,13 @@ class Container():
 
         if self.docker_desktop:
             return '--user 0:0'
-        if self.docker_executable != 'podman':
-            return ''
-        uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
-        gidmap = self.render_single_id_mapping_string('--gidmap', mapid)
-        return f'{uidmap} {gidmap}'
+
+        if self.docker_executable == 'podman':
+            uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
+            gidmap = self.render_single_id_mapping_string('--gidmap', mapid)
+            return f'{uidmap} {gidmap}'
+
+        return ''
 
     def render_single_id_mapping_string(self, flag, mapid):
         # e.g. "--uidmap 1000:0:1 --uidmap 0:1:1000"
