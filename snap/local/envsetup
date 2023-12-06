@@ -18,11 +18,6 @@ if ! snapctl is-connected docker; then
     ERROR=1
 fi
 
-if ! snapctl is-connected docker; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:docker docker"
-    ERROR=1
-fi
-
 if ! snapctl is-connected home; then
     echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:home"
     ERROR=1
