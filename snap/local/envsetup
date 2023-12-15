@@ -61,4 +61,4 @@ fi
 $@
 
 # Prevent adb from sticking around and stalling Snap updates
-adb kill-server
+adb kill-server 2> /dev/null
