@@ -226,6 +226,9 @@ class Container():
     def is_docker_configured(self):
         check_command('docker')
 
+        if self.docker_desktop:
+            return True
+
         return self.docker_group_exists() and self.proccess_in_docker_group()
 
     def pull_files(self, files, dst_parent):
@@ -296,7 +299,6 @@ class Container():
         ])
 
     def render_id_mapping_string(self, mapid=os.getuid()):
-
         if self.docker_desktop:
             return '--user 0:0'
 
