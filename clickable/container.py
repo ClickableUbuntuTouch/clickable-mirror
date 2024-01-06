@@ -299,9 +299,6 @@ class Container():
         ])
 
     def render_id_mapping_string(self, mapid=os.getuid()):
-        if self.docker_desktop:
-            return '--user 0:0'
-
         if self.docker_executable == 'podman':
             uidmap = self.render_single_id_mapping_string('--uidmap', mapid)
             gidmap = self.render_single_id_mapping_string('--gidmap', mapid)
@@ -346,8 +343,10 @@ class Container():
             env_vars = self.config.prepare_docker_env_vars()
 
             user = ""
-            if not root_user:
-                user = f"-u {os.getuid()}"
+            if self.docker_desktop:
+                user = '--user 0:0'
+            elif not root_user:
+                user = f"--user {os.getuid()}"
 
             id_mappings = self.render_id_mapping_string()
 
