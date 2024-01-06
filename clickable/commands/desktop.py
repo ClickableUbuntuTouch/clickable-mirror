@@ -142,6 +142,9 @@ class DesktopCommand(Command):
             self.desktop_locale = f"{self.desktop_locale}.UTF-8"
 
     def run(self):
+        if self.container.docker_desktop:
+            raise ClickableException("Desktop Mode isn't supported when using Docker Desktop.")
+
         self.prepare_run()
         self.run_app()
 
