@@ -3,6 +3,7 @@ from datetime import datetime
 
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
+from clickable.utils import check_command
 from .base import Command
 
 COOKIECUTTER_AVAILABLE = True
@@ -151,6 +152,8 @@ class CreateCommand(Command):
                 'can be found here: '
                 'https://cookiecutter.readthedocs.io/en/latest/installation.html'
             )
+
+        check_command("git")
 
         config_file = os.path.join(Constants.clickable_dir, 'cookiecutter_config.yaml')
         if not os.path.isfile(config_file):

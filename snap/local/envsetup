@@ -58,6 +58,7 @@ if [ "$ERROR" = "1" ]; then
     exit 1
 fi
 
+export PATH=${SNAP}/usr/lib/git-core/:${PATH}
 $@
 
 # Prevent adb from sticking around and stalling Snap updates

@@ -38,6 +38,7 @@ parts:
      - adb
      - openssh-client
      - docker.io
+     - git
   wrapper:
     plugin: dump
     source: snap/local
