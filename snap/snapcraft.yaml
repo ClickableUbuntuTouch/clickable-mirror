@@ -1,5 +1,5 @@
 name: clickable
-version: git
+adopt-info: clickable
 summary: Compile, build, and deploy Ubuntu Touch click packages.
 description: |
   Build and compile Ubuntu Touch apps easily from the command line.
@@ -38,6 +38,11 @@ parts:
      - openssh-client
      - docker.io
      - git
+    override-build: |
+      cd $CRAFT_PART_SRC
+      VERSION="$(git describe --abbrev=0 --tags)"
+      craftctl set version="$VERSION"
+      craftctl default
   wrapper:
     plugin: dump
     source: snap/local
