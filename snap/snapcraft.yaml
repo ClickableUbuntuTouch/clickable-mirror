@@ -34,7 +34,6 @@ parts:
     plugin: python
     stage-packages:
      - python3.10-minimal
-     - python3-cookiecutter
      - adb
      - openssh-client
      - docker.io
