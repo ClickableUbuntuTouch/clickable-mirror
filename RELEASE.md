@@ -38,6 +38,10 @@ in the `clickable/clickable-docker-images` repository. This will trigger the rel
 of images tagged with the release version as well as CI images shipping the new version
 of Clickable.
 
+Log into [Snapcraft](https://snapcraft.io/clickable/releases) and pull the new version
+into the **latest/stable** channel. Changes on the master branch get released on
+the **edge** channel automatically.
+
 Changes to the Documentation get published via a Webhook on any push event on
 the master branch.
 
