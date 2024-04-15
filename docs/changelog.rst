@@ -3,6 +3,15 @@
 Changelog
 =========
 
+Changes in v8.1.0
+-----------------
+
+- Added support for rootless Docker Desktop
+- Released Clickable snap package
+- Fixed bug with paths starting with a placeholder
+- Fixed ``no-lock`` command for focal
+- Reverted unintended CMake downgrade in Clickable containers
+
 Changes in v8.0.1
 -----------------
 

@@ -1,3 +1,13 @@
+clickable (8.1.0) unstable; urgency=medium
+
+  * Added support for rootless Docker Desktop
+  * Released Clickable snap package
+  * Fixed bug with paths starting with a placeholder
+  * Fixed no-lock command for focal
+  * Reverted unintended CMake downgrade in Clickable containers
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Sun, 14 Apr 2024 09:08:19 -0500
+
 clickable (8.0.1) unstable; urgency=medium
 
   * Changed default framework to 20.04.1
