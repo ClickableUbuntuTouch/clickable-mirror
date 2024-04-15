@@ -47,6 +47,28 @@ Install Via Python Virtual Environment (Alternative)
    clickable create --dir ./
 
 
+Install as Snap
+---------------
+* Make sure you have `snapd installed <https://snapcraft.io/docs/installing-snapd>`__.
+* Run:
+
+.. code-block:: bash
+   :linenos:
+
+   # Install clickable and docker
+   sudo snap install clickable
+   sudo snap install docker
+   # Add connections
+   sudo snap connect clickable:raw-usb
+   sudo snap connect clickable:docker docker
+   sudo snap connect clickable:home
+   sudo snap connect clickable:removable-media
+   sudo snap connect clickable:network
+   sudo snap connect clickable:network-bind
+   sudo snap connect clickable:ssh-keys
+   sudo snap connect clickable:ssh-public-keys
+   sudo snap connect clickable:adb-support
+
 Install Via PPA (Ubuntu)
 ------------------------
 

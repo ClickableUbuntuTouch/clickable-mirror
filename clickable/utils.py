@@ -326,13 +326,19 @@ def make_absolute(path, change_keys=False):
         return path
 
     if isinstance(path, list):
-        return [make_absolute(p) for p in path]
+        return [make_absolute(p,
+                              change_keys=change_keys) for p in path]
 
     if isinstance(path, dict):
         if change_keys:
-            return {make_absolute(key): path[key] for key in path}
+            return {make_absolute(key,
+                                  change_keys=change_keys): path[key] for key in path}
 
-        return {key: make_absolute(path[key]) for key in path}
+        return {key: make_absolute(
+            path[key], change_keys=change_keys) for key in path}
+
+    if path.startswith('$'):
+        return path
 
     return os.path.abspath(path)
 
