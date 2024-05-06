@@ -110,9 +110,11 @@ class PublishCommand(Command):
             raise ClickableException(
                 "Upload timed out. Consider setting a higher timeout via --timeout argument."
             ) from e
-        except (ConnectTimeout, requests.exceptions.ConnectionError) as e:
+        except (ConnectTimeout) as e:
             raise ClickableException(
                 "Couldn't connect to the server. Check your internet connection.") from e
+        except (requests.exceptions.ConnectionError) as e:
+            raise ClickableException("Connection to the server died.") from e
 
         if response.status_code == 200:
             logger.info('Upload successful')
