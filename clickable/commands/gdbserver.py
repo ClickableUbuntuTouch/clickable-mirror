@@ -1,6 +1,7 @@
 import os
 import sys
 import signal
+from subprocess import CalledProcessError
 
 from clickable.logger import logger
 from clickable.exceptions import ClickableException
@@ -24,7 +25,6 @@ class GdbserverCommand(Command):
         self.desktop_file = None
         self.add_desktop_file_hint = True
         self.check_desktop_file = True
-        self.push_gdbserver = False
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -62,7 +62,10 @@ class GdbserverCommand(Command):
         parser.add_argument(
             '--system-gdbserver',
             action='store_true',
-            help='Use system gdbserver instead of pushing gdbserver to device home directory',
+            help='DEPRECATED: Use system gdbserver instead of pushing \
+                    gdbserver to device home directory (this option has become \
+                    superfluous, because Clickable will only push gdbserver if \
+                    it is not yet available).',
         )
 
     def configure(self, args):
@@ -73,7 +76,9 @@ class GdbserverCommand(Command):
         self.desktop_file = args.desktop_file_hint
         self.add_desktop_file_hint = not args.no_desktop_file_hint
         self.check_desktop_file = not args.no_desktop_file_check
-        self.push_gdbserver = not args.system_gdbserver
+
+        if args.system_gdbserver:
+            logger.warning("Deprecated option --system-gdbserver has been ignored.")
 
     def set_signal_handler(self):
         def signal_handler(_, __):
@@ -190,7 +195,7 @@ class GdbserverCommand(Command):
             "MIR_SERVER_NAME": "session-0",
             "MIR_SERVER_XWAYLAND_PATH": "/usr/libexec/Xwayland.lomiri",
             "MIR_SOCKET": "/run/user/32011/mir_socket",
-            "PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}/bin:/opt/click.ubuntu.com/.click/users/@all/{package_name}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/phablet/bin",  # noqa=E501
+            "PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}/bin:/opt/click.ubuntu.com/.click/users/@all/{package_name}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/phablet/bin:/home/phablet/.local/bin",  # noqa=E501
             "PULSE_PROP": "media.role=multimedia",
             "QML2_IMPORT_PATH": f"/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}:/opt/click.ubuntu.com/.click/users/@all/{package_name}/lib/{self.config.arch_triplet}/qml",  # noqa=E501
             "QMLSCENE_DEVICE": "haliumqsgcontext",
@@ -271,6 +276,15 @@ class GdbserverCommand(Command):
         self.container.pull_files(["/usr/bin/gdbserver"], "/tmp/clickable")
         self.device.push_file('/tmp/clickable/gdbserver', '/home/phablet/bin/gdbserver')
 
+    def is_gdbserver_available(self):
+        try:
+            self.device.run_command("which gdbserver", get_output=True)
+            return True
+        except CalledProcessError as e:
+            if e.returncode == 1:
+                return False
+            raise e
+
     def start_gdbserver(self):
         if self.device.connection != "ssh":
             logger.warning(
@@ -313,7 +327,7 @@ class GdbserverCommand(Command):
         if self.check_desktop_file:
             self.check_cached_desktop_file()
 
-        if self.push_gdbserver:
+        if not self.is_gdbserver_available():
             self.push_gdbserver_to_device()
 
         self.start_gdbserver()
