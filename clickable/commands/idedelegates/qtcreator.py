@@ -160,10 +160,10 @@ class QtCreatorDelegate(IdeCommandDelegate):
         env_vars = docker_config.environment
         clickable_env_path = f'{env_vars["PATH"]}:{env_vars["CLICK_PATH"]}'
         clickable_ld_library_path = f'{env_vars["LD_LIBRARY_PATH"]}:' \
-                                    f'{env_vars["CLICK_LD_LIBRARY_PATH"]}'
+            f'{env_vars["CLICK_LD_LIBRARY_PATH"]}'
         lib_install_dir = os.path.join(config.install_dir, 'lib')
         clickable_qml2_import_path = f'{env_vars["QML2_IMPORT_PATH"]}:' \
-                                     f'{env_vars["CLICK_QML2_IMPORT_PATH"]}:{lib_install_dir}'
+            f'{env_vars["CLICK_QML2_IMPORT_PATH"]}:{lib_install_dir}'
         build_args = ''
         if config.build_args:
             build_args = ' '.join(self.config.build_args)

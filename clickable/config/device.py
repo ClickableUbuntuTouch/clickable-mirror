@@ -84,12 +84,12 @@ class DeviceConfig(BaseConfig):
                 self.config['selection'] = args.target
 
             if args.serial_number:
-                if args.target and args.target != 'abd':
+                if args.target and args.target != 'adb':
                     raise ClickableException(
                         f'--target {args.target} cannot be combined with --serial-number')
 
                 self.config['serial_number'] = args.serial_number
-                self.config['selection'] = 'abd'
+                self.config['selection'] = 'adb'
 
             if args.ssh:
                 if args.target and args.target != 'ssh':
