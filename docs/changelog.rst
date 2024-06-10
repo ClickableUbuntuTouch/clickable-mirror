@@ -3,6 +3,14 @@
 Changelog
 =========
 
+Changes in v8.2.0
+-----------------
+
+- ``gdbserver`` will only be copied to the device if needed when running ``clickable gdbserver``
+- Fixed the ``--serial-number`` throwing errors due to a typo
+- Updated error messages when connecting to the OpenStore to include different messages when there are connection errors and connection timeouts
+- Fixed Godot template apps running under Clickable Desktop
+
 Changes in v8.1.0
 -----------------
 
