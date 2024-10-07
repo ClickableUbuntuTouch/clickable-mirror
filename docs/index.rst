@@ -50,3 +50,5 @@ Issues and Feature Requests
 
 If you run into any problems using clickable or have any feature requests you
 can find clickable on `GitLab <https://gitlab.com/clickable/clickable/issues>`__.
+Clickable logs from the last run can be found at ``~/.clickable/clickable.log``
+or ``~/snap/clickable/current/.clickable/clickable.log`` for the snap package.
