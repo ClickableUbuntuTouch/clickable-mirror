@@ -49,9 +49,7 @@ class Constants():
                 os.path.join(docker_registry, 'clickable/arm64-16.04-arm64:16.04.5'),
             ('20.04', 'arm64'):
                 os.path.join(docker_registry, 'clickable/arm64-20.04-arm64'),
-            # TODO: once branching happens, switch to release-specific image
-            # (arm64-ut2505.x-[ARCH]).
-            ('2505.x', 'arm64'):
+            ('next', 'arm64'):
                 os.path.join(docker_registry, 'clickable/arm64-utnext-arm64'),
         },
         "amd64": {
@@ -79,19 +77,18 @@ class Constants():
                 os.path.join(docker_registry, 'clickable/amd64-20.04-amd64-ide'),
             ('20.04', 'amd64-nvidia-ide'):
                 os.path.join(docker_registry, 'clickable/amd64-20.04-amd64-nvidia-ide'),
-            # TODO: once branching happens, switch to release-specific image
-            # (amd64-ut2505.x-[ARCH]).
-            ('2505.x', 'amd64'):
+            # (amd64-utnext-[ARCH]).
+            ('next', 'amd64'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-amd64'),
-            ('2505.x', 'armhf'):
+            ('next', 'armhf'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-armhf'),
-            ('2505.x', 'arm64'):
+            ('next', 'arm64'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-arm64'),
-            ('2505.x', 'amd64-nvidia'):
+            ('next', 'amd64-nvidia'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-amd64-nvidia'),
-            ('2505.x', 'amd64-ide'):
+            ('next', 'amd64-ide'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-amd64-ide'),
-            ('2505.x', 'amd64-nvidia-ide'):
+            ('next', 'amd64-nvidia-ide'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-amd64-nvidia-ide'),
         }
     }
@@ -103,29 +100,27 @@ class Constants():
         ('20.04', 'amd64'): os.path.join(docker_registry, 'clickable/ci-20.04-amd64'),
         ('20.04', 'armhf'): os.path.join(docker_registry, 'clickable/ci-20.04-armhf'),
         ('20.04', 'arm64'): os.path.join(docker_registry, 'clickable/ci-20.04-arm64'),
-        # TODO: once branching happens, switch to release-specific image (ci-ut2505.x-[ARCH]).
-        ('2505.x', 'amd64'): os.path.join(docker_registry, 'clickable/ci-utnext-amd64'),
-        ('2505.x', 'armhf'): os.path.join(docker_registry, 'clickable/ci-utnext-armhf'),
-        ('2505.x', 'arm64'): os.path.join(docker_registry, 'clickable/ci-utnext-arm64'),
+        ('next', 'amd64'): os.path.join(docker_registry, 'clickable/ci-utnext-amd64'),
+        ('next', 'armhf'): os.path.join(docker_registry, 'clickable/ci-utnext-armhf'),
+        ('next', 'arm64'): os.path.join(docker_registry, 'clickable/ci-utnext-arm64'),
     }
 
     framework_image_mapping = {
         "ubuntu-sdk-16.04": "16.04.5",
         "ubuntu-sdk-20.04": "20.04",
         "ubuntu-sdk-20.04.1": "20.04",
-        "ubuntu-touch-2505": "2505.x",
-        "ubuntu-touch-2505-qml": "2505.x",
-        "ubuntu-touch-2505-papi": "2505.x",
+        "ubuntu-touch-next-internal": "next",
     }
     framework_image_fallback = {
         '16.04': '16.04.5',
         '20.04': '20.04',
-        '2505': '2505.x',
+        'next': 'next',
     }
 
     default_qt_framework_mapping = {
         '5.12': 'ubuntu-sdk-20.04.1',
-        '5.15': 'ubuntu-touch-2505',
+        # TODO: once we have a release defined, update this constant.
+        '5.15': 'ubuntu-touch-next-internal',
     }
 
     default_qt = '5.12'
@@ -133,7 +128,7 @@ class Constants():
     framework_base = [
         '16.04',
         '20.04',
-        '2505',
+        'next',
     ]
     framework_base_default = '20.04'
 
