@@ -32,6 +32,9 @@ class GdbCommand(Command):
         self.forward = []
         self.debug_symbols = None
 
+        self.command_conf.device_command = True
+        self.command_conf.arch_specific = True
+
     def setup_parser(self, parser):
         parser.add_argument(
             '--script',
