@@ -1,6 +1,5 @@
+import atexit
 import os
-import sys
-import signal
 from subprocess import CalledProcessError
 
 from clickable.logger import logger
@@ -87,10 +86,9 @@ class GdbserverCommand(Command):
             logger.warning("Deprecated option --system-gdbserver has been ignored.")
 
     def set_signal_handler(self):
-        def signal_handler(_, __):
+        def cleanup():
             self.kill_gdbserver()
-            sys.exit(0)
-        signal.signal(signal.SIGINT, signal_handler)
+        atexit.register(cleanup)
 
     def get_app_dir(self):
         package_name = self.config.install_files.find_package_name()
