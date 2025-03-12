@@ -3,6 +3,7 @@ import glob
 import json
 
 from clickable.exceptions import ClickableException
+from ..logger import logger
 from ..utils import (
     find
 )
@@ -164,17 +165,32 @@ class InstallFiles():
     def try_find_locale(self):
         return ':'.join(glob.glob(f"{self.install_dir}/**/locale", recursive=True))
 
-    def get_desktop(self, cwd, temp_dir=None, build_dir=None):
-        desktop = {}
+    def get_desktop(self, cwd, temp_dir=None, build_dir=None, hook_name=None):
+        desktop_file = None
+        hooks = self.get_manifest().get('hooks', {})
+        for key, value in hooks.items():
+            if 'desktop' in value and (not hook_name or hook_name == key):
+                desktop_file = value.get('desktop')
+                break
 
-        desktop_file = find(
-            ['.desktop', '.desktop.in'],
-            cwd,
-            temp_dir,
-            build_dir,
-            extensions_only=True,
-            depth=3
-        )
+        if desktop_file:
+            desktop_file = os.path.join(self.install_dir, desktop_file)
+            logger.debug("Using desktop file from manifest: %s", desktop_file)
+        elif not hook_name:
+            desktop_file = find(
+                ['.desktop', '.desktop.in'],
+                cwd,
+                temp_dir,
+                build_dir,
+                extensions_only=True,
+                depth=3
+            )
+            logger.debug("Using desktop file found by glob: %s", desktop_file)
+        else:
+            logger.error("The hook '%s' is either misspelt or it does not "
+                         "have a .desktop file in manifest.json.", hook_name)
+
+        desktop = {}
 
         if desktop_file:
             with open(desktop_file, 'r', encoding='UTF-8') as f:
