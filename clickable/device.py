@@ -92,7 +92,7 @@ class Device():
 
         command = self.get_adb_command(detect_command)
         try:
-            self.device_arch = run_subprocess_check_output(command, shell=True, timeout=3).strip()
+            self.device_arch = run_subprocess_check_output(command, shell=True, timeout=5).strip()
         except TimeoutExpired:
             if self.config.xenial_adb:
                 raise

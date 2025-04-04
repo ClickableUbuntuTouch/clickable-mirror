@@ -1,6 +1,5 @@
+import atexit
 import os
-import sys
-import signal
 from subprocess import CalledProcessError
 
 from clickable.logger import logger
@@ -25,6 +24,7 @@ class GdbserverCommand(Command):
         self.desktop_file = None
         self.add_desktop_file_hint = True
         self.check_desktop_file = True
+        self.hook_name = None
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -67,6 +67,10 @@ class GdbserverCommand(Command):
                     superfluous, because Clickable will only push gdbserver if \
                     it is not yet available).',
         )
+        parser.add_argument(
+            '--hook',
+            help='Debug the executable linked to a certain hook.',
+        )
 
     def configure(self, args):
         self.port = args.port
@@ -76,15 +80,15 @@ class GdbserverCommand(Command):
         self.desktop_file = args.desktop_file_hint
         self.add_desktop_file_hint = not args.no_desktop_file_hint
         self.check_desktop_file = not args.no_desktop_file_check
+        self.hook_name = args.hook
 
         if args.system_gdbserver:
             logger.warning("Deprecated option --system-gdbserver has been ignored.")
 
     def set_signal_handler(self):
-        def signal_handler(_, __):
+        def cleanup():
             self.kill_gdbserver()
-            sys.exit(0)
-        signal.signal(signal.SIGINT, signal_handler)
+        atexit.register(cleanup)
 
     def get_app_dir(self):
         package_name = self.config.install_files.find_package_name()
@@ -97,7 +101,10 @@ class GdbserverCommand(Command):
         return f"{package_name}_{app_name}_{version}"
 
     def get_app_exec(self):
-        desktop = self.config.install_files.get_desktop(self.config.install_dir)
+        desktop = self.config.install_files.get_desktop(
+            self.config.install_dir,
+            hook_name=self.hook_name
+        )
         return desktop["Exec"]
 
     def get_app_exec_full_path(self):

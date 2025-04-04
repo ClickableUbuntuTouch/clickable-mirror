@@ -3,6 +3,15 @@
 Changelog
 =========
 
+Changes in v8.3.0
+-----------------
+
+- Added support for building Noble apps (``ubuntu-touch-24.04-1.x``)
+- Made the timeout longer when detecting the attached device's architecture
+- Fixed issues running the ``gdb`` command
+- Added an option to specify an app hook when debugging with gdb
+- Fixed the gdb server not getting killed when Clickable exits
+
 Changes in v8.2.0
 -----------------
 

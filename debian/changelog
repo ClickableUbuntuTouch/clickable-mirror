@@ -1,3 +1,13 @@
+clickable (8.3.0) unstable; urgency=medium
+
+  * Added support for building Noble apps (ubuntu-touch-24.04-1.x)
+  * Made the timeout longer when detecting the attached device's architecture
+  * Fixed issues running the gdb command
+  * Added an option to specify an app hook when debugging with gdb
+  * Fixed the gdb server not getting killed when Clickable exits
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Thu, 03 Apr 2025 22:48:34 -0500
+
 clickable (8.2.0) unstable; urgency=medium
 
   * gdbserver will only be copied to the device if needed when running clickable gdbserver

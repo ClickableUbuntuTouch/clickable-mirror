@@ -31,6 +31,10 @@ class GdbCommand(Command):
         self.add_sysroot = True
         self.forward = []
         self.debug_symbols = None
+        self.hook_name = None
+
+        self.command_conf.device_command = True
+        self.command_conf.arch_specific = True
 
     def setup_parser(self, parser):
         parser.add_argument(
@@ -71,6 +75,10 @@ class GdbCommand(Command):
             help='Params forwarded to gdb-multiarch directly. Prepend with "--" to '
                  'make sure they are not interpreted by Clickable.'
         )
+        parser.add_argument(
+            '--hook',
+            help='Debug the executable linked to a certain hook.',
+        )
 
     def configure(self, args):
         self.export_script = args.script
@@ -80,6 +88,7 @@ class GdbCommand(Command):
         self.configure_app = not args.no_app_config
         self.add_sysroot = not args.no_sysroot
         self.forward = args.forward
+        self.hook_name = args.hook
 
         self.configure_nested()
 
@@ -101,7 +110,10 @@ class GdbCommand(Command):
         return None
 
     def find_binary_path(self):
-        desktop = self.config.install_files.get_desktop(self.config.install_dir)
+        desktop = self.config.install_files.get_desktop(
+            self.config.install_dir,
+            hook_name=self.hook_name
+        )
         exec_list = desktop["Exec"].split()
         binary = None
 
