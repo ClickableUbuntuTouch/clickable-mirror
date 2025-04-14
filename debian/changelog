@@ -1,3 +1,9 @@
+clickable (8.3.1) unstable; urgency=medium
+
+  * Fixed container image names for Noble
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Mon, 14 Apr 2025 16:10:37 -0500
+
 clickable (8.3.0) unstable; urgency=medium
 
   * Added support for building Noble apps (ubuntu-touch-24.04-1.x)

@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v8.3.1
+-----------------
+
+- Fixed container image names for Noble
+
 Changes in v8.3.0
 -----------------
 
