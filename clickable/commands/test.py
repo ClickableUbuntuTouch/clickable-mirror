@@ -50,6 +50,7 @@ class TestCommand(Command):
             self.test_libs()
         if self.app:
             logger.info("Running app tests")
+            self.container.setup()
             run_test(self.container, self.config)
 
     def test_libs(self):
