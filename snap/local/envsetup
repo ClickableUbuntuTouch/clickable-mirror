@@ -8,18 +8,8 @@ fi
 # Check for supported interfaces
 ERROR=0
 
-if ! snapctl is-connected raw-usb; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:raw-usb"
-    ERROR=1
-fi
-
 if ! snapctl is-connected docker; then
     echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:docker docker"
-    ERROR=1
-fi
-
-if ! snapctl is-connected home; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:home"
     ERROR=1
 fi
 
@@ -28,28 +18,18 @@ if ! snapctl is-connected removable-media; then
     ERROR=1
 fi
 
-if ! snapctl is-connected network; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:network"
-    ERROR=1
-fi
-
-if ! snapctl is-connected network-bind; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:network-bind"
-    ERROR=1
-fi
-
 if ! snapctl is-connected ssh-keys; then
     echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:ssh-keys"
     ERROR=1
 fi
 
-if ! snapctl is-connected ssh-public-keys; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:ssh-public-keys"
+if ! snapctl is-connected adb-support; then
+    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:adb-support"
     ERROR=1
 fi
 
-if ! snapctl is-connected adb-support; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:adb-support"
+if ! snapctl is-connected etc-gitconfig; then
+    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:etc-gitconfig"
     ERROR=1
 fi
 
