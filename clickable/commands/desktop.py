@@ -159,7 +159,9 @@ class DesktopCommand(Command):
         if is_command('xhost'):
             subprocess.check_call(shlex.split('xhost +local:docker'))
         else:
-            logger.warning('xhost not installed, desktop mode may fail')
+            logger.warning('xhost not detected, desktop mode may fail. '
+                           'If you are using the snap package, '
+                           'run "xhost +local:docker" before running the desktop command.')
 
         return self.setup_docker_config()
 
