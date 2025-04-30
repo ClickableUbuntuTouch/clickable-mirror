@@ -105,8 +105,10 @@ App Manifest
 The ``architecture`` and ``framework`` fields in the ``manifest.json`` need to be set according
 to the architecture the app is build for (``--arch``) and the minimum framework version it
 requires, e.g. depending on the QT Version (:ref:`qt_version <project-config-qt_version>`).
+
 To let Clickable automatically set those fields, leave them empty or set them to
-``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@`` respectively.
+``@CLICK_ARCH@`` and ``@CLICK_FRAMEWORK@`` respectively. The apparmor policy needs to match
+the framework. To let Clickable fill it, leave it empty or set it to ``@APPARMOR_POLICY@``.
 
 Note: The app templates provided by Clickable make use of CMake's ``configure()`` to set
 the fields in the ``manifest.json``.

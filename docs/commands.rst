@@ -97,6 +97,9 @@ find it in the build dir). Finally runs a review.
 Set the manifest architecture field to ``@CLICK_ARCH@`` and the framework field
 to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate values.
 
+Set the apparmor policy to ``@APPARMOR_POLICY@`` to have Clickable replace it with
+an appropriate value based on the framework.
+
 Specify where to put the compiled click by ``--output``.
 
 Builds libraries specified in the project config using the ``libs`` parameter.

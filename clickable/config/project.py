@@ -179,6 +179,7 @@ class ProjectConfig(BaseConfig):
             'qt_version': Constants.default_qt,
             'rust_channel': None,
             'framework': None,
+            'apparmor_policy': None,
             'always_clean': False,
             'skip_review': False,
             'ignore_review_warnings': None,
@@ -374,6 +375,10 @@ class ProjectConfig(BaseConfig):
                 raise ClickableException(f'Qt version "{qt}" is not known to Clickable')
 
             self.config['framework'] = framework
+
+        if not self.config['apparmor_policy']:
+            self.config['apparmor_policy'] = Constants.default_framework_base_policy_mapping[
+                self.get_framework_base()]
 
         self.set_build_arch()
         self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.build_arch]
