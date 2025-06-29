@@ -229,6 +229,8 @@ class ProjectConfig(BaseConfig):
         if always_clean:
             self.config['always_clean'] = True
 
+        self.harmonize_config()
+
     def setup(self):
         self.ignore.extend([
             '.git', '.bzr', '.clickable', '.gitlab-ci.yml', 'build', '.gitignore', '.bzrignore'
