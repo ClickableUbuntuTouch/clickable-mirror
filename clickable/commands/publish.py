@@ -69,8 +69,9 @@ class PublishCommand(Command):
             return 'xenial'
         if '20.04' in self.config.framework:
             return 'focal'
-        raise ClickableException(f'Clickable does not know an Open Store channel \
-                corresponding to framework {self.config.framework}')
+
+        # All new releases use channel 'focal'.
+        return 'focal'
 
     def run(self):
         if not REQUESTS_AVAILABLE:
