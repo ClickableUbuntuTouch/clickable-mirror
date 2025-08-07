@@ -55,15 +55,8 @@ Install as Snap
    sudo snap install clickable
    sudo snap install docker
    # Add connections
-   sudo snap connect clickable:raw-usb
-   sudo snap connect clickable:docker docker
-   sudo snap connect clickable:home
-   sudo snap connect clickable:removable-media
-   sudo snap connect clickable:network
-   sudo snap connect clickable:network-bind
    sudo snap connect clickable:ssh-keys
-   sudo snap connect clickable:ssh-public-keys
-   sudo snap connect clickable:adb-support
+   sudo snap connect clickable:etc-gitconfig
 
 Install Via PPA (Ubuntu)
 ------------------------

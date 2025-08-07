@@ -27,6 +27,7 @@ from clickable.exceptions import ClickableException
 
 from .base import Command
 from .build import BuildCommand
+from .docker.dbus_support import DBusSupport
 from .docker.debug_gdb_support import DebugGdbSupport
 from .docker.debug_valgrind_support import DebugValgrindSupport
 from .docker.docker_config import DockerConfig
@@ -55,6 +56,7 @@ class DesktopCommand(Command):
         self.desktop_locale = 'C'
         self.qmllive = False
         self.file_observer = None
+        self.dbus = False
 
         self.builder = BuildCommand(skip_review=True, skip_click=True)
 
@@ -101,6 +103,13 @@ class DesktopCommand(Command):
             help='Start app with the given language code',
             default=os.getenv('LANG', 'C')
         )
+        parser.add_argument(
+            '--dbus',
+            action='store_true',
+            help='Start app with dbus passthrough (eg. to allow app to \
+                    connect to Bluetooth devices)',
+            default=False
+        )
 
     def configure(self, args):
         self.builder.init_from_command(self)
@@ -113,6 +122,7 @@ class DesktopCommand(Command):
         self.qmllive = args.qmllive
         self.dark_mode = args.dark_mode
         self.desktop_locale = args.lang
+        self.dbus = args.dbus
 
         if self.qmllive and self.skip_build:
             logger.warning(
@@ -159,7 +169,9 @@ class DesktopCommand(Command):
         if is_command('xhost'):
             subprocess.check_call(shlex.split('xhost +local:docker'))
         else:
-            logger.warning('xhost not installed, desktop mode may fail')
+            logger.warning('xhost not detected, desktop mode may fail. '
+                           'If you are using the snap package, '
+                           'run "xhost +local:docker" before running the desktop command.')
 
         return self.setup_docker_config()
 
@@ -169,6 +181,7 @@ class DesktopCommand(Command):
         docker_config.uid = os.getuid()
         docker_config.docker_image = self.container.docker_image
         docker_config.use_nvidia = self.config.use_nvidia
+        docker_config.dbus = self.dbus
 
         if self.custom_mode:
             docker_config.execute = self.command
@@ -214,6 +227,8 @@ class DesktopCommand(Command):
 
         GoSupport(self.config).update(docker_config)
         RustSupport(self.config).update(docker_config)
+
+        DBusSupport().update(docker_config)
 
         return docker_config
 

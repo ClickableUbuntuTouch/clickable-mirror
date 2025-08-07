@@ -17,6 +17,12 @@ architectures:
 - build-on: arm64
 - build-on: armhf
 
+plugs:
+  etc-gitconfig:
+    interface: system-files
+    read:
+    - /etc/gitconfig
+
 apps:
   clickable:
     environment:
@@ -26,7 +32,7 @@ apps:
     command-chain:
       - bin/envsetup
     command: bin/clickable
-    plugs: [ home, removable-media, network, network-bind, ssh-keys, ssh-public-keys, adb-support, raw-usb, docker ]
+    plugs: [ home, removable-media, network, network-bind, ssh-keys, adb-support, docker, etc-gitconfig ]
 
 parts:
   clickable:

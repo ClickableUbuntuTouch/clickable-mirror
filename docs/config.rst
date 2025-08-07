@@ -4,7 +4,8 @@ Clickable Config Format
 =======================
 
 Optionally, a config file can be provided to configure Clickable for
-all projects. The file needs to be located at ``~/.clickable/config.yaml``.
+all projects. The file needs to be located at ``~/.clickable/config.yaml``
+or ``~/snap/clickable/current/.clickable/config.yaml`` for the snap package.
 
 Example:
 

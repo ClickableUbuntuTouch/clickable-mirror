@@ -136,6 +136,13 @@ class Constants():
         'next': 'next',
     }
 
+    default_framework_base_policy_mapping = {
+        '16.04': '16.04',
+        '20.04': '20.04',
+        '24.04-1.x': '2404.1',
+        'next': '9999',
+    }
+
     default_qt_framework_mapping = {
         '5.12': 'ubuntu-sdk-20.04.1',
         '5.15': 'ubuntu-touch-24.04-1.x',

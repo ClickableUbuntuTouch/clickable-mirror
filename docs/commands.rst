@@ -37,7 +37,7 @@ A clean build in a chain can be enforced by running ``clickable chain --clean``.
 Compiles and runs the app on the desktop. Accepts the same arguments as the ``build`` command
 plus some desktop mode specific ones.
 
-Note: ArchLinux user might need to run ``xhost +local:clickable`` before using
+Note: Snap and ArchLinux users might need to run ``xhost +local:clickable`` before using
 desktop mode.
 
 Run ``clickable desktop --dark-mode`` to set the dark mode preference.
@@ -96,6 +96,9 @@ find it in the build dir). Finally runs a review.
 
 Set the manifest architecture field to ``@CLICK_ARCH@`` and the framework field
 to ``@CLICK_FRAMEWORK@`` to have Clickable replace them with the appropriate values.
+
+Set the apparmor policy to ``@APPARMOR_POLICY@`` to have Clickable replace it with
+an appropriate value based on the framework.
 
 Specify where to put the compiled click by ``--output``.
 

@@ -359,11 +359,15 @@ class Container():
 
             # make sure PID 1 process handles signals
             if not tty:
+                command = command.replace('"', '\\"')
                 command = f'''
 set -Eeou pipefail
 trap "exit" SIGINT
 trap "exit" SIGTERM
-{command} &
+execute() {{
+{command}
+}}
+execute &
 bg_pid=$!
 wait $bg_pid
 exit $?

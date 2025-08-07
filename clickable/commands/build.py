@@ -407,8 +407,23 @@ class BuildCommand(Command):
         if has_changed:
             self.config.install_files.write_manifest(manifest)
 
+    def set_apparmor_policy(self, apparmor_file):
+        content = self.config.install_files.load_apparmor(apparmor_file)
+        policy = content.get('policy_version', None)
+        expectation = float(self.config.apparmor_policy)
+
+        if policy in ['@APPARMOR_POLICY@', '']:
+            content['policy_version'] = expectation
+            self.config.install_files.write_apparmor(apparmor_file, content)
+        elif policy != expectation:
+            logger.debug('Apparmor policy in %s is "%s", Clickable expected "%s".',
+                         apparmor_file, policy, expectation)
+
     def click_build(self):
         self.manipulate_manifest()
+
+        for apparmor in self.config.install_files.get_apparmor_files():
+            self.set_apparmor_policy(apparmor)
 
         command = f'click build {self.config.install_dir} --no-validate'
         self.container.run_command(command)

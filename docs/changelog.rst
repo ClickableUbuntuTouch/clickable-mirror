@@ -3,6 +3,16 @@
 Changelog
 =========
 
+Changes in v8.4.0
+-----------------
+
+- Added the ability to automatically set the apparmor version by using ``@APPARMOR_POLICY@``
+- Added the ``--dbus`` argument to the ``desktop`` command to pass dbus into the container
+- Fixed the container not being setup for the ``test`` command
+- Fixed multi-line commands not working
+- Fixed ``CLICKABLE_BUILD_ARGS`` not working
+- Updated to use the correct channel when publishing Noble apps to the OpenStore
+
 Changes in v8.3.1
 -----------------
 

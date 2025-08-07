@@ -162,6 +162,34 @@ class InstallFiles():
     def get_manifest(self):
         return self.load_manifest(os.path.join(self.install_dir, "manifest.json"))
 
+    def get_apparmor_files(self):
+        manifest = self.get_manifest()
+        hooks = manifest.get('hooks', [])
+        files = [hook.get('apparmor', None) for hook in hooks.values()]
+        return [f for f in files if f]
+
+    def write_apparmor(self, apparmor_file, content):
+        with open(os.path.join(self.install_dir, apparmor_file),
+                  'w', encoding='UTF-8')as writer:
+            json.dump(content, writer, indent=4)
+
+    def load_apparmor(self, apparmor_file):
+        path = os.path.join(self.install_dir, apparmor_file)
+        apparmor = {}
+
+        if not os.path.exists(path):
+            raise ClickableException(f"Can't find apparmor file {apparmor_file}.")
+
+        with open(path, 'r', encoding='UTF-8') as f:
+            try:
+                apparmor = json.load(f)
+            except ValueError as err:
+                raise ClickableException(
+                    f'Failed reading {path}, it is not valid json'
+                ) from err
+
+        return apparmor
+
     def try_find_locale(self):
         return ':'.join(glob.glob(f"{self.install_dir}/**/locale", recursive=True))
 

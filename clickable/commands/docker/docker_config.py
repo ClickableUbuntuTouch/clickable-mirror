@@ -16,6 +16,7 @@ class DockerConfig():
     uid = ''
 
     use_nvidia = False
+    dbus = False
 
     def add_volume_mappings(self, volume_mapping_dict):
         self.volumes.update(volume_mapping_dict)

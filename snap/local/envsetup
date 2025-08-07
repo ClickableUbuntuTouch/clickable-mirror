@@ -1,63 +1,30 @@
 #!/bin/bash
+set -Eeou pipefail
 
 # For Podman
 if [ ! -d $XDG_RUNTIME_DIR ]; then
     mkdir -p $XDG_RUNTIME_DIR
 fi
 
-# Check for supported interfaces
-ERROR=0
+# Check for missing connections on supported interfaces
+PLUGS=(removable-media ssh-keys adb-support docker etc-gitconfig)
+MISSING_CONNECTION=()
 
-if ! snapctl is-connected raw-usb; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:raw-usb"
-    ERROR=1
+for plug in "${PLUGS[@]}"; do
+    if ! snapctl is-connected "${plug}"; then
+        MISSING_CONNECTION+=("${plug}")
+    fi
+done
+
+if [ ${#MISSING_CONNECTION[*]} -gt 0 ]; then
+    echo "Missing connection(s). You can add connection(s) manually by running:"
+
+    for connection in "${MISSING_CONNECTION[@]}"; do
+        echo "sudo snap connect clickable:${connection}"
+    done
 fi
 
-if ! snapctl is-connected docker; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:docker docker"
-    ERROR=1
-fi
-
-if ! snapctl is-connected home; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:home"
-    ERROR=1
-fi
-
-if ! snapctl is-connected removable-media; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:removable-media"
-    ERROR=1
-fi
-
-if ! snapctl is-connected network; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:network"
-    ERROR=1
-fi
-
-if ! snapctl is-connected network-bind; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:network-bind"
-    ERROR=1
-fi
-
-if ! snapctl is-connected ssh-keys; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:ssh-keys"
-    ERROR=1
-fi
-
-if ! snapctl is-connected ssh-public-keys; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:ssh-public-keys"
-    ERROR=1
-fi
-
-if ! snapctl is-connected adb-support; then
-    echo "ERROR: Missing connection, try again after you've ran: sudo snap connect clickable:adb-support"
-    ERROR=1
-fi
-
-if [ "$ERROR" = "1" ]; then
-    echo "Errors encountered, bailing..."
-    exit 1
-fi
-
+# Run Clickable
 export PATH=${SNAP}/usr/lib/git-core/:${PATH}
 $@
 EXIT_CODE=$?
