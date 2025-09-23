@@ -22,6 +22,7 @@ class LibInitConfig:
         self.arch_inferred = False
         self.root_dir = None
         self.qt_version = None
+        self.framework = None
         self.verbose = None
         self.libs_placeholders = None
         self.lib_configs = None
@@ -36,6 +37,8 @@ class LibConfig():
     config = {}
 
     static_placeholders = OrderedDict({
+        "SDK_FRAMEWORK": "framework",
+        "QT_VERSION": "qt_version",
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
         "ARCH_RUST": "arch_rust",
@@ -73,7 +76,6 @@ class LibConfig():
     lib_configs = []
 
     def __init__(self, config):
-        self.qt_version = config.qt_version
         self.verbose = config.verbose
         self.container_mode = config.container_mode
         self.build_arch = config.build_arch
@@ -116,6 +118,8 @@ class LibConfig():
             'image_setup': {},
             'test': None,
             'rust_channel': None,
+            'framework': config.framework,
+            'qt_version': config.qt_version,
         }
 
         self.config.update(config.config_dict)
