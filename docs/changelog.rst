@@ -3,6 +3,13 @@
 Changelog
 =========
 
+Changes in v8.5.0
+-----------------
+
+- Fixed crash when only podman is installed
+- Fixed ``clean-images`` command for 24.04 images
+- Added ``SDK_FRAMEWORK`` and ``QT_VERSION`` env vars for libraries, too
+
 Changes in v8.4.0
 -----------------
 
