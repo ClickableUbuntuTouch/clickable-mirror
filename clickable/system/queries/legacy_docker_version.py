@@ -1,7 +1,7 @@
 import re
 
 from clickable.system.query import Query
-from clickable.utils import run_subprocess_check_output
+from clickable.utils import run_subprocess_check_output, get_docker_command
 
 
 class LegacyDockerVersion(Query):
@@ -33,7 +33,22 @@ class LegacyDockerVersion(Query):
         }
 
     def get_docker_version_string(self):
-        return run_subprocess_check_output("docker version --format '{{.Client.Version}}'")
+        cmd = get_docker_command()
+        if cmd == 'podman':
+            # Prefer structured output. Newer podman supports Go template '{{.Version}}'.
+            try:
+                return run_subprocess_check_output("podman version --format '{{.Version}}'")
+            except Exception:
+                # Fallback: try JSON and grep Version field from Client/Server or top-level
+                try:
+                    output = run_subprocess_check_output('podman version --format json')
+                except Exception:
+                    # Last resort: plain text `podman version` and regex the first X.Y
+                    output = run_subprocess_check_output('podman version')
+                match = re.search(r"(\d+\.\d+)", output)
+                return match.group(1) if match else output.strip()
+        else:
+            return run_subprocess_check_output("docker version --format '{{.Client.Version}}'")
 
     def get_user_instructions(self):
         return None

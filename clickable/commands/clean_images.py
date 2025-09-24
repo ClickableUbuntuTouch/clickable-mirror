@@ -38,7 +38,7 @@ class CleanImagesCommand(Command):
         self.container.check_docker()
         docker_executable = get_docker_command()
 
-        image_format = r'clickable\/\w{5}-\d\d\.\d\d-\w{5}'
+        image_format = r'clickable\/\w{5}-(?:ut|)\d\d\.\d\d(?:-\d\.\w|)-\w{5}'
         pattern_base = re.compile(image_format)
         pattern_derived = re.compile(image_format + r'-\w{8}[-\w]+')
 
