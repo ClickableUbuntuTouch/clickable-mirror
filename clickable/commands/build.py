@@ -394,6 +394,20 @@ class BuildCommand(Command):
 
         return False
 
+    def manipulate_version(self, manifest):
+        version = manifest.get('version', None)
+        new_version = version.replace(
+            '@CLICK_FRAMEWORK@',
+            self.config.framework).replace(
+            '@CLICK_FRAMEWORK_BASE@',
+            self.config.get_framework_base())
+
+        if new_version != version:
+            manifest['version'] = new_version
+            return True
+
+        return False
+
     def manipulate_manifest(self):
         manifest = self.config.install_files.get_manifest()
         has_changed = False
@@ -402,6 +416,9 @@ class BuildCommand(Command):
             has_changed = True
 
         if self.set_framework(manifest):
+            has_changed = True
+
+        if self.manipulate_version(manifest):
             has_changed = True
 
         if has_changed:
