@@ -113,7 +113,7 @@ the framework. To let Clickable fill it, leave it empty or set it to ``@APPARMOR
 If you need to distinguish different frameworks for the same app version, you
 may append your version with either ``@CLICK_FRAMEWORK_BASE@`` or
 ``@CLICK_FRAMEWORK@`` to let Clickable fill it, e.g.
-``1.0.0-@CLICK_FRAMEWORK_BASE`` may result in ``1.0.0-24.04-1.x``.
+``1.0.0-@CLICK_FRAMEWORK_BASE@`` may result in ``1.0.0-24.04-1.x``.
 
 Note: The app templates provided by Clickable make use of CMake's ``configure()`` to set
 the fields in the ``manifest.json``.
