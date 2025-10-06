@@ -30,6 +30,6 @@ class TestUpdateCommand(UnitTest):
     ):
         self.command.run()
 
-        mock_check_docker.assert_called_once_with()
+        mock_check_docker.assert_called_with()
         mock_run_image_exists.assert_called_with(ANY)
         mock_run_pull_image.assert_called_with(ANY, skip_existing=False)

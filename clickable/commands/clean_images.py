@@ -70,9 +70,13 @@ class CleanImagesCommand(Command):
 
         if self.confirm("Delete images?"):
             run_subprocess_check_call(delete_command)
+            prune_command = f"{docker_executable} system prune"
             logger.info(
-                'Finished. You may run "%s system prune" to free some space.',
-                docker_executable)
+                'Finished. You may run "%s" to free some space.',
+                prune_command)
+
+            if self.confirm(f'Run "{prune_command}" now?', default=False):
+                run_subprocess_check_call(prune_command)
         else:
             logger.info("skipped")
 
