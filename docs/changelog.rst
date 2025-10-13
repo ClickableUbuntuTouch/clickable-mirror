@@ -3,6 +3,13 @@
 Changelog
 =========
 
+Changes in v8.6.0
+-----------------
+
+- Added support for ``@CLICK_FRAMEWORK@`` and ``@CLICK_FRAMEWORK_BASE@`` placeholders in manifest version field
+- Require docker image v12 to ensure up-to-date reviewer tool
+- Let update-images command also clean images after update
+
 Changes in v8.5.0
 -----------------
 

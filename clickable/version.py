@@ -12,9 +12,9 @@ try:
 except ImportError:
     REQUESTS_AVAILABLE = False
 
-__version__ = '8.5.0'
+__version__ = '8.6.0'
 
-__container_minimum_required__ = 11
+__container_minimum_required__ = 12
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 

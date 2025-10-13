@@ -1,3 +1,11 @@
+clickable (8.6.0) unstable; urgency=medium
+
+  * Added support for ``@CLICK_FRAMEWORK@`` and ``@CLICK_FRAMEWORK_BASE@`` placeholders in manifest version field
+  * Require docker image v12 to ensure up-to-date reviewer tool
+  * Let update-images command also clean images after update
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Tue, 07 Oct 2025 10:26:59 -0500
+
 clickable (8.5.0) unstable; urgency=medium
 
   * Fixed crash when only podman is installed
