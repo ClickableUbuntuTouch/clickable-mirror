@@ -12,7 +12,7 @@ class ThemeSupport(DockerSupport):
         self.dark_mode = dark_mode
 
     def update(self, docker_config: DockerConfig):
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             folder = "ubuntu-ui-toolkit"
             theme_base = 'Ubuntu.Components.Themes'
         else:

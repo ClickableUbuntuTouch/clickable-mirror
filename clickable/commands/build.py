@@ -368,15 +368,15 @@ class BuildCommand(Command):
     def set_arch(self, manifest):
         arch = manifest.get('architecture', None)
 
-        if arch in ['@CLICK_ARCH@', '']:
+        if arch in ['$ENV{ARCH}', '$ENV{CLICK_ARCH}', '@CLICK_ARCH@', '']:
             manifest['architecture'] = self.config.arch
             return True
 
         if arch != self.config.arch:
             raise ClickableException(
                 f'Clickable is building for architecture "{self.config.arch}", but "{arch}" is '
-                'specified in the manifest. You can set the architecture field to @CLICK_ARCH@ to '
-                'let Clickable set the architecture field automatically.'
+                'specified in the manifest. You can set the architecture field to '
+                '$ENV{CLICK_ARCH} to let Clickable set the architecture field automatically.'
             )
 
         return False
@@ -384,7 +384,7 @@ class BuildCommand(Command):
     def set_framework(self, manifest):
         framework = manifest.get('framework', None)
 
-        if framework in ['@CLICK_FRAMEWORK@', '']:
+        if framework in ['$ENV{CLICK_FRAMEWORK}', '$ENV{SDK_FRAMEWORK}', '@CLICK_FRAMEWORK@', '']:
             manifest['framework'] = self.config.framework
             return True
 
@@ -399,8 +399,12 @@ class BuildCommand(Command):
         new_version = version.replace(
             '@CLICK_FRAMEWORK@',
             self.config.framework).replace(
+            '$ENV{CLICK_FRAMEWORK}',
+            self.config.framework).replace(
             '@CLICK_FRAMEWORK_BASE@',
-            self.config.get_framework_base())
+            self.config.framework_base).replace(
+            '$ENV{CLICK_FRAMEWORK_BASE}',
+            self.config.framework_base)
 
         if new_version != version:
             manifest['version'] = new_version
@@ -429,7 +433,7 @@ class BuildCommand(Command):
         policy = content.get('policy_version', None)
         expectation = float(self.config.apparmor_policy)
 
-        if policy in ['@APPARMOR_POLICY@', '']:
+        if policy in ['$ENV{APPARMOR_POLICY}', '@APPARMOR_POLICY@', '']:
             content['policy_version'] = expectation
             self.config.install_files.write_apparmor(apparmor_file, content)
         elif policy != expectation:

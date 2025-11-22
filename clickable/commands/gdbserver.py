@@ -175,7 +175,7 @@ class GdbserverCommand(Command):
         return environ
 
     def get_app_env(self):
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             return self.get_app_env_xenial()
 
         package_name = self.config.install_files.find_package_name()
@@ -241,7 +241,7 @@ class GdbserverCommand(Command):
         return environ
 
     def get_cached_desktop_path(self):
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             return os.path.join(
                 "/home/phablet/.cache/ubuntu-app-launch/desktop",
                 f"{self.get_app_id()}.desktop"
