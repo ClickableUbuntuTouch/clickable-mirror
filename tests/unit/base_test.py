@@ -8,17 +8,17 @@ from ..mocks import ConfigMock
 
 
 class UnitTest(TestCase):
-    def setUpWithTmpBuildDir(self):
+    def setUpWithTmpBuildDir(self, commands):
         config_json = {}
         config_json["build_dir"] = "/tmp/build"
         config_json["install_dir"] = "/tmp/build/install"
-        self.setUpConfig(mock_config_json=config_json)
+        self.setUpConfig(commands=commands, mock_config_json=config_json)
 
     def setUpConfig(self,
+                    commands,
                     expect_exception=False,
                     mock_config_json={},
                     mock_config_env={},
-                    commands=['build'],
                     *args, **kwargs):
         self.config = None
         try:

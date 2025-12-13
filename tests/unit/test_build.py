@@ -5,6 +5,13 @@ from clickable.commands.build import BuildCommand
 from ..mocks import empty_fn, false_fn
 from .base_test import UnitTest
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def mock_function(monkeypatch):
+    monkeypatch.setattr("clickable.container.Container.is_docker_desktop", false_fn)
+
 
 class TestBuildCommand(UnitTest):
     def setUp(self):
@@ -21,13 +28,14 @@ class TestBuildCommand(UnitTest):
                 }
             }
         }
-        self.setUpConfig(mock_config_json=config_json)
+        self.setUpConfig(commands="build", mock_config_json=config_json)
 
         self.click_cmd = 'click build {} --no-validate'.format(self.config.install_dir)
 
+    # @mock.patch('clickable.container.Container.is_docker_desktop', side_effect=false_fn)
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
     @mock.patch('os.makedirs', side_effect=empty_fn)
-    def test_lib_build(self, mock_makedirs, mock_run_command):
+    def test_lib_build(self, mock_makedirs, mock_run_command):  # , mock_desktop):
         self.command.app = False
         self.command.libs = []
         self.command.run()

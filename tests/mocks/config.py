@@ -31,6 +31,9 @@ class ConfigMock(ProjectConfig):
                  respect_container_mode=False,
                  args=None,
                  commands=['build']):
+        if isinstance(commands, str):
+            commands = [commands]
+
         container_mode_key = "CLICKABLE_CONTAINER_MODE"
 
         if respect_container_mode:

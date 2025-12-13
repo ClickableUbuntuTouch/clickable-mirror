@@ -1,14 +1,21 @@
 from unittest import mock
 
 from clickable.commands.run import RunCommand
-from ..mocks import empty_fn
+from ..mocks import empty_fn, false_fn
 from .base_test import UnitTest
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def mock_function(monkeypatch):
+    monkeypatch.setattr("clickable.container.Container.is_docker_desktop", false_fn)
 
 
 class TestRunCommand(UnitTest):
     def setUp(self):
         self.command = RunCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="run")
 
     @mock.patch('clickable.container.Container.run_command', side_effect=empty_fn)
     @mock.patch('clickable.container.Container.setup', side_effect=empty_fn)

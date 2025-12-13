@@ -5,7 +5,7 @@ from .base_test import UnitTest
 class TestPublishCommand(UnitTest):
     def setUp(self):
         self.command = PublishCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="publish")
 
 
 # TODO implement this
