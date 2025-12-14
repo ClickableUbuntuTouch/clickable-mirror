@@ -33,6 +33,7 @@ integration-test:
   variables:
     CLICKABLE_SKIP_DOCKER_CHECKS: 1
   script:
+    - docker info
     - export HOME=`pwd`/home
     - mkdir -p $HOME
     - pytest ./tests/integration
