@@ -16,7 +16,7 @@ def devices(*args, **kwargs):
 class TestDevicesCommand(UnitTest):
     def setUp(self):
         self.command = DevicesCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="devices")
 
     @mock.patch('clickable.commands.devices.detect_adb_attached', side_effect=no_devices)
     @mock.patch('clickable.commands.devices.logger.warning', side_effect=empty_fn)

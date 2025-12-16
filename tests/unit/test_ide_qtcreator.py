@@ -13,7 +13,7 @@ class TestIdeQtCreatorCommand(UnitTest):
 
     def setUp(self):
         super().setUp()
-        self.setUpConfig()
+        self.setUpConfig(commands="ide")
         self.docker_config = DockerConfig()
         self.docker_config.add_environment_variables(
             {

@@ -9,7 +9,7 @@ from .base_test import UnitTest
 class TestInstallCommand(UnitTest):
     def setUp(self):
         self.command = InstallCommand()
-        self.setUpWithTmpBuildDir()
+        self.setUpWithTmpBuildDir(commands="install")
 
     @mock.patch('clickable.device.Device.push_file', side_effect=empty_fn)
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)

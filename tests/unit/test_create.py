@@ -9,7 +9,7 @@ from ..mocks import empty_fn
 class TestCreateCommand(UnitTest):
     def setUp(self):
         self.command = CreateCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="create")
 
     @mock.patch('cookiecutter.main.cookiecutter', side_effect=empty_fn)
     def test_create_interactive(self, mock_cookiecutter):

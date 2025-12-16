@@ -9,7 +9,7 @@ from .base_test import UnitTest
 class TestLogCommand(UnitTest):
     def setUp(self):
         self.command = LogCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="log")
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_log(self, mock_run_command):

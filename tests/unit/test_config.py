@@ -7,7 +7,7 @@ from ..mocks import ConfigMock, true_fn
 
 class TestConfigCommand(TestCase):
     def setUp(self):
-        self.config = ConfigMock(mock_config_env={})
+        self.config = ConfigMock(commands="build", mock_config_env={})
         self.config.arch = None
         self.config.make_jobs = None
 

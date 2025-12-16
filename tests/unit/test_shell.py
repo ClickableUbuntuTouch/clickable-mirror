@@ -5,7 +5,7 @@ from .base_test import UnitTest
 class TestShellCommand(UnitTest):
     def setUp(self):
         self.command = ShellCommand()
-        self.setUpConfig()
+        self.setUpConfig(commands="shell")
 
 
 # TODO implement this
