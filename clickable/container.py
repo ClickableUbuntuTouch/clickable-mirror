@@ -310,7 +310,7 @@ class Container():
         # e.g. "--uidmap 1000:0:1 --uidmap 0:1:1000"
         return f'{flag} {mapid}:0:1 {flag} 0:1:{mapid}'
 
-    def run_command(self,
+    def run_command(self,  # pylint: disable=too-many-positional-arguments
                     command,
                     root_user=False,
                     get_output=False,

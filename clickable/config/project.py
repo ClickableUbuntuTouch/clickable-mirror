@@ -196,8 +196,9 @@ class ProjectConfig(BaseConfig):
 
         self.harmonize_config()
 
-    def configure(self, global_config: GlobalConfig, commands, args=None, device_arch=None,
-                  cwd=None, always_clean=False):
+    def configure(self,  # pylint: disable=too-many-positional-arguments
+                  global_config: GlobalConfig, commands, args=None,
+                  device_arch=None, cwd=None, always_clean=False):
         self.global_config = global_config
 
         self.placeholders.update(ProjectConfig.static_placeholders)

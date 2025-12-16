@@ -82,7 +82,7 @@ def find_pattern(pattern, base_dir, exclude_dir=None):
     return files
 
 
-def find(
+def find(  # pylint: disable=too-many-positional-arguments
     names,
     cwd,
     temp_dir=None,
