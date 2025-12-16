@@ -7,6 +7,7 @@ import glob
 import inspect
 from os.path import dirname, basename, isfile, isdir, join
 
+from jsonschema import validate, ValidationError
 import yaml
 
 from clickable.builders.base import Builder
@@ -14,15 +15,6 @@ from clickable.logger import logger
 from clickable.exceptions import FileNotFoundException, ClickableException
 from clickable.config.constants import Constants
 from clickable.logger import Colors
-
-SCHEMA_VALIDATOR_AVAILABLE = True
-try:
-    from jsonschema import validate, ValidationError
-except ImportError:
-    SCHEMA_VALIDATOR_AVAILABLE = False
-
-
-# TODO use these subprocess functions everywhere
 
 
 def prepare_command(cmd, shell=False):
@@ -270,21 +262,18 @@ def load_config_schema(name):
 
 
 def validate_config_format(config, schema, name, path):
-    if SCHEMA_VALIDATOR_AVAILABLE:
-        try:
-            validate(instance=config, schema=schema)
-        except ValidationError as e:
-            logger.error('The %s config file "%s" contains invalid fields!', name, path)
-            error_message = e.message
-            # Lets add the key to the invalid value
-            if e.path:
-                if len(e.path) > 1 and isinstance(e.path[-1], int):
-                    error_message = f'{error_message} (in "{e.path[-2]}")'
-                else:
-                    error_message = f'{error_message} (in "{e.path[-1]}")'
-            raise ClickableException(error_message) from e
-    else:
-        logger.warning('Dependency "jsonschema" not found. Could not validate config file.')
+    try:
+        validate(instance=config, schema=schema)
+    except ValidationError as e:
+        logger.error('The %s config file "%s" contains invalid fields!', name, path)
+        error_message = e.message
+        # Lets add the key to the invalid value
+        if e.path:
+            if len(e.path) > 1 and isinstance(e.path[-1], int):
+                error_message = f'{error_message} (in "{e.path[-2]}")'
+            else:
+                error_message = f'{error_message} (in "{e.path[-1]}")'
+        raise ClickableException(error_message) from e
 
 
 def pull_image(image, skip_existing=True):
