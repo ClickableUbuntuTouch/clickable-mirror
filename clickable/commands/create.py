@@ -1,16 +1,11 @@
 import os
 from datetime import datetime
+import cookiecutter.main
 
 from clickable.config.constants import Constants
 from clickable.exceptions import ClickableException
 from clickable.utils import check_command
 from .base import Command
-
-COOKIECUTTER_AVAILABLE = True
-try:
-    import cookiecutter.main
-except ImportError:
-    COOKIECUTTER_AVAILABLE = False
 
 
 COOKIECUTTER_URL = 'https://gitlab.com/clickable/ut-app-meta-template.git'
@@ -146,13 +141,6 @@ class CreateCommand(Command):
             self.extra_context['Git Tag Versioning'] = 'y'
 
     def run(self):
-        if not COOKIECUTTER_AVAILABLE:
-            raise ClickableException(
-                'Cookiecutter is not available on your computer, more information '
-                'can be found here: '
-                'https://cookiecutter.readthedocs.io/en/latest/installation.html'
-            )
-
         check_command("git")
 
         config_file = os.path.join(Constants.clickable_dir, 'cookiecutter_config.yaml')
