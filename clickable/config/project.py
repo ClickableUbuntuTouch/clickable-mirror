@@ -55,6 +55,9 @@ class ProjectConfig(BaseConfig):
 
     static_placeholders = OrderedDict({
         "SDK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK_BASE": "framework_base",
+        "APPARMOR_POLICY": "apparmor_policy",
         "QT_VERSION": "qt_version",
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
@@ -179,6 +182,7 @@ class ProjectConfig(BaseConfig):
             'qt_version': Constants.default_qt,
             'rust_channel': None,
             'framework': None,
+            'framework_base': None,
             'apparmor_policy': None,
             'always_clean': False,
             'skip_review': False,
@@ -378,9 +382,15 @@ class ProjectConfig(BaseConfig):
 
             self.config['framework'] = framework
 
+        self.config['framework_base'] = Constants.framework_base_default
+        for base in Constants.framework_base:
+            if self.config['framework'].find(base) != -1:
+                self.config['framework_base'] = base
+                break
+
         if not self.config['apparmor_policy']:
             self.config['apparmor_policy'] = Constants.default_framework_base_policy_mapping[
-                self.get_framework_base()]
+                self.config['framework_base']]
 
         self.set_build_arch()
         self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.build_arch]
@@ -389,14 +399,7 @@ class ProjectConfig(BaseConfig):
         if self.config['framework'] in Constants.framework_image_mapping:
             return Constants.framework_image_mapping[self.config['framework']]
 
-        return Constants.framework_image_fallback[self.get_framework_base()]
-
-    def get_framework_base(self):
-        for base in Constants.framework_base:
-            if self.config['framework'].find(base) != -1:
-                return base
-
-        return Constants.framework_base_default
+        return Constants.framework_image_fallback[self.config['framework_base']]
 
     def setup_image(self):
         if self.needs_clickable_image():

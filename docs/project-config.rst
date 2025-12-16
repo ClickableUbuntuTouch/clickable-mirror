@@ -28,7 +28,10 @@ The following table lists all available placeholders.
 ======================= ======
 Placeholder             Output
 ======================= ======
-SDK_FRAMEWORK           Target framework (``ubuntu-sdk-20.04`` by default)
+CLICK_FRAMEWORK_BASE    Target framework base (``20.04`` by default)
+CLICK_FRAMEWORK         Target framework (``ubuntu-sdk-20.04`` by default)
+SDK_FRAMEWORK           Depecrated, same as CLICK_FRAMEWORK
+APPARMOR_POLICY         The (assumed) app armor policy, based on target framework
 QT_VERSION              Qt version within target framework (``5.12`` by default)
 ARCH                    Target architecture (``armhf``, ``arm64``, ``amd64`` or ``all``)
 ARCH_TRIPLET            Target architecture triplet (``arm-linux-gnueabihf``, ``aarch64-linux-gnu``, ``x86_64-linux-gnu`` or ``all``)

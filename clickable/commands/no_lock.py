@@ -12,7 +12,7 @@ class NoLockCommand(Command):
 
     def run(self):
         logger.info('Turning off device activity timeout')
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             command = 'gsettings set com.ubuntu.touch.system activity-timeout 0'
         else:
             command = 'gsettings set com.lomiri.touch.system activity-timeout 0'

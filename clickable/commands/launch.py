@@ -71,7 +71,7 @@ class LaunchCommand(Command):
         if self.config.launch:
             logger.debug("Using custom launch command")
             launch = self.config.launch
-        elif self.config.get_framework_base() == '16.04':
+        elif self.config.framework_base == '16.04':
             logger.debug("Using UT 16.04 launch command")
             launch = f'ubuntu-app-launch {self.package}'
         else:

@@ -20,7 +20,7 @@ class LogCommand(Command):
             return
 
         package_name = self.config.install_files.find_full_package_name()
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             logger.debug("Using UT 16.04 log command")
 
             log = f'~/.cache/upstart/application-click-{package_name}.log'
