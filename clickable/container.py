@@ -64,29 +64,35 @@ class Container():
         if not os.path.exists(self.docker_name_file):
             return
 
+        self.check_docker()
+
         with open(self.docker_name_file, 'r', encoding='UTF-8') as f:
             cached_image = None
-            cached_base_image = None
+            invalid_file = False
 
             try:
                 image_file = json.load(f)
                 cached_image = image_file.get('name', None)
-                cached_base_image = image_file.get('base_image', None)
             except ValueError:
                 pass
 
             if not cached_image:
+                invalid_file = True
                 logger.warning("Cached image file is invalid")
-                return
 
             if not image_exists(cached_image):
+                invalid_file = True
                 logger.warning("Cached container does not exist anymore")
+
+            if not image_exists(self.base_docker_image):
+                invalid_file = True
+                logger.warning(
+                    "Base docker image %s does not exist anymore",
+                    self.base_docker_image)
+
+            if invalid_file:
+                os.remove(self.docker_name_file)
                 return
-
-            if self.base_docker_image != cached_base_image:
-                logger.warning("Cached image has a different base image")
-
-            self.check_docker()
 
             if image_based_on(cached_image, self.base_docker_image):
                 logger.debug("Found cached container")
