@@ -38,7 +38,7 @@ class Container():
             self.docker_executable = get_docker_command()
             self.docker_desktop = self.is_docker_desktop()
 
-            self.clickable_dir = f'.clickable/{self.config.build_arch}'
+            self.clickable_dir = f'.clickable/{self.base_docker_image}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
 
