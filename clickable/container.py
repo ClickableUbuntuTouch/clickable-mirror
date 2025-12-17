@@ -36,10 +36,7 @@ class Container():
 
         if self.docker_mode:
             self.docker_executable = get_docker_command()
-            if self.docker_executable == 'docker':
-                format_args = "{{.OperatingSystem}}"
-                command = f'{self.docker_executable} info --format {format_args}'
-                self.docker_desktop = 'Docker Desktop' in run_subprocess_check_output(command)
+            self.docker_desktop = self.is_docker_desktop()
 
             self.clickable_dir = f'.clickable/{self.config.build_arch}'
             if name:
@@ -54,6 +51,14 @@ class Container():
         if self.config.builder == Constants.RUST and self.config.cargo_home:
             logger.debug("Caching cargo related files in %s",
                          self.config.cargo_home)
+
+    def is_docker_desktop(self):
+        if self.docker_executable == 'docker':
+            format_args = "{{.OperatingSystem}}"
+            command = f'{self.docker_executable} info --format {format_args}'
+            return 'Docker Desktop' in run_subprocess_check_output(command)
+
+        return False
 
     def restore_cached_image(self):
         if not os.path.exists(self.docker_name_file):

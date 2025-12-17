@@ -34,7 +34,9 @@ html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = [
+    'sphinx_llms_txt'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -50,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Clickable'
-copyright = '2023 Brian Douglass, Jonatan Hatakeyama Zeidler'
+copyright = '2025 Brian Douglass, Jonatan Hatakeyama Zeidler'
 author = 'Clickable Team'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,4 +172,8 @@ texinfo_documents = [
     (master_doc, 'Clickable', 'Clickable Documentation',
      author, 'Clickable', 'Compile, build, and deploy Ubuntu Touch click packages all from the command line.',
      'Miscellaneous'),
+]
+
+llms_txt_exclude = [
+    'changelog'
 ]

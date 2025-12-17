@@ -8,7 +8,7 @@ from .base_test import UnitTest
 class TestLaunchCommand(UnitTest):
     def setUp(self):
         self.command = LaunchCommand()
-        self.setUpWithTmpBuildDir()
+        self.setUpWithTmpBuildDir(commands="launch")
 
     @mock.patch('clickable.device.Device.run_command', side_effect=empty_fn)
     def test_kill(self, mock_run_command):
