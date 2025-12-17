@@ -188,6 +188,7 @@ class ProjectConfig(BaseConfig):
             'skip_review': False,
             'ignore_review_warnings': None,
             'ignore_review_errors': None,
+            'is_app': True,
         }
 
     def load(self, config_path):
@@ -736,7 +737,7 @@ class ProjectConfig(BaseConfig):
                          'clean-images']).intersection(self.commands))
 
     def needs_builder(self):
-        return self.is_build_cmd()
+        return self.config['is_app'] and self.is_build_cmd()
 
     def needs_clickable_image(self):
         return (not self.is_custom_docker_image and
@@ -865,12 +866,21 @@ class ProjectConfig(BaseConfig):
             )
 
     def check_builder_rules(self):
+        if self.config['builder'] and not self.config['is_app']:
+            raise ClickableException(
+                'The "builder" config field is not allowed in combination with "is_app: false"'
+            )
+
         if not self.needs_builder():
             return
 
         if self.config['builder'] == Constants.CUSTOM and not self.config['build']:
             raise ClickableException(
                 'When using the "custom" builder you must specify a "build" in the config'
+            )
+        if self.config['builder'] != Constants.CUSTOM and self.config['build']:
+            raise ClickableException(
+                'The "build" config field is only allowed when using the "custom" builder'
             )
         if self.config['builder'] == Constants.GO and not self.config['gopath']:
             raise ClickableException(
@@ -924,7 +934,7 @@ class ProjectConfig(BaseConfig):
         if not let_user_confirm(
                 'No builder was specified, would you like to auto detect the builder?',
                 default=False):
-            raise ClickableException('Not builder configured. Is this a Clickable project?')
+            raise ClickableException('No builder configured. Is this a Clickable project?')
 
         builder = None
         directory = os.listdir(self.cwd)

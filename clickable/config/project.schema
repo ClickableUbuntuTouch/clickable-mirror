@@ -128,6 +128,7 @@
       "type": "integer",
       "minimum": 1
     },
+    "is_app": {"type": "boolean"},
     "dirty": {"type": "boolean"},
     "always_clean": {"type": "boolean"},
     "skip_review": {"type": "boolean"},
@@ -234,6 +235,10 @@
         },
         "additionalProperties": false
       }
+    },
+    "templates": {
+      "type": ["object"],
+      "additionalProperties": true
     }
   },
   "additionalProperties": false

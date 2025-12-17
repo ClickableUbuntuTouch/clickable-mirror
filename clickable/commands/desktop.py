@@ -152,6 +152,10 @@ class DesktopCommand(Command):
             self.desktop_locale = f"{self.desktop_locale}.UTF-8"
 
     def run(self):
+        if not self.config.is_app and not self.custom_mode:
+            raise ClickableException(
+                "Desktop Mode requires an app, but project does not contain one.")
+
         if self.container.docker_desktop:
             raise ClickableException("Desktop Mode isn't supported when using Docker Desktop.")
 
