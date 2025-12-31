@@ -293,16 +293,26 @@ def image_exists(image):
     ) == 0
 
 
-def image_based_on(image, base):
+def get_image_hash(image):
     docker_executable = get_docker_command()
-    command_template = f'{docker_executable} history --no-trunc -q'
-    command_base = f'{command_template} {base}'
-    command_image = f'{command_template} {image}'
+    format_string = "'{{.Id}}'"
+    command = f"{docker_executable} inspect --format {format_string} {image}"
 
-    hash_base = run_subprocess_check_output(command_base).split('\n', 1)[0]
-    history = run_subprocess_check_output(command_image).strip()
+    return run_subprocess_check_output(command).strip()
 
-    return hash_base in history
+
+def image_based_on_hash(image, base_hash):
+    docker_executable = get_docker_command()
+    format_string = "'{{.Config.Labels.base_image_hash}}'"
+    command = f"{docker_executable} inspect --format {format_string} {image}"
+
+    hash_label = run_subprocess_check_output(command).strip()
+
+    return base_hash == hash_label
+
+
+def image_based_on(image, base):
+    return image_based_on_hash(image, get_image_hash(base))
 
 
 def makedirs(path):
