@@ -276,15 +276,19 @@ def validate_config_format(config, schema, name, path):
         raise ClickableException(error_message) from e
 
 
-def pull_image(image, skip_existing=True):
-    if not skip_existing or not image_exists(image):
-        docker_executable = get_docker_command()
+def pull_image(image, skip_existing=True, docker_executable=None):
+    if not skip_existing or not image_exists(image, docker_executable):
+        if not docker_executable:
+            docker_executable = get_docker_command()
+
         command = f'{docker_executable} pull {image}'
         run_subprocess_check_call(command)
 
 
-def image_exists(image):
-    docker_executable = get_docker_command()
+def image_exists(image, docker_executable=None):
+    if not docker_executable:
+        docker_executable = get_docker_command()
+
     command = f'{docker_executable} image inspect {image}'
     return run_subprocess_call(
         command,
@@ -293,16 +297,20 @@ def image_exists(image):
     ) == 0
 
 
-def get_image_hash(image):
-    docker_executable = get_docker_command()
+def get_image_hash(image, docker_executable=None):
+    if not docker_executable:
+        docker_executable = get_docker_command()
+
     format_string = "'{{.Id}}'"
     command = f"{docker_executable} inspect --format {format_string} {image}"
 
     return run_subprocess_check_output(command).strip()
 
 
-def image_based_on_hash(image, base_hash):
-    docker_executable = get_docker_command()
+def image_based_on_hash(image, base_hash, docker_executable=None):
+    if not docker_executable:
+        docker_executable = get_docker_command()
+
     format_string = "'{{.Config.Labels.base_image_hash}}'"
     command = f"{docker_executable} inspect --format {format_string} {image}"
 
@@ -311,8 +319,8 @@ def image_based_on_hash(image, base_hash):
     return base_hash == hash_label
 
 
-def image_based_on(image, base):
-    return image_based_on_hash(image, get_image_hash(base))
+def image_based_on(image, base, docker_executable=None):
+    return image_based_on_hash(image, get_image_hash(base, docker_executable), docker_executable)
 
 
 def makedirs(path):

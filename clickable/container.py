@@ -465,7 +465,7 @@ LABEL base_image_hash="{base_hash}"
                 logger.debug("Cached container is outdated")
                 return True
 
-        if not image_exists(self.docker_image):
+        if not image_exists(self.docker_image, self.docker_executable):
             logger.debug("Cached container does not exist anymore")
             return True
 
@@ -505,10 +505,10 @@ LABEL base_image_hash="{base_hash}"
         if self.config.image_setup:
             commands.extend(self.config.image_setup.get('run', []))
 
-        if not image_exists(self.base_docker_image):
+        if not image_exists(self.base_docker_image, self.docker_executable):
             run_subprocess_check_call(f'{self.docker_executable} pull {self.base_docker_image}')
 
-        base_hash = get_image_hash(self.base_docker_image)
+        base_hash = get_image_hash(self.base_docker_image, self.docker_executable)
         dockerfile_content = self.construct_dockerfile_content(commands, env_vars, args, base_hash)
 
         if self.is_dockerfile_outdated(dockerfile_content):
@@ -572,7 +572,7 @@ LABEL base_image_hash="{base_hash}"
         if not self.minimum_version or self.config.is_custom_docker_image:
             return
 
-        if not image_exists(self.docker_image):
+        if not image_exists(self.docker_image, self.docker_executable):
             return
 
         version = 0
