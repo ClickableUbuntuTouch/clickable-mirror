@@ -44,7 +44,7 @@ class CleanImagesCommand(Command):
 
         base_images = Constants.container_mapping[Constants.host_arch].values()
         base_images = [(img, pattern_base.search(img).group())
-                       for img in base_images if image_exists(img)]
+                       for img in base_images if image_exists(img, docker_executable)]
 
         images = []
         query_args = 'images --format {{.Repository}}'
@@ -57,7 +57,9 @@ class CleanImagesCommand(Command):
             images = images_all
         else:
             logger.info("Checking which images are obsolete. This may take a while...")
-            images = [img for img in images_all if is_obsolete(img, base_images)]
+            images = [
+                img for img in images_all if is_obsolete(
+                    img, base_images, docker_executable)]
             if images:
                 logger.info("Found %i outdated images", len(images))
 
@@ -81,13 +83,13 @@ class CleanImagesCommand(Command):
             logger.info("skipped")
 
 
-def is_obsolete(img, base_images):
-    return all(not is_based_on(img, base) for base in base_images)
+def is_obsolete(img, base_images, docker_executable):
+    return all(not is_based_on(img, base, docker_executable) for base in base_images)
 
 
-def is_based_on(img, base):
+def is_based_on(img, base, docker_executable):
     # The only reason for this wrapper around image_based_on is the performance
     # bonus from checking the name against the base name first
 
     (base_img, base_trunc) = base
-    return img.startswith(base_trunc) and image_based_on(img, base_img)
+    return img.startswith(base_trunc) and image_based_on(img, base_img, docker_executable)
