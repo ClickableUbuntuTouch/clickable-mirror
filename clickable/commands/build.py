@@ -151,9 +151,10 @@ class BuildCommand(Command):
             existing_libs = [lib.name for lib in self.config.lib_configs]
             for lib in self.libs:
                 if lib not in existing_libs:
+                    options = ", ".join(existing_libs)
                     raise ClickableException(
                         f'Cannot build unknown library "{lib}", which is not in your '
-                        'project config'
+                        f'project config. Valid options: {options}'
                     )
 
                 for config in self.config.lib_configs:
