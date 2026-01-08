@@ -197,6 +197,9 @@ def env(name):
 
 
 def get_builder(config, container, debug_build=False):
+    if not config.builder:
+        raise ClickableException(
+            "Builder requested when there is none defined. Please report this bug.")
     builder_classes = get_builders()
     return builder_classes[config.builder](config, container, debug_build)
 
