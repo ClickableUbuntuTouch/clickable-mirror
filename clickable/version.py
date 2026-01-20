@@ -8,7 +8,7 @@ from clickable.config.constants import Constants
 from clickable.logger import logger
 
 
-__version__ = '8.6.0'
+__version__ = '8.7.0'
 
 __container_minimum_required__ = 12
 
