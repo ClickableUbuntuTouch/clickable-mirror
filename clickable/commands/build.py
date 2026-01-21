@@ -33,7 +33,7 @@ class BuildCommand(Command):
         self.skip_review = skip_review or skip_click
         self.skip_click = skip_click
         self.debug_build = False
-        self.app = True
+        self.app = False
         self.libs = None
         self.accept_errors = False
         self.accept_warnings = False
@@ -42,7 +42,7 @@ class BuildCommand(Command):
         parser.add_argument(
             '--clean',
             action='store_true',
-            help='Clean build directory before building (only applies for app)',
+            help='Clean build directory before building',
             default=False,
         )
         parser.add_argument(
@@ -75,19 +75,22 @@ class BuildCommand(Command):
         parser.add_argument(
             '--app',
             action='store_true',
-            help='Build app after building libs (only needed when using --libs as well)',
+            help='Build app after building libs '
+            '(default if project contains an app and nothing else specified)',
             default=False,
         )
         parser.add_argument(
             '--libs',
             nargs='*',
-            help='Build specified libs or all libs if none is specified',
+            help='Build specified libs or all libs if none is specified. '
+            'Enabled by default, if the project does not contain an app.',
             default=None,
         )
         parser.add_argument(
             '--all',
             action='store_true',
-            help='Build libraries and app (equivalent to --libs --app)',
+            help='Build libraries and app (equivalent to --libs and --app '
+            'if project contains an app)',
             default=False,
         )
 
@@ -97,8 +100,14 @@ class BuildCommand(Command):
             self.skip_review = True
         self.output_path = args.output
         self.debug_build = args.debug
-        self.app = args.app or args.libs is None or args.all
-        self.libs = [] if args.all else args.libs
+        self.app = args.app
+        self.libs = args.libs
+
+        if (args.all or args.libs is None) and self.config.is_app:
+            self.app = True
+        if args.all:
+            # Empty list implies all libs are built
+            self.libs = []
 
         self.configure_common()
 
@@ -112,12 +121,23 @@ class BuildCommand(Command):
             self.accept_warnings = True
 
     def configure_nested(self):
+        if self.config.is_app:
+            self.app = True
+
         self.configure_common()
 
         if self.accept_errors:
             self.accept_warnings = True
 
     def configure_common(self):
+        if self.app and not self.config.is_app:
+            raise ClickableException("Cannot build app when project does not contain an app")
+
+        if not self.config.is_app and self.libs is None:
+            # Empty list implies all libs are built
+            logger.info("Building libs, because project does not contain an app")
+            self.libs = []
+
         if self.config.skip_review or self.config.global_config.build.skip_review:
             self.skip_review = True
 
@@ -151,9 +171,10 @@ class BuildCommand(Command):
             existing_libs = [lib.name for lib in self.config.lib_configs]
             for lib in self.libs:
                 if lib not in existing_libs:
+                    options = ", ".join(existing_libs)
                     raise ClickableException(
                         f'Cannot build unknown library "{lib}", which is not in your '
-                        'project config'
+                        f'project config. Valid options: {options}'
                     )
 
                 for config in self.config.lib_configs:
@@ -199,7 +220,7 @@ class BuildCommand(Command):
         self.create_lib_build_warning()
 
         if self.clean:
-            clean_cmd = CleanCommand()
+            clean_cmd = CleanCommand(libs=None, app=True)
             clean_cmd.init_from_command(self)
             clean_cmd.run()
 
@@ -368,15 +389,15 @@ class BuildCommand(Command):
     def set_arch(self, manifest):
         arch = manifest.get('architecture', None)
 
-        if arch in ['@CLICK_ARCH@', '']:
+        if arch in ['$ENV{ARCH}', '$ENV{CLICK_ARCH}', '@CLICK_ARCH@', '']:
             manifest['architecture'] = self.config.arch
             return True
 
         if arch != self.config.arch:
             raise ClickableException(
                 f'Clickable is building for architecture "{self.config.arch}", but "{arch}" is '
-                'specified in the manifest. You can set the architecture field to @CLICK_ARCH@ to '
-                'let Clickable set the architecture field automatically.'
+                'specified in the manifest. You can set the architecture field to '
+                '$ENV{CLICK_ARCH} to let Clickable set the architecture field automatically.'
             )
 
         return False
@@ -384,7 +405,7 @@ class BuildCommand(Command):
     def set_framework(self, manifest):
         framework = manifest.get('framework', None)
 
-        if framework in ['@CLICK_FRAMEWORK@', '']:
+        if framework in ['$ENV{CLICK_FRAMEWORK}', '$ENV{SDK_FRAMEWORK}', '@CLICK_FRAMEWORK@', '']:
             manifest['framework'] = self.config.framework
             return True
 
@@ -399,8 +420,12 @@ class BuildCommand(Command):
         new_version = version.replace(
             '@CLICK_FRAMEWORK@',
             self.config.framework).replace(
+            '$ENV{CLICK_FRAMEWORK}',
+            self.config.framework).replace(
             '@CLICK_FRAMEWORK_BASE@',
-            self.config.get_framework_base())
+            self.config.framework_base).replace(
+            '$ENV{CLICK_FRAMEWORK_BASE}',
+            self.config.framework_base)
 
         if new_version != version:
             manifest['version'] = new_version
@@ -429,7 +454,7 @@ class BuildCommand(Command):
         policy = content.get('policy_version', None)
         expectation = float(self.config.apparmor_policy)
 
-        if policy in ['@APPARMOR_POLICY@', '']:
+        if policy in ['$ENV{APPARMOR_POLICY}', '@APPARMOR_POLICY@', '']:
             content['policy_version'] = expectation
             self.config.install_files.write_apparmor(apparmor_file, content)
         elif policy != expectation:

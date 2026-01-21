@@ -26,10 +26,4 @@ fi
 
 # Run Clickable
 export PATH=${SNAP}/usr/lib/git-core/:${PATH}
-$@
-EXIT_CODE=$?
-
-# Prevent adb from sticking around and stalling Snap updates
-adb kill-server 2> /dev/null
-
-exit $EXIT_CODE
+exec "$@"

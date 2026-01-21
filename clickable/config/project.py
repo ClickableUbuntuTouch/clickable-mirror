@@ -55,6 +55,9 @@ class ProjectConfig(BaseConfig):
 
     static_placeholders = OrderedDict({
         "SDK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK_BASE": "framework_base",
+        "APPARMOR_POLICY": "apparmor_policy",
         "QT_VERSION": "qt_version",
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
@@ -179,11 +182,13 @@ class ProjectConfig(BaseConfig):
             'qt_version': Constants.default_qt,
             'rust_channel': None,
             'framework': None,
+            'framework_base': None,
             'apparmor_policy': None,
             'always_clean': False,
             'skip_review': False,
             'ignore_review_warnings': None,
             'ignore_review_errors': None,
+            'is_app': True,
         }
 
     def load(self, config_path):
@@ -192,8 +197,9 @@ class ProjectConfig(BaseConfig):
 
         self.harmonize_config()
 
-    def configure(self, global_config: GlobalConfig, commands, args=None, device_arch=None,
-                  cwd=None, always_clean=False):
+    def configure(self,  # pylint: disable=too-many-positional-arguments
+                  global_config: GlobalConfig, commands, args=None,
+                  device_arch=None, cwd=None, always_clean=False):
         self.global_config = global_config
 
         self.placeholders.update(ProjectConfig.static_placeholders)
@@ -378,9 +384,15 @@ class ProjectConfig(BaseConfig):
 
             self.config['framework'] = framework
 
+        self.config['framework_base'] = Constants.framework_base_default
+        for base in Constants.framework_base:
+            if self.config['framework'].find(base) != -1:
+                self.config['framework_base'] = base
+                break
+
         if not self.config['apparmor_policy']:
             self.config['apparmor_policy'] = Constants.default_framework_base_policy_mapping[
-                self.get_framework_base()]
+                self.config['framework_base']]
 
         self.set_build_arch()
         self.config['arch_rust'] = Constants.rust_arch_target_mapping[self.build_arch]
@@ -389,14 +401,7 @@ class ProjectConfig(BaseConfig):
         if self.config['framework'] in Constants.framework_image_mapping:
             return Constants.framework_image_mapping[self.config['framework']]
 
-        return Constants.framework_image_fallback[self.get_framework_base()]
-
-    def get_framework_base(self):
-        for base in Constants.framework_base:
-            if self.config['framework'].find(base) != -1:
-                return base
-
-        return Constants.framework_base_default
+        return Constants.framework_image_fallback[self.config['framework_base']]
 
     def setup_image(self):
         if self.needs_clickable_image():
@@ -732,7 +737,7 @@ class ProjectConfig(BaseConfig):
                          'clean-images']).intersection(self.commands))
 
     def needs_builder(self):
-        return self.is_build_cmd()
+        return self.config['is_app'] and self.is_build_cmd()
 
     def needs_clickable_image(self):
         return (not self.is_custom_docker_image and
@@ -861,12 +866,21 @@ class ProjectConfig(BaseConfig):
             )
 
     def check_builder_rules(self):
+        if self.config['builder'] and not self.config['is_app']:
+            raise ClickableException(
+                'The "builder" config field is not allowed in combination with "is_app: false"'
+            )
+
         if not self.needs_builder():
             return
 
         if self.config['builder'] == Constants.CUSTOM and not self.config['build']:
             raise ClickableException(
                 'When using the "custom" builder you must specify a "build" in the config'
+            )
+        if self.config['builder'] != Constants.CUSTOM and self.config['build']:
+            raise ClickableException(
+                'The "build" config field is only allowed when using the "custom" builder'
             )
         if self.config['builder'] == Constants.GO and not self.config['gopath']:
             raise ClickableException(
@@ -920,7 +934,7 @@ class ProjectConfig(BaseConfig):
         if not let_user_confirm(
                 'No builder was specified, would you like to auto detect the builder?',
                 default=False):
-            raise ClickableException('Not builder configured. Is this a Clickable project?')
+            raise ClickableException('No builder configured. Is this a Clickable project?')
 
         builder = None
         directory = os.listdir(self.cwd)

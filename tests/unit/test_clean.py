@@ -28,7 +28,7 @@ def temp_exception(path):
 
 class TestCleanCommand(UnitTest):
     def setUp(self):
-        self.command = CleanCommand()
+        self.command = CleanCommand(app=True)
         self.setUpWithTmpBuildDir(commands="clean")
 
     @mock.patch('shutil.rmtree', side_effect=empty_fn)

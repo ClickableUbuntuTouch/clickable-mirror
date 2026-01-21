@@ -1,5 +1,6 @@
 import os
 import urllib.parse
+import requests
 
 from requests.exceptions import ConnectTimeout, ReadTimeout
 
@@ -8,12 +9,6 @@ from clickable.exceptions import ClickableException
 from clickable.utils import env
 
 from .base import Command
-
-REQUESTS_AVAILABLE = True
-try:
-    import requests
-except ImportError:
-    REQUESTS_AVAILABLE = False
 
 
 OPENSTORE_API = 'https://open-store.io'
@@ -74,11 +69,6 @@ class PublishCommand(Command):
         return 'focal'
 
     def run(self):
-        if not REQUESTS_AVAILABLE:
-            raise ClickableException(
-                'Unable to publish app, python requests module is not installed'
-            )
-
         if not self.api_key:
             raise ClickableException('No api key specified, use OPENSTORE_API_KEY or --apikey')
 

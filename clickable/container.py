@@ -8,7 +8,7 @@ import sys
 import json
 
 from clickable.utils import (
-    image_based_on,
+    get_image_hash,
     run_subprocess_check_call,
     run_subprocess_check_output,
     get_docker_command,
@@ -38,7 +38,7 @@ class Container():
             self.docker_executable = get_docker_command()
             self.docker_desktop = self.is_docker_desktop()
 
-            self.clickable_dir = f'.clickable/{self.config.build_arch}'
+            self.clickable_dir = f'.clickable/{self.base_docker_image}'
             if name:
                 self.clickable_dir = f'{self.clickable_dir}/{name}'
 
@@ -64,35 +64,23 @@ class Container():
         if not os.path.exists(self.docker_name_file):
             return
 
+        self.check_docker()
+
         with open(self.docker_name_file, 'r', encoding='UTF-8') as f:
             cached_image = None
-            cached_base_image = None
 
             try:
                 image_file = json.load(f)
                 cached_image = image_file.get('name', None)
-                cached_base_image = image_file.get('base_image', None)
             except ValueError:
                 pass
 
-            if not cached_image:
-                logger.warning("Cached image file is invalid")
-                return
-
-            if not image_exists(cached_image):
-                logger.warning("Cached container does not exist anymore")
-                return
-
-            if self.base_docker_image != cached_base_image:
-                logger.warning("Cached image has a different base image")
-
-            self.check_docker()
-
-            if image_based_on(cached_image, self.base_docker_image):
+            if cached_image:
                 logger.debug("Found cached container")
                 self.docker_image = cached_image
             else:
-                logger.warning("Cached container is outdated")
+                logger.debug("Cached image file is invalid")
+                os.remove(self.docker_name_file)
 
     def start_docker(self):
         check_command('systemctl')
@@ -315,7 +303,7 @@ class Container():
         # e.g. "--uidmap 1000:0:1 --uidmap 0:1:1000"
         return f'{flag} {mapid}:0:1 {flag} 0:1:{mapid}'
 
-    def run_command(self,
+    def run_command(self,  # pylint: disable=too-many-positional-arguments
                     command,
                     root_user=False,
                     get_output=False,
@@ -412,7 +400,7 @@ exit $?
 
         return []
 
-    def construct_dockerfile_content(self, commands, env_vars, args):
+    def construct_dockerfile_content(self, commands, env_vars, args, base_hash):
         env_lines = ''
 
         args_strings = [
@@ -434,6 +422,7 @@ exit $?
 
         return f'''
 FROM {self.base_docker_image}
+LABEL base_image_hash="{base_hash}"
 {args_lines}
 {env_lines}
 {run_lines}
@@ -465,9 +454,7 @@ FROM {self.base_docker_image}
 
     def is_dockerfile_outdated(self, dockerfile_content):
         if self.docker_image == self.base_docker_image:
-            return True
-
-        if not os.path.exists(self.clickable_dir):
+            # this indicates that there is no cached custom image
             return True
 
         if not os.path.exists(self.docker_file):
@@ -475,9 +462,14 @@ FROM {self.base_docker_image}
 
         with open(self.docker_file, 'r', encoding='UTF-8') as f:
             if dockerfile_content.strip() != f.read().strip():
+                logger.debug("Cached container is outdated")
                 return True
 
-        return not image_exists(self.docker_image)
+        if not image_exists(self.docker_image, self.docker_executable):
+            logger.debug("Cached container does not exist anymore")
+            return True
+
+        return False
 
     def get_apt_install_cmd(self, dependencies):
         joined_deps = ' '.join(dependencies)
@@ -513,12 +505,16 @@ FROM {self.base_docker_image}
         if self.config.image_setup:
             commands.extend(self.config.image_setup.get('run', []))
 
-        dockerfile_content = self.construct_dockerfile_content(commands, env_vars, args)
+        if not image_exists(self.base_docker_image, self.docker_executable):
+            run_subprocess_check_call(f'{self.docker_executable} pull {self.base_docker_image}')
+
+        base_hash = get_image_hash(self.base_docker_image, self.docker_executable)
+        dockerfile_content = self.construct_dockerfile_content(commands, env_vars, args, base_hash)
 
         if self.is_dockerfile_outdated(dockerfile_content):
             self.create_custom_container(dockerfile_content)
         else:
-            logger.debug('Image already setup')
+            logger.debug('Image already set up')
 
     def setup_container_mode(self):
         ppa_commands = self.get_ppa_adding_commands()
@@ -576,7 +572,7 @@ FROM {self.base_docker_image}
         if not self.minimum_version or self.config.is_custom_docker_image:
             return
 
-        if not image_exists(self.docker_image):
+        if not image_exists(self.docker_image, self.docker_executable):
             return
 
         version = 0
@@ -585,7 +581,6 @@ FROM {self.base_docker_image}
             command = f"\
                 {self.docker_executable} inspect --format '{format_string}' {self.docker_image} \
             "
-            logger.debug('Checking docker image version via: %s', command)
 
             version_string = run_subprocess_check_output(command)
             version = int(version_string)

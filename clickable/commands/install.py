@@ -56,7 +56,7 @@ class InstallCommand(Command):
         version = self.try_find_installed_version(package_name)
 
         if version:
-            if self.config.get_framework_base() == '16.04':
+            if self.config.framework_base == '16.04':
                 logger.debug("Using UT 16.04 uninstall command")
                 command = ['pkcon', 'remove', f'\\"{package_name};{version};all;local:click\\"']
             else:
@@ -101,7 +101,7 @@ class InstallCommand(Command):
 
         logger.info("Installing the app.")
 
-        if self.config.get_framework_base() == '16.04':
+        if self.config.framework_base == '16.04':
             logger.debug("Using UT 16.04 install command")
             command = ['pkcon', 'install-local', '--allow-untrusted', f'/home/phablet/{click}']
         else:

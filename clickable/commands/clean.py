@@ -9,13 +9,14 @@ from .base import Command
 
 
 class CleanCommand(Command):
-    def __init__(self, libs=None, app=True):
+    def __init__(self, libs=None, app=False):
         super().__init__()
         self.cli_conf.name = 'clean'
         self.cli_conf.help_msg = 'Clean the build directory'
 
         self.libs = libs
         self.app = app
+
         self.app_cache = False
         self.app_config = False
         self.app_data = False
@@ -28,19 +29,22 @@ class CleanCommand(Command):
         parser.add_argument(
             '--app',
             action='store_true',
-            help='Clean app build dir (default when nothing else specified)',
+            help='Clean app build dir '
+            '(default if project contains an app and nothing else specified)',
             default=False,
         )
         parser.add_argument(
             '--libs',
             nargs='*',
-            help='Clean build dir of specified libs or all libs if none is specified',
+            help='Clean build dir of specified libs or all libs if none is specified. '
+            'Enabled by default, if the project does not contain an app.',
             default=None,
         )
         parser.add_argument(
             '--all',
             action='store_true',
-            help='Clean all build dirs (equivalent to --libs --app)',
+            help='Clean all build dirs (equivalent to --libs and --app '
+            'if project contains an app)',
             default=False,
         )
         parser.add_argument(
@@ -96,7 +100,7 @@ class CleanCommand(Command):
         )
 
     def configure(self, args):
-        default = args.libs is None
+        default = True
         (self.app_cache, default) = is_set(args.app_cache, default)
         (self.app_config, default) = is_set(args.app_config, default)
         (self.app_data, default) = is_set(args.app_data, default)
@@ -111,17 +115,46 @@ class CleanCommand(Command):
             self.app_data = True
             default = False
 
-        self.app = args.app or args.all or default
-        self.libs = [] if args.all else args.libs
+        if args.app:
+            self.app = args.app
+            default = False
+
+        if args.libs is not None:
+            self.libs = args.libs
+            default = False
+
+        if (args.all or default) and self.config.is_app:
+            self.app = True
+        if args.all:
+            # Empty list implies all libs are cleaned
+            self.libs = []
+
+        self.configure_common(default)
 
         if self.libs is not None:
             existing_libs = [lib.name for lib in self.config.lib_configs]
             for lib in self.libs:
                 if lib not in existing_libs:
+                    options = ", ".join(existing_libs)
                     raise ClickableException(
                         f'Cannot clean unknown library "{lib}", which is not in your '
-                        'project config'
+                        f'project config. Valid options: {options}'
                     )
+
+    def configure_nested(self):
+        if self.config.is_app:
+            self.app = True
+
+        self.configure_common()
+
+    def configure_common(self, default=True):
+        if self.app and not self.config.is_app:
+            raise ClickableException("Cannot clean app dir when project does not contain an app")
+
+        if default and not self.config.is_app and self.libs is None:
+            # Empty list implies all libs are cleaned
+            logger.info("Cleaning libs, because project does not contain an app")
+            self.libs = []
 
     def run(self):
         if self.libs is not None:

@@ -3,6 +3,21 @@
 Changelog
 =========
 
+Changes in v8.7.0
+-----------------
+
+- Added ``CLICK_FRAMEWORK``, ``CLICK_FRAMEWORK_BASE`` and ``APPARMOR_POLICY`` as env vars to simplify CMake configuration of manifest file
+- Added support for replacing ``$ENV{...}`` placeholders in manifest so that they can be used by apps that don't build with CMake, too
+- Deprecated ``SDK_FRAMEWORK`` as placeholder/env var (use ``CLICK_FRAMEWORK`` instead)
+- Remove workaround in snap package that would kill adb-server after each clickable call
+- Fixed preserving up-to-date cached images for all docker-based commands and on ``clean-images``
+- Fixed "no such image" error on switching between build and ide command
+- Added printing existing libraries when running ``--libs`` with an invalid argument
+- Added support for library-only projects via ``is_app`` field
+- Added support for a ``templates`` field that can be used for reusing conifg snippets via YAML anchors
+- Added check that apps don't use the ``build`` without the ``custom`` builder
+- Updated QtCreator to 17.0.1 in the ``ide`` command
+
 Changes in v8.6.0
 -----------------
 

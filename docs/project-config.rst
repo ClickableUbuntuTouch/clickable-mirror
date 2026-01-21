@@ -28,7 +28,10 @@ The following table lists all available placeholders.
 ======================= ======
 Placeholder             Output
 ======================= ======
-SDK_FRAMEWORK           Target framework (``ubuntu-sdk-20.04`` by default)
+CLICK_FRAMEWORK_BASE    Target framework base (``20.04`` by default)
+CLICK_FRAMEWORK         Target framework (``ubuntu-sdk-20.04`` by default)
+SDK_FRAMEWORK           Depecrated, same as CLICK_FRAMEWORK
+APPARMOR_POLICY         The (assumed) app armor policy, based on target framework
 QT_VERSION              Qt version within target framework (``5.12`` by default)
 ARCH                    Target architecture (``armhf``, ``arm64``, ``amd64`` or ``all``)
 ARCH_TRIPLET            Target architecture triplet (``arm-linux-gnueabihf``, ``aarch64-linux-gnu``, ``x86_64-linux-gnu`` or ``all``)
@@ -338,6 +341,13 @@ disabling the build cache. Affects the ``chain``, ``build`` and ``desktop`` comm
 Does not affect libraries.
 The default is ``false``.
 
+is_app
+------
+
+Optional, whether or not the project contains an app that can be packaged as a
+click. If not, the project can still be used to build libraries.
+The default is ``true``.
+
 ignore_review_errors
 --------------------
 
@@ -492,6 +502,31 @@ Optional, specify a test command to be executed when running ``clickable test``.
 The default is ``qmltestrunner``.
 
 .. _project-config-libraries:
+
+templates
+---------
+
+Optional, add reusable objects here for reuse with yaml anchors. Mostly usefull
+to share dependency lists or build args between libraries.
+
+.. code-block:: yaml
+
+    templates:
+      lib_dep: &lib_dep
+        dependencies_host:
+        - nasm
+        dependencies_target:
+        - libasound2-dev
+
+    libraries:
+      mylib1:
+        <<*: &lib_dep
+        builder: cmake
+      mylib2:
+        <<*: &lib_dep
+        builder: cmake
+
+.. _project-config-templates:
 
 libraries
 ---------
