@@ -9,4 +9,5 @@ class NvidiaContainerToolkit(Query):
 
     def get_user_instructions(self):
         return ("You are running clickable in nvidia mode.\n"
-                "Please install nvidia-container-toolkit.\n")
+                "Please install nvidia-container-toolkit.\n"
+                "See the nvidia documentation for instructions: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\n")
