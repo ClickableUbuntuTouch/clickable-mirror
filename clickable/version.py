@@ -10,7 +10,7 @@ from clickable.logger import logger
 
 __version__ = '8.7.0'
 
-__container_minimum_required__ = 12
+__container_minimum_required__ = 13
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
