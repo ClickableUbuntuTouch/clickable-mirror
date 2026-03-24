@@ -71,6 +71,20 @@ Install Via AUR (Arch Linux)
 * Using your favorite AUR helper, install the `clickable-git package <https://aur.archlinux.org/packages/clickable-git/>`__
 * Example: ``pacaur -S clickable-git``
 
+Install NixOS
+-------------
+
+* Using one of the following options to install the clickable package 
+* nix-shell: ``nix-shell -p clickable``
+* or add the following code to your configuration:
+
+.. code-block:: nix
+   :linenos:
+
+   environment.systemPackages = [
+     pkgs.clickable
+   ];
+
 After install
 -------------
 
