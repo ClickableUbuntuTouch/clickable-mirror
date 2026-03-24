@@ -11,8 +11,8 @@ QML Only
 An app template that is setup for a purely QML app. It includes a CMake setup
 to allow for easy translations.
 
-C++ (Plugin)
-------------
+C++
+---
 
 An app template that is setup for a QML app with a C++ plugin. It includes a CMake
 setup for compiling and to allow for easy translation.
@@ -33,17 +33,16 @@ Go
 
 An app template that is setup for a QML app with a Go backend.
 
-C++ (Binary)
-------------
-
-An app template that is setup for a QML app with a main.cpp to build a custom
-binary rather than relying on qmlscene. It includes a CMake setup for compiling
-to allow for easy translation.
-
 Rust
 ----
 
 An app template that is setup for a QML app with a Rust backend.
+
+Godot (Precompiled)
+-------------------
+
+An app template that is setup to package a precompiled Godot app together with
+a patched Godot and SDL 2 build.
 
 SDL
 ---
