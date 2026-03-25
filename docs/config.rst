@@ -117,8 +117,8 @@ environment
 
 Default configuration for the environment Clickable is running in.
 
-nvida
-^^^^^
+nvidia
+^^^^^^
 
 Set to ``"on"`` if you use the proprietary nvidia driver in order to use a special
 docker image with an nvidia workaround in Desktop Mode.
