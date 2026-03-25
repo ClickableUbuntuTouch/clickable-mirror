@@ -258,5 +258,6 @@ makes tools like ``make`` or ``cargo`` more verbose.
 ^^^^^^^^^
 
 Specify an IP address to run a device-related command over SSH rather than the default
-ADB.
+ADB. Note that you will first need to set up SSH public key authentication for your device by following the
+`SSH setup instructions <https://docs.ubports.com/en/latest/userguide/advanceduse/ssh.html>`__.
 
