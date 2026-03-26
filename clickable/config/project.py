@@ -690,6 +690,7 @@ class ProjectConfig(BaseConfig):
             lib_init.root_dir = self.config['root_dir']
             lib_init.qt_version = self.config['qt_version']
             lib_init.framework = self.config['framework']
+            lib_init.framework_base = self.config['framework_base']
             lib_init.verbose = self.verbose
             lib_init.libs_placeholders = placeholders
             lib_init.lib_configs = self.lib_configs
