@@ -23,6 +23,7 @@ class LibInitConfig:
         self.root_dir = None
         self.qt_version = None
         self.framework = None
+        self.framework_base = None
         self.verbose = None
         self.libs_placeholders = None
         self.lib_configs = None
@@ -38,6 +39,8 @@ class LibConfig():
 
     static_placeholders = OrderedDict({
         "SDK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK": "framework",
+        "CLICK_FRAMEWORK_BASE": "framework_base",
         "QT_VERSION": "qt_version",
         "ARCH": "arch",
         "ARCH_TRIPLET": "arch_triplet",
@@ -119,6 +122,7 @@ class LibConfig():
             'test': None,
             'rust_channel': None,
             'framework': config.framework,
+            'framework_base': config.framework_base,
             'qt_version': config.qt_version,
         }
 
