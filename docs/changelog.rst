@@ -3,6 +3,12 @@
 Changelog
 =========
 
+Changes in v8.8.0
+-----------------
+
+- Added SDL app template
+- Added ``CLICK_FRAMEWORK`` and ``CLICK_FRAMEWORK_BASE`` as env vars to libraries, too
+
 Changes in v8.7.0
 -----------------
 
