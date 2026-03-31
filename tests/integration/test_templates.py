@@ -97,3 +97,7 @@ class TestTemplates(IntegrationTest):
     def test_godot_plugin(self):
         self.create_and_run('Godot (Precompiled)', 'amd64')
         self.assertClickExists('amd64')
+
+    def test_sdl(self):
+        self.create_and_run('SDL', 'amd64')
+        self.assertClickExists('amd64')

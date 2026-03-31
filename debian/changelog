@@ -1,3 +1,10 @@
+clickable (8.8.0) unstable; urgency=medium
+
+  * Added SDL app template
+  * Added ``CLICK_FRAMEWORK`` and ``CLICK_FRAMEWORK_BASE`` as env vars to libraries, too
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Fri, 27 Mar 2026 19:59:23 -0500
+
 clickable (8.7.0) unstable; urgency=medium
 
   * Added CLICK_FRAMEWORK, CLICK_FRAMEWORK_BASE and APPARMOR_POLICY as env vars to simplify CMake configuration of manifest file

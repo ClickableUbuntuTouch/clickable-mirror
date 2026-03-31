@@ -19,6 +19,7 @@ TEMPLATE_MAP = {
     'go': 'Go',
     'rust': 'Rust',
     'godot': 'Godot (Precompiled)',
+    'sdl': 'SDL',
 }
 
 LICENSE_MAP = {
