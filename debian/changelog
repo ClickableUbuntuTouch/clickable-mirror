@@ -1,3 +1,9 @@
+clickable (8.9.0) unstable; urgency=medium
+
+  * Added support for ubuntu-touch-24.04-2.x framework
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Sun, 14 Jun 2026 10:32:39 -0500
+
 clickable (8.8.0) unstable; urgency=medium
 
   * Added SDL app template
