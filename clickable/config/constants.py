@@ -51,6 +51,8 @@ class Constants():
                 os.path.join(docker_registry, 'clickable/arm64-20.04-arm64'),
             ('24.04-1.x', 'arm64'):
                 os.path.join(docker_registry, 'clickable/arm64-ut24.04-1.x-arm64'),
+            ('24.04-2.x', 'arm64'):
+                os.path.join(docker_registry, 'clickable/arm64-ut24.04-2.x-arm64'),
             ('next', 'arm64'):
                 os.path.join(docker_registry, 'clickable/arm64-utnext-arm64'),
         },
@@ -91,6 +93,18 @@ class Constants():
                 os.path.join(docker_registry, 'clickable/amd64-ut24.04-1.x-amd64-ide'),
             ('24.04-1.x', 'amd64-nvidia-ide'):
                 os.path.join(docker_registry, 'clickable/amd64-ut24.04-1.x-amd64-nvidia-ide'),
+            ('24.04-2.x', 'amd64'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-amd64'),
+            ('24.04-2.x', 'armhf'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-armhf'),
+            ('24.04-2.x', 'arm64'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-arm64'),
+            ('24.04-2.x', 'amd64-nvidia'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-amd64-nvidia'),
+            ('24.04-2.x', 'amd64-ide'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-amd64-ide'),
+            ('24.04-2.x', 'amd64-nvidia-ide'):
+                os.path.join(docker_registry, 'clickable/amd64-ut24.04-2.x-amd64-nvidia-ide'),
             # (amd64-utnext-[ARCH]).
             ('next', 'amd64'):
                 os.path.join(docker_registry, 'clickable/amd64-utnext-amd64'),
@@ -117,6 +131,9 @@ class Constants():
         ('24.04-1.x', 'amd64'): os.path.join(docker_registry, 'clickable/ci-ut24.04-1.x-amd64'),
         ('24.04-1.x', 'armhf'): os.path.join(docker_registry, 'clickable/ci-ut24.04-1.x-armhf'),
         ('24.04-1.x', 'arm64'): os.path.join(docker_registry, 'clickable/ci-ut24.04-1.x-arm64'),
+        ('24.04-2.x', 'amd64'): os.path.join(docker_registry, 'clickable/ci-ut24.04-2.x-amd64'),
+        ('24.04-2.x', 'armhf'): os.path.join(docker_registry, 'clickable/ci-ut24.04-2.x-armhf'),
+        ('24.04-2.x', 'arm64'): os.path.join(docker_registry, 'clickable/ci-ut24.04-2.x-arm64'),
         ('next', 'amd64'): os.path.join(docker_registry, 'clickable/ci-utnext-amd64'),
         ('next', 'armhf'): os.path.join(docker_registry, 'clickable/ci-utnext-armhf'),
         ('next', 'arm64'): os.path.join(docker_registry, 'clickable/ci-utnext-arm64'),
@@ -127,12 +144,14 @@ class Constants():
         "ubuntu-sdk-20.04": "20.04",
         "ubuntu-sdk-20.04.1": "20.04",
         "ubuntu-touch-24.04-1.x": "24.04-1.x",
+        "ubuntu-touch-24.04-2.x": "24.04-2.x",
         "ubuntu-touch-next-internal": "next",
     }
     framework_image_fallback = {
         '16.04': '16.04.5',
         '20.04': '20.04',
         '24.04-1.x': '24.04-1.x',
+        '24.04-2.x': '24.04-2.x',
         'next': 'next',
     }
 
@@ -140,6 +159,7 @@ class Constants():
         '16.04': '16.04',
         '20.04': '20.04',
         '24.04-1.x': '2404.1',
+        '24.04-2.x': '2404.2',
         'next': '9999',
     }
 
@@ -154,6 +174,7 @@ class Constants():
         '16.04',
         '20.04',
         '24.04-1.x',
+        '24.04-2.x',
         'next',
     ]
     framework_base_default = '20.04'

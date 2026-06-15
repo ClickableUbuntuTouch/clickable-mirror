@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Changes in v8.9.0
+-----------------
+
+- Added support for ubuntu-touch-24.04-2.x framework
+
 Changes in v8.8.0
 -----------------
 
