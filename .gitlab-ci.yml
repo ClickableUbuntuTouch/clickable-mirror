@@ -1,6 +1,12 @@
 services:
   - docker:dind
 
+.ubuntu_releases: &ubuntu_releases
+  - focal
+  - jammy
+  - noble
+  - resolute
+
 variables:
   DOCKER_CERT_PATH: /certs/client
   DOCKER_TLS_CERTDIR: "/certs"
@@ -82,46 +88,16 @@ publish-pypi:
     - python3 setup.py sdist bdist_wheel
     - python3 -m twine upload dist/*
 
-publish-focal:
+publish-ppa:
   stage: publish
   image: clickable/build-deb:focal
   rules:
     - if: $CI_COMMIT_TAG
+  parallel:
+    matrix:
+      - RELEASE: *ubuntu_releases
   script:
     - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~focal) focal/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
-publish-jammy:
-  stage: publish
-  image: clickable/build-deb:focal
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~jammy) jammy/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
-publish-noble:
-  stage: publish
-  image: clickable/build-deb:focal
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~noble) noble/g" debian/changelog
-    - debuild -S
-    - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
-
-publish-plucky:
-  stage: publish
-  image: clickable/build-deb:focal
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - ./scripts/setup_gpg_keys.sh
-    - sed -i "s/) unstable/~plucky) plucky/g" debian/changelog
+    - sed -i "s/) unstable/~$RELEASE) $RELEASE/g" debian/changelog
     - debuild -S
     - dput ppa:bhdouglass/clickable ../clickable_*_source.changes
