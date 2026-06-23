@@ -1,6 +1,7 @@
 from clickable.config.constants import Constants
 import os
 import shutil
+import pytest
 from clickable.commands.docker.docker_config import DockerConfig
 from clickable.commands.idedelegates.qtcreator import QtCreatorDelegate
 
@@ -9,6 +10,7 @@ from unittest import mock
 from ..mocks import true_fn
 
 
+@pytest.mark.skipif(Constants.host_arch != "amd64", reason="IDE image only exists for x86_64")
 class TestIdeQtCreatorCommand(UnitTest):
 
     def setUp(self):
