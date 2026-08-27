@@ -3,6 +3,7 @@ from clickable.commands.build import BuildCommand
 from clickable.commands.create import CreateCommand
 from clickable.config.constants import Constants
 from .base_test import UnitTest
+import pytest
 
 
 class TestArchitectures(UnitTest):
@@ -63,6 +64,8 @@ class TestArchitectures(UnitTest):
         if not expect_exception:
             self.assertEqual(expected_arch, self.config.arch)
 
+    @pytest.mark.skipif(Constants.host_arch != "amd64",
+                        reason="Cross-compilation images only exist for amd64 hosts, yet")
     def test_arch(self):
         self.run_arch_test('all')
         self.run_arch_test('amd64')
@@ -103,6 +106,8 @@ class TestArchitectures(UnitTest):
             expect_exception=True
         )
 
+    @pytest.mark.skipif(Constants.host_arch != "amd64",
+                        reason="Cross-compilation images only exist for amd64 hosts, yet")
     def test_restricted_arch_env(self):
         self.run_arch_test('all', restrict_arch_env='armhf')
         self.run_arch_test(
@@ -126,6 +131,8 @@ class TestArchitectures(UnitTest):
             expect_exception=True
         )
 
+    @pytest.mark.skipif(Constants.host_arch != "amd64",
+                        reason="Only amd64 provides images targeting amd64")
     def test_restricted_arch(self):
         self.run_arch_test('all', restrict_arch='all')
         self.run_arch_test('amd64', restrict_arch='amd64')
