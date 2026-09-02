@@ -1,3 +1,9 @@
+clickable (8.10.0) unstable; urgency=medium
+
+  * Added support for ubuntu-touch-26.04-1.x framework
+
+ -- Clickable <bhdouglass+clickable@gmail.com>  Wed, 02 Sep 2026 00:03:20 -0500
+
 clickable (8.9.0) unstable; urgency=medium
 
   * Added support for ubuntu-touch-24.04-2.x framework
