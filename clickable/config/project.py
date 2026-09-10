@@ -407,21 +407,28 @@ class ProjectConfig(BaseConfig):
         if self.needs_clickable_image():
             self.check_nvidia_mode()
 
-            container_spec = self.build_arch
+            nvidia_suffix = "-nvidia" if self.use_nvidia else ""
+            ide_suffix = "-ide" if self.is_ide_command() else ""
+
+            container_specs = [f"{self.build_arch}{nvidia_suffix}{ide_suffix}"]
 
             if self.use_nvidia:
-                container_spec += "-nvidia"
-
-            if self.is_ide_command():
-                container_spec += "-ide"
+                # Newer UT versions no longer have Nvidia images available.
+                container_specs.append(f"{self.build_arch}{ide_suffix}")
 
             image_framework = self.get_image_framework()
             container_mapping_host = Constants.container_mapping[Constants.host_arch]
-            container = container_mapping_host.get((image_framework, container_spec), None)
+
+            container = None
+            for spec in container_specs:
+                container = container_mapping_host.get((image_framework, spec), None)
+                if container:
+                    break
 
             if not container:
+                framework_images = [f"{image_framework}-{spec}" for spec in container_specs]
                 raise ClickableException(
-                    f'There is currently no docker image for {image_framework}-{container_spec}'
+                    f'There is currently no docker image for {",".join(framework_images)}'
                 )
 
             self.config['docker_image'] = container
