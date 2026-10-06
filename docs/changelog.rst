@@ -3,11 +3,6 @@
 Changelog
 =========
 
-Changes in v8.10.1
------------------
-
-- Fix support for ubuntu-touch-24.04-2.x framework in click review tool
-
 Changes in v8.10.0
 ------------------
 
