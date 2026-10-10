@@ -12,6 +12,8 @@ from clickable.config.constants import Constants
 from clickable.logger import logger
 from .base import Command
 
+IMAGE_FORMAT = r'clickable\/\w{5}-(?:ut|)\d\d\.\d\d(?:-\d\.\w|)-\w{5}'
+
 
 class CleanImagesCommand(Command):
     def __init__(self):
@@ -38,15 +40,8 @@ class CleanImagesCommand(Command):
         self.container.check_docker()
         docker_executable = get_docker_command()
 
-        image_format = r'clickable\/\w{5}-(?:ut|)\d\d\.\d\d(?:-\d\.\w|)-\w{5}'
-        pattern_base = re.compile(image_format)
-        pattern_derived = re.compile(image_format + r'-\w{8}[-\w]+')
+        pattern_derived = re.compile(IMAGE_FORMAT + r'-\w{8}[-\w]+')
 
-        base_images = Constants.container_mapping[Constants.host_arch].values()
-        base_images = [(img, pattern_base.search(img).group())
-                       for img in base_images if image_exists(img, docker_executable)]
-
-        images = []
         query_args = 'images --format {{.Repository}}'
         images_raw = run_subprocess_check_output(f'{docker_executable} {query_args}').strip()
         images_all = pattern_derived.findall(images_raw)
@@ -56,6 +51,7 @@ class CleanImagesCommand(Command):
         if self.all:
             images = images_all
         else:
+            base_images = get_base_images(docker_executable)
             logger.info("Checking which images are obsolete. This may take a while...")
             images = [
                 img for img in images_all if is_obsolete(
@@ -93,3 +89,19 @@ def is_based_on(img, base, docker_executable):
 
     (base_img, base_trunc) = base
     return img.startswith(base_trunc) and image_based_on(img, base_img, docker_executable)
+
+
+def get_base_images(docker_executable=None) -> list[(str, str)]:
+    """
+    collects the base images, which usually should not be cleaned
+    :param docker_executable: pre-calculated executable info to not recalculate it on every call
+    :return: list of base images and their group name
+    """
+    pattern_base = re.compile(IMAGE_FORMAT)
+    base_images = []
+    for img in Constants.container_mapping[Constants.host_arch].values():
+        if image_exists(img, docker_executable):
+            img_match = pattern_base.search(img)
+            if img_match is not None:
+                base_images.append((img, img_match.group()))
+    return base_images
