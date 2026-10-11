@@ -1,4 +1,5 @@
 import re
+from typing import List, Tuple
 
 from clickable.utils import (
     get_docker_command,
@@ -91,7 +92,7 @@ def is_based_on(img, base, docker_executable):
     return img.startswith(base_trunc) and image_based_on(img, base_img, docker_executable)
 
 
-def get_base_images(docker_executable=None) -> list[(str, str)]:
+def get_base_images(docker_executable=None) -> List[Tuple[str, str]]:
     """
     collects the base images, which usually should not be cleaned
     :param docker_executable: pre-calculated executable info to not recalculate it on every call
